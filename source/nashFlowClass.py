@@ -32,16 +32,10 @@ class NashFlow:
         self.inflowRate = inflowRate    # For the moment: constant
         self.flowIntervals = []
         self.lowerBoundsToIntervalDict = OrderedDict()
-        '''
-        self.compute_flowInterval()
-        self.compute_flowInterval()
-        self.compute_flowInterval()
-        '''
 
         self.compute_flowInterval()
         while self.flowIntervals[-1][1] < float('inf'):
             self.compute_flowInterval()
-
 
     def compute_flowInterval(self):
         # NOTE TO MYSELF: computing shortest paths and resetting edges is only necessary for first flowInterval -> later: implement in flowIntervallClass

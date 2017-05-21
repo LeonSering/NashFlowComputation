@@ -14,6 +14,8 @@ from currentGraphClass import CurrentGraph
 from plotCanvasClass import PlotCanvas
 from ui import mainWdw
 
+import ConfigParser
+
 filterwarnings('ignore')  # For the moment: ignore warnings as pyplot.hold is deprecated
 
 if os.name == 'posix':
@@ -33,6 +35,12 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.setupUi(self)
 
         self.currentGraph = CurrentGraph()  # CurrentGraph instantiation for graph creation
+        self.outputDirectory = ''
+        self.templateFile = ''
+        self.scipFile = ''
+        self.inflowRate = 0
+        self.numberOfIntervals = -1
+        self.configFile = ConfigParser.RawConfigParser()
 
         # Configure plotWidget to display plots of graphs
         self.layout = QtGui.QVBoxLayout()
@@ -42,16 +50,24 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.layout.addWidget(self.canvas)
 
         self.canvas.update_plot()  # Plot for the first time
+        self.load_config()
 
         # Signal configuration
         self.updateNodeButton.clicked.connect(self.update_node)
         self.deleteNodeButton.clicked.connect(self.delete_node)
         self.updateEdgeButton.clicked.connect(self.update_add_edge)
         self.deleteEdgeButton.clicked.connect(self.delete_edge)
+        self.outputDirectoryPushButton.clicked.connect(self.select_output_directory)
+        self.templateFilePushButton.clicked.connect(self.select_template_file)
+        self.scipPathPushButton.clicked.connect(self.select_scip_binary)
+        self.computeFlowPushButton.clicked.connect(self.compute_nash_flow)
+
         self.actionNew_graph.triggered.connect(self.clear_application)
         self.actionLoad_graph.triggered.connect(self.load_graph)
         self.actionSave_graph.triggered.connect(self.save_graph)
         self.actionExit.triggered.connect(QtGui.QApplication.quit)
+
+
 
     def update_node_display(self):
         """Update display of the properties of the currently focussed node self.canvas.focusNode, if existing"""
@@ -198,3 +214,89 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         # Save currentGraph instance to file
         with open(fsave, 'wb') as f:
             pickle.dump(self.currentGraph, f)
+
+    def select_output_directory(self):
+        """Select output directory for nash flow computation"""
+        dialog = QtGui.QFileDialog
+        fselect = dialog.getExistingDirectory(self, "Select Directory")
+
+        if os.name != 'posix':
+            fselect = fselect[0]
+        if len(fselect) == 0:
+            return
+        fselect = str(fselect)
+        self.outputDirectoryLineEdit.setText(fselect)
+        self.outputDirectory = fselect
+
+    def select_template_file(self):
+        """Select zimpl template file"""
+        dialog = QtGui.QFileDialog
+        fselect = dialog.getOpenFileName(self, "Select File", "", "zimpl files (*.zpl)")
+
+        if os.name != 'posix':
+            fselect = fselect[0]
+        if len(fselect) == 0:
+            return
+        fselect = str(fselect)
+        self.templateFileLineEdit.setText(fselect)
+        self.templateFile = fselect
+
+    def select_scip_binary(self):
+        """Select scip binary"""
+        dialog = QtGui.QFileDialog
+        fselect = dialog.getOpenFileName(self, "Select File", "")
+
+        if os.name != 'posix':
+            fselect = fselect[0]
+        if len(fselect) == 0:
+            return
+        fselect = str(fselect)
+        self.scipPathLineEdit.setText(fselect)
+        self.scipFile = fselect
+
+
+    def load_config(self):
+        self.configFile.add_section('Settings')
+        self.configFile.set('Settings', 'outputdir', '')
+        self.configFile.set('Settings', 'templatefile', '')
+        self.configFile.set('Settings', 'scippath', '')
+        self.configFile.set('Settings', 'inflowrate', '0')
+        self.configFile.set('Settings', 'intervals', '-1')
+
+
+        try:
+            self.configFile.read('config.cfg')
+
+            self.outputDirectory = self.configFile.get('Settings', 'outputdir')
+            self.outputDirectoryLineEdit.setText(self.outputDirectory)
+            self.templateFile = self.configFile.get('Settings', 'templatefile')
+            self.templateFileLineEdit.setText(self.templateFile)
+            self.scipFile = self.configFile.get('Settings', 'scippath')
+            self.scipPathLineEdit.setText(self.scipFile)
+            self.inflowRate = self.configFile.get('Settings', 'inflowrate')
+            self.inflowLineEdit.setText(self.inflowRate)
+            self.numberOfIntervals = self.configFile.get('Settings', 'intervals')
+            self.intervalsLineEdit.setText(self.numberOfIntervals)
+
+        except Exception as err:
+            return
+
+
+
+    def save_config(self):
+        self.configFile.set('Settings', 'outputdir', self.outputDirectory)
+        self.configFile.set('Settings', 'templatefile', self.templateFile)
+        self.configFile.set('Settings', 'scippath', self.scipFile)
+        self.configFile.set('Settings', 'inflowrate', self.inflowRate)
+        self.configFile.set('Settings', 'intervals', self.numberOfIntervals)
+
+        with open('config.cfg', 'wb') as configfile:
+            self.configFile.write(configfile)
+
+
+
+    def compute_nash_flow(self):
+        self.numberOfIntervals = self.intervalsLineEdit.text()
+        self.inflowRate = self.inflowLineEdit.text()
+
+        self.save_config()
