@@ -7,7 +7,6 @@
 import networkx as nx
 from utilitiesClass import Utilities
 import os
-from itertools import combinations
 from shutil import copy
 import subprocess
 import re
@@ -49,8 +48,8 @@ class NormalizedThinFlow:
         self.check_result()
 
     def get_labels_and_flow(self):
-        labelPattern = r'l\$(\w)\s*(\d+)'
-        flowPattern = r'x\$(\w)\$(\w)\s*(\d+)'
+        labelPattern = r'l\$(\w)\s*([\d.]+)'
+        flowPattern = r'x\$(\w)\$(\w)\s*([\d.]+)'
 
         labelMatch = re.findall(labelPattern, self.resultLog)
         labelDict = {node:float(val) for node, val in labelMatch}
@@ -93,7 +92,7 @@ class NormalizedThinFlow:
 
         with open(os.path.join(self.outputDirectory, 'other.txt'), 'w') as otherWriter:
             otherWriter.write(str(self.inflowRate) + '\n')
-            otherWriter.write(str(self.minCapacity) + '\n')
+            otherWriter.write(str(self.inflowRate/self.minCapacity) + '\n')
 
 
 
