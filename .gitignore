@@ -40,3 +40,7 @@ Thumbs.db
 # Other files #
 ######################
 *.pyc
+*.pyproj
+*.sln
+*.suo
+*.cfg
