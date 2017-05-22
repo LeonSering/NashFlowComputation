@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>963</width>
-    <height>751</height>
+    <width>1292</width>
+    <height>1016</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -24,7 +24,7 @@
        <attribute name="title">
         <string>Create/Load Graph</string>
        </attribute>
-       <widget class="QWidget" name="plotWidget" native="true">
+       <widget class="QFrame" name="plotFrame">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -33,12 +33,18 @@
           <height>411</height>
          </rect>
         </property>
+        <property name="frameShape">
+         <enum>QFrame::Box</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
        </widget>
        <widget class="QGroupBox" name="groupBox">
         <property name="geometry">
          <rect>
           <x>650</x>
-          <y>10</y>
+          <y>0</y>
           <width>121</width>
           <height>361</height>
          </rect>
@@ -187,7 +193,7 @@
         <property name="geometry">
          <rect>
           <x>790</x>
-          <y>10</y>
+          <y>0</y>
           <width>131</width>
           <height>301</height>
          </rect>
@@ -509,6 +515,121 @@
        <attribute name="title">
         <string>Compute Nash flow</string>
        </attribute>
+       <widget class="QGroupBox" name="groupBox_5">
+        <property name="geometry">
+         <rect>
+          <x>670</x>
+          <y>0</y>
+          <width>291</width>
+          <height>521</height>
+         </rect>
+        </property>
+        <property name="title">
+         <string>Edge</string>
+        </property>
+        <widget class="QWidget" name="plotEdgeQueueWidget" native="true">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>20</y>
+           <width>251</width>
+           <height>241</height>
+          </rect>
+         </property>
+        </widget>
+        <widget class="QWidget" name="plotEdgeInflowWidget" native="true">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>270</y>
+           <width>251</width>
+           <height>241</height>
+          </rect>
+         </property>
+        </widget>
+       </widget>
+       <widget class="QGroupBox" name="groupBox_6">
+        <property name="geometry">
+         <rect>
+          <x>970</x>
+          <y>0</y>
+          <width>291</width>
+          <height>271</height>
+         </rect>
+        </property>
+        <property name="title">
+         <string>Node</string>
+        </property>
+        <widget class="QWidget" name="plotNodeLabelWidget" native="true">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>20</y>
+           <width>251</width>
+           <height>241</height>
+          </rect>
+         </property>
+        </widget>
+       </widget>
+       <widget class="QSlider" name="horizontalSlider">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>430</y>
+          <width>631</width>
+          <height>19</height>
+         </rect>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
+       <widget class="QGroupBox" name="groupBox_4">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>460</y>
+          <width>651</width>
+          <height>431</height>
+         </rect>
+        </property>
+        <property name="title">
+         <string>Normalized Thin Flows</string>
+        </property>
+        <widget class="QWidget" name="plotNTFWidget" native="true">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>20</y>
+           <width>631</width>
+           <height>401</height>
+          </rect>
+         </property>
+        </widget>
+       </widget>
+       <widget class="QGroupBox" name="groupBox_7">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>10</y>
+          <width>651</width>
+          <height>441</height>
+         </rect>
+        </property>
+        <property name="title">
+         <string>Nash Flow over Time</string>
+        </property>
+        <widget class="QWidget" name="plotNashflowWidget" native="true">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>20</y>
+           <width>631</width>
+           <height>391</height>
+          </rect>
+         </property>
+        </widget>
+       </widget>
       </widget>
      </widget>
     </item>
@@ -519,8 +640,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>963</width>
-     <height>25</height>
+     <width>1292</width>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">

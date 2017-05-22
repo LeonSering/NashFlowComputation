@@ -5,7 +5,6 @@
 # Description:  Interface class; controlling signals/slots & communication between widgets et cetera
 # ===========================================================================
 
-import matplotlib
 import os
 import pickle
 from warnings import filterwarnings
@@ -22,7 +21,6 @@ if os.name == 'posix':
     from PyQt4 import QtGui
 else:
     from PySide import QtGui
-
 
 # =======================================================================================================================
 
@@ -42,15 +40,15 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.numberOfIntervals = -1
         self.configFile = ConfigParser.RawConfigParser()
 
-        # Configure plotWidget to display plots of graphs
+        # Configure plotFrame to display plots of graphs
         self.layout = QtGui.QVBoxLayout()
-        self.plotWidget.setLayout(self.layout)
-        self.figure = matplotlib.figure.Figure()
-        self.canvas = PlotCanvas(self.figure, self.currentGraph, self)  # Initialize PlotCanvas
+        self.plotFrame.setLayout(self.layout)
+        self.canvas = PlotCanvas(self.currentGraph, self)  # Initialize PlotCanvas
         self.layout.addWidget(self.canvas)
 
         self.canvas.update_plot()  # Plot for the first time
-        self.load_config()
+
+        self.load_config()  # Try to load configuration file
 
         # Signal configuration
         self.updateNodeButton.clicked.connect(self.update_node)
@@ -296,7 +294,11 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
 
 
     def compute_nash_flow(self):
+        
+        # Get remaining settings
         self.numberOfIntervals = self.intervalsLineEdit.text()
         self.inflowRate = self.inflowLineEdit.text()
 
-        self.save_config()
+        self.save_config()  # Save config-settings to file
+        self.tabWidget.setCurrentIndex(1)   # Switch to next tab
+

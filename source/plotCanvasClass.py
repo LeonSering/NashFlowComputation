@@ -11,9 +11,12 @@
 import numpy as np
 import time
 from math import sqrt
+import matplotlib.figure
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
+import os
 
 from networkx import draw_networkx_nodes, draw_networkx_edges, draw_networkx_labels, draw_networkx_edge_labels
+
 
 # Config
 SIMILARITY_DIST = 9  # Maximal distance at which a click is recognized as a click on a node/edge
@@ -33,10 +36,10 @@ class PlotCanvas(FigureCanvas):
         interface:  Interface instance
     """
 
-    def __init__(self, figure, graph, interface):
+    def __init__(self, graph, interface):
+        self.figure = matplotlib.figure.Figure()
+        super(PlotCanvas, self).__init__(self.figure)  # Call parents constructor
 
-        super(PlotCanvas, self).__init__(figure)  # Call parents constructor
-        self.figure = figure
         self.currentGraph = graph
         self.interface = interface
 
@@ -192,7 +195,8 @@ class PlotCanvas(FigureCanvas):
         Update canvas to plot new graph
         """
         self.figure.clf()  # Clear current figure window
-        axes = self.figure.add_subplot(111)
+        axes = self.figure.add_axes([0, 0, 1, 1])
+        
         axes.set_xlim(-100, 100)
         axes.set_ylim(-100, 100)
         axes.axis('off')  # Hide axes in the plot
@@ -222,3 +226,4 @@ class PlotCanvas(FigureCanvas):
         draw_networkx_edge_labels(self.currentGraph, pos=self.currentGraph.position, ax=axes, edge_labels=lbls)
 
         self.draw_idle()  # Draw only if necessary
+        
