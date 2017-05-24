@@ -3,11 +3,13 @@
 # Project:      NashFlowComputation 2017
 # File:         plotCanvasClass.py
 # Description:  Class to plot networkx graphs in widgets and control click events on said graphs
-# Parameters:   figure:     matplotlib.figure.Figure instance
-#               graph:      CurrentGraph instance
+# Parameters:   graph:      nx.Digraph instance
 #               interface:  Interface instance
+#               clickable:  (bool) if True then canvas is clickable (i.e. drag&drop, selection, etc)
 # ===========================================================================
 
+import networkx as nx
+from utilitiesClass import Utilities
 import numpy as np
 import time
 from math import sqrt
@@ -31,21 +33,28 @@ class PlotCanvas(FigureCanvas):
     """
     Class to plot networkx graphs in widgets and control click events on said graphs
     Parameters:
-        figure:     matplotlib.figure.Figure instance
-        graph:      CurrentGraph instance
+        graph:      nx.Digraph instance
         interface:  Interface instance
+        clickable:  (bool) if True then canvas is clickable (i.e. drag&drop, selection, etc)
     """
 
-    def __init__(self, graph, interface):
+    def __init__(self, graph, interface, clickable=True, intervalID=None):
         self.figure = matplotlib.figure.Figure()
         super(PlotCanvas, self).__init__(self.figure)  # Call parents constructor
 
-        self.currentGraph = graph
+        self.network = graph
         self.interface = interface
+        self.displaysNTF = (not clickable)
 
-        # Signals
-        self.mpl_connect('button_press_event', self.onclick)
-        self.mpl_connect('button_release_event', self.onrelease)
+
+        if not self.displaysNTF:
+            # Signals
+            self.mpl_connect('button_press_event', self.onclick)
+            self.mpl_connect('button_release_event', self.onrelease)
+        else:
+            flowLabels = self.interface.nashFlow.flowIntervals[intervalID][2].NTFEdgeFlowDict
+            self.NTFEdgeFlowDict = {edge:flowLabels[edge] for edge in self.network.edges()}
+            self.NTFNodeLabelDict = self.interface.nashFlow.flowIntervals[intervalID][2].NTFNodeLabelDict
 
         # Mouse events
         self.mouseReleased = False
@@ -107,8 +116,8 @@ class PlotCanvas(FigureCanvas):
             self.releasedNode = clickedNode
             if self.pressedNode is not None and self.pressedNode != self.releasedNode:
                 # Add the corresponding edge, if valid
-                if not self.currentGraph.has_edge(self.pressedNode, self.releasedNode):
-                    self.currentGraph.add_edge(self.pressedNode, self.releasedNode, transitTime=0, capacity=0)
+                if not self.network.has_edge(self.pressedNode, self.releasedNode):
+                    self.network.add_edge(self.pressedNode, self.releasedNode, transitTime=0, capacity=0)
                     self.focusEdge = (self.pressedNode, self.releasedNode)
                     self.interface.update_edge_display()
                     self.update_plot()
@@ -129,9 +138,9 @@ class PlotCanvas(FigureCanvas):
         :return: clicked edge (None if no edge has been selected)
         """
         clickedEdge = None
-        for edge in self.currentGraph.edges_iter():
-            startpos = self.currentGraph.position[edge[0]]
-            endpos = self.currentGraph.position[edge[1]]
+        for edge in self.network.edges_iter():
+            startpos = self.network.node[edge[0]]['position']
+            endpos = self.network.node[edge[1]]['position']
             dist = self.compute_dist_projection_on_segment(clickpos, startpos, endpos)
             if 0 <= dist <= SIMILARITY_DIST:
                 clickedEdge = edge
@@ -172,7 +181,8 @@ class PlotCanvas(FigureCanvas):
         xAbsolute, yAbsolute = clickpos[0], clickpos[1]
         clickedNode = None
         minDist = float('inf')
-        for node, pos in self.currentGraph.position.iteritems():
+        positions = nx.get_node_attributes(self.network, 'position')
+        for node, pos in positions.iteritems():
             dist = sqrt((xAbsolute - pos[0]) ** 2 + (yAbsolute - pos[1]) ** 2)
             if dist <= SIMILARITY_DIST:
                 clickedNode = node
@@ -182,11 +192,11 @@ class PlotCanvas(FigureCanvas):
 
         if clickedNode is None and minDist > 2 * SIMILARITY_DIST and not edgePossible:
             # Create new node
-            nodeID = str(self.currentGraph.lastID)
-            self.currentGraph.add_node(nodeID)
-            self.currentGraph.position[nodeID] = (int(xAbsolute), int(yAbsolute))
-            self.currentGraph.label[nodeID] = nodeID
-            self.currentGraph.lastID += 1
+            nodeID = str(self.network.graph['lastID'])
+            self.network.add_node(nodeID)
+            self.network.node[nodeID]['position'] = (int(xAbsolute), int(yAbsolute))
+            self.network.node[nodeID]['label'] = nodeID
+            self.network.graph['lastID'] += 1
             return nodeID
         return clickedNode
 
@@ -201,29 +211,45 @@ class PlotCanvas(FigureCanvas):
         axes.set_ylim(-100, 100)
         axes.axis('off')  # Hide axes in the plot
 
+        positions = nx.get_node_attributes(self.network, 'position')
         if self.focusNode is not None:
-            draw_networkx_nodes(self.currentGraph, pos=self.currentGraph.position, ax=axes,
+            draw_networkx_nodes(self.network, pos=positions, ax=axes,
                                 nodelist=[self.focusNode], node_color='b')
-            remainingNodes = [node for node in self.currentGraph.nodes() if node != self.focusNode]
-            draw_networkx_nodes(self.currentGraph, pos=self.currentGraph.position, ax=axes, nodelist=remainingNodes)
+            remainingNodes = [node for node in self.network.nodes() if node != self.focusNode]
+            draw_networkx_nodes(self.network, pos=positions, ax=axes, nodelist=remainingNodes)
         else:
-            draw_networkx_nodes(self.currentGraph, pos=self.currentGraph.position, ax=axes)
-        draw_networkx_labels(self.currentGraph, pos=self.currentGraph.position, ax=axes, labels=self.currentGraph.label)
+            draw_networkx_nodes(self.network, pos=positions, ax=axes)
+
+        draw_networkx_labels(self.network, pos=positions, ax=axes, labels=nx.get_node_attributes(self.network, 'label'))
 
         if self.focusEdge is not None:
-            draw_networkx_edges(self.currentGraph, pos=self.currentGraph.position, ax=axes, arrow=True,
+            draw_networkx_edges(self.network, pos=positions, ax=axes, arrow=True,
                                 edgelist=[self.focusEdge], edge_color='b')
-            remainingEdges = [edge for edge in self.currentGraph.edges() if edge != self.focusEdge]
-            draw_networkx_edges(self.currentGraph, pos=self.currentGraph.position, ax=axes, arrow=True,
+            remainingEdges = [edge for edge in self.network.edges() if edge != self.focusEdge]
+            draw_networkx_edges(self.network, pos=positions, ax=axes, arrow=True,
                                 edgelist=remainingEdges)
         else:
-            draw_networkx_edges(self.currentGraph, pos=self.currentGraph.position, ax=axes, arrow=True)
+            draw_networkx_edges(self.network, pos=positions, ax=axes, arrow=True)
 
-        lbls = {
-            edge: (self.currentGraph[edge[0]][edge[1]]['transitTime'], self.currentGraph[edge[0]][edge[1]]['capacity'])
-            for edge in self.currentGraph.edges()
-        }  # Edge labels
-        draw_networkx_edge_labels(self.currentGraph, pos=self.currentGraph.position, ax=axes, edge_labels=lbls)
 
+        if not self.displaysNTF:
+            # Plot actual edge labels
+            lbls = Utilities.join_dicts(nx.get_edge_attributes(self.network, 'transitTime'),
+                                        nx.get_edge_attributes(self.network, 'capacity'))  # Edge labels
+        else:
+            # Plot flow value
+            lbls = self.NTFEdgeFlowDict
+
+            # Plot NTFNodeLabels
+            offset = (0, 8)
+            add_tuple_offset = lambda a: (a[0] + offset[0], a[1] + offset[1])
+            movedPositions = {edge:add_tuple_offset(positions[edge]) for edge in positions}
+            draw_networkx_labels(self.network, pos=movedPositions, ax=axes,
+                                 labels=self.NTFNodeLabelDict)
+
+
+
+
+        draw_networkx_edge_labels(self.network, pos=positions, ax=axes, edge_labels=lbls)
         self.draw_idle()  # Draw only if necessary
         

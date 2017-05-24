@@ -9,9 +9,11 @@ import os
 import pickle
 from warnings import filterwarnings
 
-from currentGraphClass import CurrentGraph
+#from currentGraphClass import CurrentGraph
 from plotCanvasClass import PlotCanvas
+from nashFlowClass import NashFlow
 from ui import mainWdw
+import networkx as nx
 
 import ConfigParser
 
@@ -32,7 +34,9 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         QtGui.QMainWindow.__init__(self)
         self.setupUi(self)
 
-        self.currentGraph = CurrentGraph()  # CurrentGraph instantiation for graph creation
+        # Init graph
+        self.network = self.init_graph()
+
         self.outputDirectory = ''
         self.templateFile = ''
         self.scipFile = ''
@@ -41,14 +45,23 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.configFile = ConfigParser.RawConfigParser()
 
         # Configure plotFrame to display plots of graphs
-        self.layout = QtGui.QVBoxLayout()
-        self.plotFrame.setLayout(self.layout)
-        self.canvas = PlotCanvas(self.currentGraph, self)  # Initialize PlotCanvas
-        self.layout.addWidget(self.canvas)
+        self.plotFrameLayout = QtGui.QVBoxLayout()
+        self.plotFrame.setLayout(self.plotFrameLayout)
+        self.graphCreationCanvas = PlotCanvas(self.network, self)  # Initialize PlotCanvas
+        self.plotFrameLayout.addWidget(self.graphCreationCanvas)
 
-        self.canvas.update_plot()  # Plot for the first time
+
+        # Configure plotNTFFrame to display plots of NTF
+        self.plotNTFFrameLayout = QtGui.QVBoxLayout()
+        self.plotNTFFrame.setLayout(self.plotNTFFrameLayout)
+        self.plotNTFCanvas = None
+        self.NTFPlotList = []
+
+        self.graphCreationCanvas.update_plot()  # Plot for the first time
 
         self.load_config()  # Try to load configuration file
+
+        self.tabWidget.setCurrentIndex(0)   # Show Graph Creation Tab
 
         # Signal configuration
         self.updateNodeButton.clicked.connect(self.update_node)
@@ -65,15 +78,26 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.actionSave_graph.triggered.connect(self.save_graph)
         self.actionExit.triggered.connect(QtGui.QApplication.quit)
 
+        self.intervalsListWidget.currentItemChanged.connect(self.update_NTF_display)
 
+    @staticmethod
+    def init_graph():
+
+        # Graph Creation
+        network = nx.DiGraph()
+        network.add_nodes_from([('s', {'position': (-90, 0), 'label': 's'}), ('t', {'position': (90, 0), 'label': 't'})])
+        network.graph['lastID'] = network.number_of_nodes() - 2  # Keep track of next nodes ID
+
+        return network
 
     def update_node_display(self):
-        """Update display of the properties of the currently focussed node self.canvas.focusNode, if existing"""
-        if self.canvas.focusNode is not None:
+        """Update display of the properties of the currently focussed node self.graphCreationCanvas.focusNode, if existing"""
+        if self.graphCreationCanvas.focusNode is not None:
             # TO DO: Check for valid input
-            self.nodeNameLineEdit.setText(self.currentGraph.label[self.canvas.focusNode])
-            self.nodeXLineEdit.setText(str(self.currentGraph.position[self.canvas.focusNode][0]))
-            self.nodeYLineEdit.setText(str(self.currentGraph.position[self.canvas.focusNode][1]))
+            vertex = self.graphCreationCanvas.focusNode
+            self.nodeNameLineEdit.setText(self.network.node[vertex]['label'])
+            self.nodeXLineEdit.setText(str(self.network.node[vertex]['position'][0]))
+            self.nodeYLineEdit.setText(str(self.network.node[vertex]['position'][1]))
         else:
             self.nodeNameLineEdit.setText("")
             self.nodeXLineEdit.setText("")
@@ -86,36 +110,37 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         YPos = str(self.nodeYLineEdit.text())
         if len(nodeName) > 0 and len(XPos) > 0 and len(YPos) > 0:
             # TO DO: Check for valid input
-            self.currentGraph.label[self.canvas.focusNode] = nodeName
-            self.currentGraph.position[self.canvas.focusNode] = (int(XPos), int(YPos))
+            vertex = self.graphCreationCanvas.focusNode
+            self.network.node[vertex]['label'] = nodeName
+            self.network.node[vertex]['position'] = (int(XPos), int(YPos))
 
-            self.canvas.update_plot()  # Update UI
+            self.graphCreationCanvas.update_plot()  # Update UI
 
     def delete_node(self):
-        """Delete focusNode from currentGraph"""
-        if self.canvas.focusNode is None or self.canvas.focusNode in ['s', 't']:
+        """Delete focusNode from network"""
+        vertex = self.graphCreationCanvas.focusNode
+        if vertex is None or vertex in ['s', 't']:
             return
 
-        if self.canvas.focusNode in self.currentGraph:
-            self.currentGraph.remove_node(self.canvas.focusNode)
-            del self.currentGraph.position[self.canvas.focusNode]  # for later: override within class
-            del self.currentGraph.label[self.canvas.focusNode]  # for later: override within class
-            self.canvas.focusNode = None
+        if vertex in self.network:
+            self.network.remove_node(vertex)
+            self.graphCreationCanvas.focusNode = None
 
             # Update UI
             self.update_node_display()
-            self.canvas.update_plot()
+            self.graphCreationCanvas.update_plot()
 
     def update_edge_display(self):
         """Update display of the properties of the currently focussed edge focusEdge, if existing"""
-        if self.canvas.focusEdge is not None:
+        edge = self.graphCreationCanvas.focusEdge
+        if edge is not None:
             # TO DO: Check for valid input
-            self.tailLineEdit.setText(self.currentGraph.label[self.canvas.focusEdge[0]])
-            self.headLineEdit.setText(self.currentGraph.label[self.canvas.focusEdge[1]])
+            self.tailLineEdit.setText(self.network.node[edge[0]]['label'])
+            self.headLineEdit.setText(self.network.node[edge[1]]['label'])
             self.transitTimeLineEdit.setText(
-                str(self.currentGraph[self.canvas.focusEdge[0]][self.canvas.focusEdge[1]]['transitTime']))
+                str(self.network[edge[0]][edge[1]]['transitTime']))
             self.capacityLineEdit.setText(
-                str(self.currentGraph[self.canvas.focusEdge[0]][self.canvas.focusEdge[1]]['capacity']))
+                str(self.network[edge[0]][edge[1]]['capacity']))
         else:
             self.tailLineEdit.setText("")
             self.headLineEdit.setText("")
@@ -130,35 +155,36 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         capacityText = float(self.capacityLineEdit.text())
 
         # Work with actual node IDs, not labels
-        tail = self.currentGraph.label.keys()[self.currentGraph.label.values().index(tailLabel)]
-        head = self.currentGraph.label.keys()[self.currentGraph.label.values().index(headLabel)]
+        labels = nx.get_node_attributes(self.network,'label')
+        tail = labels.keys()[labels.values().index(tailLabel)]
+        head = labels.keys()[labels.values().index(headLabel)]
 
-        if self.currentGraph.has_edge(tail, head):
+        if self.network.has_edge(tail, head):
             # Update the edges attributes
-            self.currentGraph[tail][head]['transitTime'] = transitText
-            self.currentGraph[tail][head]['capacity'] = capacityText
+            self.network[tail][head]['transitTime'] = transitText
+            self.network[tail][head]['capacity'] = capacityText
         else:
             # Add a new edge
-            self.currentGraph.add_edge(tail, head, transitTime=transitText, capacity=capacityText)
-            self.canvas.focusEdge = (tail, head)
+            self.network.add_edge(tail, head, transitTime=transitText, capacity=capacityText)
+            self.graphCreationCanvas.focusEdge = (tail, head)
 
         # Update UI
-        self.canvas.update_plot()
+        self.graphCreationCanvas.update_plot()
         self.update_edge_display()
 
     def delete_edge(self):
-        """Delete focusEdge from currentGraph"""
-
-        if self.canvas.focusEdge is None:
+        """Delete focusEdge from network"""
+        edge = self.graphCreationCanvas.focusEdge
+        if edge is None:
             return
 
-        if self.currentGraph.has_edge(self.canvas.focusEdge[0], self.canvas.focusEdge[1]):
-            self.currentGraph.remove_edge(self.canvas.focusEdge[0], self.canvas.focusEdge[1])
-            self.canvas.focusEdge = None
+        if self.network.has_edge(edge[0], edge[1]):
+            self.network.remove_edge(edge[0], edge[1])
+            self.graphCreationCanvas.focusEdge = None
 
             # Update UI
             self.update_edge_display()
-            self.canvas.update_plot()
+            self.graphCreationCanvas.update_plot()
 
     def clear_application(self, NoNewGraph=False):
         """
@@ -166,22 +192,22 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         :param NoNewGraph: (bool) - specify whether a new graph should be initiated or the old one kept
         """
         if not NoNewGraph:
-            self.currentGraph = CurrentGraph()  # Reinstantiation of the CurrentGraph
+            self.network = self.init_graph()  # Reinstantiation of the CurrentGraph
 
-        # Reinitialization of canvas
-        self.canvas.setParent(None)  # Drop canvas widget
-        self.canvas = PlotCanvas(self.figure, self.currentGraph, self)
-        self.layout.addWidget(self.canvas)  # Add canvas-widget to application
+        # Reinitialization of graphCreationCanvas
+        self.graphCreationCanvas.setParent(None)  # Drop graphCreationCanvas widget
+        self.graphCreationCanvas = PlotCanvas(self.network, self)
+        self.plotFrameLayout.addWidget(self.graphCreationCanvas)  # Add graphCreationCanvas-widget to application
 
         # Update UI
-        self.canvas.update_plot()
+        self.graphCreationCanvas.update_plot()
         self.update_node_display()
         self.update_edge_display()
 
     def load_graph(self):
         """Load CurrentGraph instance from '.cg' file"""
         dialog = QtGui.QFileDialog
-        fopen = dialog.getOpenFileName(self, "Select File", "", "currentGraph files (*.cg)")
+        fopen = dialog.getOpenFileName(self, "Select File", "", "network files (*.cg)")
 
         if os.name != 'posix':
             fopen = fopen[0]
@@ -191,14 +217,14 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
 
         # Read file         
         with open(fopen, 'rb') as f:
-            self.currentGraph = pickle.load(f)
+            self.network = pickle.load(f)
 
         self.clear_application(NoNewGraph=True)
 
     def save_graph(self):
         """Save CurrentGraph instance to '.cg' file"""
         dialog = QtGui.QFileDialog
-        fsave = dialog.getSaveFileName(self, "Select File", "", "currentGraph files (*.cg)")
+        fsave = dialog.getSaveFileName(self, "Select File", "", "network files (*.cg)")
 
         if os.name != 'posix':
             fsave = fsave[0]
@@ -209,9 +235,9 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         if not fsave.endswith('cg'):
             fsave += ".cg"
 
-        # Save currentGraph instance to file
+        # Save network instance to file
         with open(fsave, 'wb') as f:
-            pickle.dump(self.currentGraph, f)
+            pickle.dump(self.network, f)
 
     def select_output_directory(self):
         """Select output directory for nash flow computation"""
@@ -302,3 +328,27 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.save_config()  # Save config-settings to file
         self.tabWidget.setCurrentIndex(1)   # Switch to next tab
 
+        self.nashFlow = NashFlow(self, self.network, float(self.inflowRate), float(self.numberOfIntervals), self.outputDirectory, self.templateFile, self.scipFile)
+        self.nashFlow.run()
+
+    def add_last_interval_to_list(self):
+
+        lastInterval = self.nashFlow.flowIntervals[-1]
+
+        intervalString = 'Interval ' + str(lastInterval[2].id) + ': [' + str(lastInterval[0]) + ',' + str(lastInterval[1]) + '['
+        item = QtGui.QListWidgetItem(intervalString)
+        self.intervalsListWidget.addItem(item)  # Add item to listWidget
+
+        plot = PlotCanvas(lastInterval[2].shortestPathNetwork, self, clickable=False, intervalID=len(self.nashFlow.flowIntervals)-1)
+        self.NTFPlotList.append(plot)   # Add NTF Plot to List
+
+
+    def update_NTF_display(self):
+        id = self.intervalsListWidget.currentRow()
+
+        if self.plotNTFCanvas is not None:
+            self.plotNTFCanvas.setParent(None)
+
+        self.plotNTFCanvas = self.NTFPlotList[id]
+        self.plotNTFFrameLayout.addWidget(self.plotNTFCanvas)
+        self.plotNTFCanvas.update_plot()
