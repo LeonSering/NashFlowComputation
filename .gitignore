@@ -46,3 +46,10 @@ Thumbs.db
 *.cfg
 *.txt
 /source/output/*
+./idea/*
+README
+*.xml
+*.cg
+*.iml
+
+
