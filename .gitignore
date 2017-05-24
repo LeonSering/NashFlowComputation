@@ -44,3 +44,5 @@ Thumbs.db
 *.sln
 *.suo
 *.cfg
+*.txt
+/source/output/*
