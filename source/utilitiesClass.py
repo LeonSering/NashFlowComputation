@@ -34,7 +34,7 @@ class Utilities:
 
 
     @staticmethod
-    def get_shortest_path_network(network, time, labels = None):
+    def get_shortest_path_network(network, time, labels=None):
         shortestPathNetwork = None
 
         if not labels:
@@ -54,6 +54,8 @@ class Utilities:
 
         for w in shortestPathNetwork:
             shortestPathNetwork.node[w]['dist'] = labels[w]
+            shortestPathNetwork.node[w]['label'] = network.node[w]['label']
+            shortestPathNetwork.node[w]['position'] = network.node[w]['position']
 
         return shortestPathNetwork
 
@@ -66,3 +68,7 @@ class Utilities:
             minimumCapacity = min([minimumCapacity, network[v][w]['capacity']])
 
         return minimumCapacity
+
+    @staticmethod
+    def join_dicts(dict1, dict2):
+        return {key:(dict1[key], dict2[key]) for key in dict1 if key in dict2}
