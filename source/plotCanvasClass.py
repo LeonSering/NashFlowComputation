@@ -238,14 +238,14 @@ class PlotCanvas(FigureCanvas):
                                         nx.get_edge_attributes(self.network, 'capacity'))  # Edge labels
         else:
             # Plot flow value
-            lbls = self.NTFEdgeFlowDict
+            lbls = {edge:"%.2f" % self.NTFEdgeFlowDict[edge] for edge in self.NTFEdgeFlowDict}
 
             # Plot NTFNodeLabels
             offset = (0, 8)
             add_tuple_offset = lambda a: (a[0] + offset[0], a[1] + offset[1])
             movedPositions = {edge:add_tuple_offset(positions[edge]) for edge in positions}
             draw_networkx_labels(self.network, pos=movedPositions, ax=axes,
-                                 labels=self.NTFNodeLabelDict)
+                                 labels={node:"%.2f" % self.NTFNodeLabelDict[node] for node in self.NTFNodeLabelDict})
 
 
 

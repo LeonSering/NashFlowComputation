@@ -8,7 +8,7 @@
 import os
 import time
 import networkx as nx
-
+TOL = 1e-8
 class Utilities:
 
     @staticmethod
@@ -21,15 +21,15 @@ class Utilities:
         return time.strftime("%d_%m_%Y-%H_%M_%S", time.localtime())
 
     @staticmethod
-    def is_eq_tol(a, b, tol=1e-8):
+    def is_eq_tol(a, b, tol=TOL):
         return ( abs(a-b) <= tol )
 
     @staticmethod
-    def is_not_eq_tol(a, b, tol=1e-8):
+    def is_not_eq_tol(a, b, tol=TOL):
         return ( abs(a-b) > tol )
 
     @staticmethod
-    def is_geq_tol(a, b, tol=1e-8):
+    def is_geq_tol(a, b, tol=TOL):
         return ( a-b+tol >= 0 )
 
 
@@ -42,7 +42,9 @@ class Utilities:
             labels = nx.single_source_dijkstra_path_length(G=network, source='s', weight='transitTime')    # Compute node distance from source
 
         # Create shortest path network containing _all_ shortest paths
-        shortestPathEdges = [(edge[0], edge[1]) for edge in network.edges() if labels[edge[0]] + network[edge[0]][edge[1]]['transitTime'] <= labels[edge[1]]]
+        #shortestPathEdges = [(edge[0], edge[1]) for edge in network.edges() if labels[edge[0]] + network[edge[0]][edge[1]]['transitTime'] <= labels[edge[1]]]
+
+        shortestPathEdges = [(edge[0], edge[1]) for edge in network.edges() if Utilities.is_geq_tol(labels[edge[1]], labels[edge[0]] + network[edge[0]][edge[1]]['transitTime'])]
         shortestPathNetwork = nx.DiGraph()
         shortestPathNetwork.add_nodes_from(network)
         shortestPathNetwork.add_edges_from(shortestPathEdges)
