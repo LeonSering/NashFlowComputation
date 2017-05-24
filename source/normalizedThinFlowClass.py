@@ -11,14 +11,11 @@ from shutil import copy
 import subprocess
 import re
 
-PATH_TO_SCIP    = '/home/doc/Documents/Thesis/dev/solver/scipoptsuite-4.0.0/scip-4.0.0/bin/scip'
-TEMPLATE_DIR    = '/home/doc/Documents/Thesis/dev/NashFlowComputation/source/templates/V2.1/BIGM'
-TEMPLATE_FILE   = '/home/doc/Documents/Thesis/dev/NashFlowComputation/source/templates/V2.1/BIGM/zimplTemplateV2_1_BIGM.zpl'
 
 class NormalizedThinFlow:
     """description of class"""
 
-    def __init__(self, shortestPathNetwork, id, resettingEdges, flowEdges, inflowRate, minCapacity, rootPath):
+    def __init__(self, shortestPathNetwork, id, resettingEdges, flowEdges, inflowRate, minCapacity, outputDirectory, templateFile, scipFile):
 
         self.network = shortestPathNetwork
         self.id = id
@@ -26,7 +23,9 @@ class NormalizedThinFlow:
         self.flowEdges = flowEdges
         self.inflowRate = inflowRate
         self.minCapacity = minCapacity
-        self.rootPath = rootPath
+        self.outputDirectory = outputDirectory
+        self.templateFile = templateFile
+        self.scipFile = scipFile
         self.isValid = False
 
         self.run_order()
@@ -35,12 +34,12 @@ class NormalizedThinFlow:
         return self.isValid
 
     def run_order(self):
-        self.outputDirectory = os.path.join(self.rootPath, str(self.id) + '-NTF-' + Utilities.get_time())
-        Utilities.create_dir(self.outputDirectory)
+        self.rootPath = os.path.join(self.outputDirectory, str(self.id) + '-NTF-' + Utilities.get_time())
+        Utilities.create_dir(self.rootPath)
 
-        copy(TEMPLATE_FILE, self.outputDirectory)
-        self.templateFile = os.path.join(self.outputDirectory, os.path.basename(TEMPLATE_FILE))
-        self.logFile = os.path.join(self.outputDirectory, 'outputLog.txt')
+        copy(self.templateFile, self.rootPath)
+        self.templateFile = os.path.join(self.rootPath, os.path.basename(self.templateFile))
+        self.logFile = os.path.join(self.rootPath, 'outputLog.txt')
 
         self.write_zimpl_files()
         self.start_process()
@@ -68,7 +67,7 @@ class NormalizedThinFlow:
         self.isValid = ( pattern in self.resultLog )
 
     def start_process(self):
-        cmd = [PATH_TO_SCIP, '-f', self.templateFile, '-l', self.logFile]
+        cmd = [self.scipFile, '-f', self.templateFile, '-l', self.logFile]
         devNull = open(os.devnull, 'w')
         rc = subprocess.call(cmd, stdout=devNull)
         devNull.close()
@@ -77,11 +76,11 @@ class NormalizedThinFlow:
 
     def write_zimpl_files(self):
         # Write files
-        with open(os.path.join(self.outputDirectory, 'nodes.txt'), 'w') as nodeWriter:
+        with open(os.path.join(self.rootPath, 'nodes.txt'), 'w') as nodeWriter:
             for node in self.network:
                 nodeWriter.write(node + '\n')
 
-        with open(os.path.join(self.outputDirectory, 'edges.txt'), 'w') as edgeWriter:
+        with open(os.path.join(self.rootPath, 'edges.txt'), 'w') as edgeWriter:
             for edge in self.network.edges():
                 v, w = edge[0], edge[1]
                 capacity = str(self.network[v][w]['capacity'])
@@ -90,7 +89,7 @@ class NormalizedThinFlow:
                 outputString = v + ":" + w + ":" + capacity + ":" + isInE_0 + ":" + isInE_Star + '\n'
                 edgeWriter.write(outputString)
 
-        with open(os.path.join(self.outputDirectory, 'other.txt'), 'w') as otherWriter:
+        with open(os.path.join(self.rootPath, 'other.txt'), 'w') as otherWriter:
             otherWriter.write(str(self.inflowRate) + '\n')
             otherWriter.write(str(self.inflowRate/self.minCapacity) + '\n')
 
