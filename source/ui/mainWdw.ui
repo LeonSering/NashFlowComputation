@@ -18,7 +18,7 @@
     <item>
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="tab">
        <attribute name="title">
@@ -527,7 +527,7 @@
         <property name="title">
          <string>Edge</string>
         </property>
-        <widget class="QWidget" name="plotEdgeQueueWidget" native="true">
+        <widget class="QFrame" name="plotEdgeQueueFrame">
          <property name="geometry">
           <rect>
            <x>10</x>
@@ -537,7 +537,7 @@
           </rect>
          </property>
         </widget>
-        <widget class="QWidget" name="plotEdgeInflowWidget" native="true">
+        <widget class="QFrame" name="plotEdgeInflowFrame">
          <property name="geometry">
           <rect>
            <x>10</x>
@@ -560,7 +560,7 @@
         <property name="title">
          <string>Node</string>
         </property>
-        <widget class="QWidget" name="plotNodeLabelWidget" native="true">
+        <widget class="QFrame" name="plotNodeLabelFrame">
          <property name="geometry">
           <rect>
            <x>10</x>
@@ -596,7 +596,7 @@
         <property name="title">
          <string>Normalized Thin Flows</string>
         </property>
-        <widget class="QWidget" name="plotNTFWidget" native="true">
+        <widget class="QFrame" name="plotNTFFrame">
          <property name="geometry">
           <rect>
            <x>10</x>
@@ -619,7 +619,7 @@
         <property name="title">
          <string>Nash Flow over Time</string>
         </property>
-        <widget class="QWidget" name="plotNashflowWidget" native="true">
+        <widget class="QFrame" name="plotNashflowFrame">
          <property name="geometry">
           <rect>
            <x>10</x>
@@ -629,6 +629,16 @@
           </rect>
          </property>
         </widget>
+       </widget>
+       <widget class="QListWidget" name="intervalsListWidget">
+        <property name="geometry">
+         <rect>
+          <x>980</x>
+          <y>270</y>
+          <width>201</width>
+          <height>241</height>
+         </rect>
+        </property>
        </widget>
       </widget>
      </widget>
@@ -641,7 +651,7 @@
      <x>0</x>
      <y>0</y>
      <width>1292</width>
-     <height>21</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
