@@ -22,6 +22,7 @@ class NashFlow:
         self.outputDirectory = outputDirectory
         self.templateFile = templateFile
         self.scipFile = scipFile
+        self.numberOfSolvedIPs = 0
 
         for v, w in self.network.edges_iter():
             self.network[v][w]['inflow'] = OrderedDict()
@@ -87,6 +88,7 @@ class NashFlow:
                 self.network[v][w]['outflow'][(self.node_label(w, interval.lowerBoundTime), self.node_label(w, interval.upperBoundTime))] = interval.NTFEdgeFlowDict[(v,w)]/interval.NTFNodeLabelDict[w]
 
         self.counter += 1
+        self.numberOfSolvedIPs += interval.numberOfSolvedIPs
 
     def node_label(self, v, time):
         intervalLowerBoundTime = self.time_interval_correspondence(time)

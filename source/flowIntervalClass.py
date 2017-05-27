@@ -29,6 +29,7 @@ class FlowInterval():
         self.scipFile = scipFile
         self.alpha      = None
         self.shortestPathNetwork = None # to be set from NashFlowClass
+        self.numberOfSolvedIPs = 0
         self.NTFNodeLabelDict = {node:0 for node in self.network}
         self.NTFEdgeFlowDict = {edge:0 for edge in self.network.edges()}
 
@@ -64,6 +65,7 @@ class FlowInterval():
         edges = self.shortestPathNetwork.edges()
         while k>0 and not found:
             for E_0 in combinations(edges, k):
+                self.numberOfSolvedIPs += 1
                 E_0 = list(E_0)
                 NTF = NormalizedThinFlow(shortestPathNetwork=self.shortestPathNetwork, id=counter,
                                          resettingEdges=self.resettingEdges, flowEdges=E_0, inflowRate=self.inflowRate,

@@ -234,8 +234,8 @@ class PlotCanvas(FigureCanvas):
 
         if not self.displaysNTF:
             # Plot actual edge labels
-            lbls = Utilities.join_dicts(nx.get_edge_attributes(self.network, 'transitTime'),
-                                        nx.get_edge_attributes(self.network, 'capacity'))  # Edge labels
+            lbls = Utilities.join_dicts(nx.get_edge_attributes(self.network, 'capacity'),
+                                        nx.get_edge_attributes(self.network, 'transitTime'))  # Edge labels
         else:
             # Plot flow value
             lbls = {edge:"%.2f" % self.NTFEdgeFlowDict[edge] for edge in self.NTFEdgeFlowDict}
