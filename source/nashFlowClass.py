@@ -100,7 +100,7 @@ class NashFlow:
         return self.cumulative_inflow(v, w, time) - self.cumulative_outflow(v, w, time + self.network[v][w]['transitTime'])
 
     def queue_delay(self, v, w, time):
-        return self.queue_size(v, w, time)/self.network[v][w]['capacity']
+        return self.queue_size(v, w, time)/float(self.network[v][w]['capacity'])
 
     def cumulative_inflow(self, v, w, time):
         if time <= TOL:

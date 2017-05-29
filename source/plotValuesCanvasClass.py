@@ -19,19 +19,19 @@ class PlotValuesCanvas(FigureCanvas):
         super(PlotValuesCanvas, self).__init__(self.figure)  # Call parents constructor
 
 
-    def update_plot(self, lowerBound, upperBound, xValues, yValues, *additional_yValues):
+    def update_plot(self, lowerBound, upperBound, xValues, yValues, *additional_values):
+
         self.figure.clf()
 
         axes = self.figure.add_subplot(111)
-        #axes.set_xlabel('time')
-        #axes.set_ylabel('raw data')
-
-        axes.plot(xValues, yValues, linewidth=2, color='blue')
-        for arg in additional_yValues:
-            axes.plot(xValues, arg, linewidth=2, color='red')
+        yMin, yMax = min(yValues), max(yValues)
+        axes.plot(xValues, yValues, linewidth=2, color='green')
+        for xVals, yVals in additional_values:
+            yMin, yMax = min(yMin, min(yVals)), max(yMax, max(yVals))
+            axes.plot(xVals, yVals, linewidth=2, color='red')
 
         axes.set_xlim(lowerBound, upperBound)
-        axes.set_ylim(min(yValues), max(yValues))
+        axes.set_ylim(yMin, yMax)
 
 
         self.draw_idle()

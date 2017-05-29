@@ -9,7 +9,6 @@ import os
 import pickle
 from warnings import filterwarnings
 
-#from currentGraphClass import CurrentGraph
 from plotCanvasClass import PlotCanvas
 from nashFlowClass import NashFlow
 from plotAnimationCanvasClass import PlotAnimationCanvas
@@ -17,7 +16,6 @@ from plotValuesCanvasClass import PlotValuesCanvas
 from ui import mainWdw
 import networkx as nx
 import numpy as np
-from utilitiesClass import Utilities
 
 import ConfigParser
 
@@ -409,19 +407,29 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
 
 
     def update_node_label_graph(self):
+        v = self.plotAnimationCanvas.focusNode
         lowerBoundInput = str(self.nodeLabelPlotLowerBoundLineEdit.text())
         lowerBound = float(lowerBoundInput) if lowerBoundInput != "" else 0
 
         upperBoundInput = str(self.nodeLabelPlotUpperBoundLineEdit.text())
         if upperBoundInput == "":
-            upperBoundInput = self.nashFlow.flowIntervals[-1][1] if self.nashFlow.flowIntervals[-1][1] < float('inf') else self.nashFlow.flowIntervals[-1][0] + 1
+            upperBoundInput = self.nashFlow.flowIntervals[-1][1] if self.nashFlow.flowIntervals[-1][1] < float('inf') else self.nashFlow.flowIntervals[-1][0]
 
         upperBound = float(upperBoundInput)
 
 
-        xValues = np.arange(max(lowerBound, 0.0), upperBound, 0.001)
-        nodeLabelValues = [self.nashFlow.node_label(self.plotAnimationCanvas.focusNode, xVal) for xVal in xValues]
-        self.plotNodeLabelCanvas.update_plot(lowerBound, upperBound, xValues, nodeLabelValues)
+        xValues = [0]
+        yValues = [self.nashFlow.node_label(v, 0)]
+        for interval in self.nashFlow.flowIntervals:
+            if interval[1] < float('inf'):
+                xValues.append(interval[1])
+                yValues.append(self.nashFlow.node_label(v, interval[1]))
+
+        if upperBound > xValues[-1] and self.nashFlow.flowIntervals[-1][1] == float('inf'):
+            xValues.append(upperBound)
+            yValues.append(self.nashFlow.node_label(v, upperBound))
+
+        self.plotNodeLabelCanvas.update_plot(lowerBound, upperBound, xValues, yValues)
 
     def set_node_label_range(self):
         if self.plotAnimationCanvas.focusNode is not None:
@@ -435,21 +443,51 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
 
         upperBoundInput = str(self.edgeFlowPlotUpperBoundLineEdit.text())
         if upperBoundInput == "":
-            upperBoundInput = self.nashFlow.node_label(v, self.nashFlow.flowIntervals[-1][1]) if self.nashFlow.flowIntervals[-1][1] < float('inf') else self.nashFlow.node_label(v, self.nashFlow.flowIntervals[-1][0] + 1)
+            upperBoundInput = self.nashFlow.node_label(v, self.nashFlow.flowIntervals[-1][1]) if self.nashFlow.flowIntervals[-1][1] < float('inf') else self.nashFlow.node_label(v, self.nashFlow.flowIntervals[-1][0])
 
         upperBound = float(upperBoundInput)
-        intervals = 1000
-        xValues = np.arange(max(lowerBound, 0.0), upperBound, 1./intervals) # Use linspace here?
-        inFlowValues = [self.nashFlow.cumulative_inflow(v, w, xVal) for xVal in xValues]
-        outFlowValues = [self.nashFlow.cumulative_outflow(v, w, xVal) for xVal in xValues]
 
-        self.plotEdgeFlowCanvas.update_plot(lowerBound, upperBound, xValues, inFlowValues, outFlowValues)
+        inflowXValues = [0]
+        outflowXValues = [0]
+        queueXValues = [0]
+        inflowYValues = [0]
+        outflowYValues = [0]
+        queueYValues = [0]
+
         transitTime = self.nashFlow.network[v][w]['transitTime']
-        capacity = self.nashFlow.network[v][w]['capacity']
+        computedUpperBound = self.nashFlow.flowIntervals[-1][1]
+        for interval in self.nashFlow.flowIntervals:
+            if interval[1] < float('inf'):
+                time = interval[1]
+                inflowXValues.append(self.nashFlow.node_label(v, time))
+                outflowXValues.append(self.nashFlow.node_label(w, time))
 
-        restrictedXValues = [time for time in xValues if (time + transitTime) <= upperBound]
-        queueWaitingTimeValues = [float(inFlowValues[time] - self.nashFlow.cumulative_outflow(v, w, restrictedXValues[time] + transitTime))/capacity for time in range(len(restrictedXValues))]
-        self.plotEdgeQueueCanvas.update_plot(lowerBound, upperBound, restrictedXValues, queueWaitingTimeValues)
+                inflowYValues.append(self.nashFlow.cumulative_inflow(v,w,time))
+                outflowYValues.append(self.nashFlow.cumulative_outflow(v,w,time))
+
+                if time + transitTime <= computedUpperBound:
+                    queueXValues.append(time)
+                    queueYValues.append(self.nashFlow.queue_delay(v,w,time))
+
+
+        if upperBound > max(inflowXValues[-1], outflowYValues[-1]) and self.nashFlow.flowIntervals[-1][1] == float('inf'):
+            inflowXValues.append(self.nashFlow.node_label(v, upperBound))
+            outflowXValues.append(self.nashFlow.node_label(v, upperBound))
+
+
+            inflowYValues.append(self.nashFlow.cumulative_inflow(v,w,upperBound))
+            outflowYValues.append(self.nashFlow.cumulative_outflow(v,w,upperBound))
+
+
+        if upperBound > queueXValues[-1] and self.nashFlow.flowIntervals[-1][1] == float('inf'):
+            queueXValues.append(upperBound)
+            queueYValues.append(self.nashFlow.queue_delay(v, w, upperBound))
+
+        self.plotEdgeFlowCanvas.update_plot(lowerBound, upperBound, inflowXValues, inflowYValues, (outflowXValues, outflowYValues))
+        self.plotEdgeQueueCanvas.update_plot(lowerBound, upperBound, queueXValues, queueYValues)
+
+
+
 
     def set_edge_range(self):
         if self.plotAnimationCanvas.focusEdge is not None:
