@@ -121,6 +121,12 @@ class PlotCanvas(FigureCanvas):
                     self.focusEdge = (self.pressedNode, self.releasedNode)
                     self.interface.update_edge_display()
                     self.update_plot()
+        elif self.pressedNode is not None and self.pressedNode not in ['s', 't'] and not self.check_edge_clicked((xAbsolute, yAbsolute)):
+            # Move the node
+            self.network.node[self.pressedNode]['position'] = (xAbsolute, yAbsolute)
+            self.focusNode = self.pressedNode
+            self.interface.update_node_display()
+            self.update_plot()
 
         self.mousePressed = False
         self.mouseReleased = False
