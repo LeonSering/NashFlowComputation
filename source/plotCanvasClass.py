@@ -46,6 +46,13 @@ class PlotCanvas(FigureCanvas):
         self.interface = interface
         self.displaysNTF = (not clickable)
 
+        # Visualization Settings
+        self.Xlim = (-100, 100)
+        self.Ylim = (-100, 100)
+        self.nodeSize = 300
+        self.nodeLabelFontSize = 12 # float but passed as int
+        self.edgeLabelFontSize = 10 # float but passed as int
+
 
         if not self.displaysNTF:
             # Signals
@@ -55,6 +62,8 @@ class PlotCanvas(FigureCanvas):
             flowLabels = self.interface.nashFlow.flowIntervals[intervalID][2].NTFEdgeFlowDict
             self.NTFEdgeFlowDict = {edge:flowLabels[edge] for edge in self.network.edges()}
             self.NTFNodeLabelDict = self.interface.nashFlow.flowIntervals[intervalID][2].NTFNodeLabelDict
+
+        self.mpl_connect('scroll_event', self.onscroll)
 
         # Mouse events
         self.mouseReleased = False
@@ -212,21 +221,25 @@ class PlotCanvas(FigureCanvas):
         """
         self.figure.clf()  # Clear current figure window
         axes = self.figure.add_axes([0, 0, 1, 1])
-        
-        axes.set_xlim(-100, 100)
-        axes.set_ylim(-100, 100)
+
+
+        axes.set_xlim(self.Xlim)
+        axes.set_ylim(self.Ylim)
         axes.axis('off')  # Hide axes in the plot
+
+        nodeLabelSize = int(round(self.nodeLabelFontSize))
+        edgeLabelSize = int(round(self.edgeLabelFontSize))
 
         positions = nx.get_node_attributes(self.network, 'position')
         if self.focusNode is not None:
             draw_networkx_nodes(self.network, pos=positions, ax=axes,
-                                nodelist=[self.focusNode], node_color='b')
+                                nodelist=[self.focusNode], node_color='b', node_size=self.nodeSize)
             remainingNodes = [node for node in self.network.nodes() if node != self.focusNode]
-            draw_networkx_nodes(self.network, pos=positions, ax=axes, nodelist=remainingNodes)
+            draw_networkx_nodes(self.network, pos=positions, ax=axes, nodelist=remainingNodes, node_size=self.nodeSize)
         else:
-            draw_networkx_nodes(self.network, pos=positions, ax=axes)
+            draw_networkx_nodes(self.network, pos=positions, ax=axes, node_size=self.nodeSize)
 
-        draw_networkx_labels(self.network, pos=positions, ax=axes, labels=nx.get_node_attributes(self.network, 'label'))
+        draw_networkx_labels(self.network, pos=positions, ax=axes, labels=nx.get_node_attributes(self.network, 'label'), font_size=nodeLabelSize)
 
         if self.focusEdge is not None:
             draw_networkx_edges(self.network, pos=positions, ax=axes, arrow=True,
@@ -251,11 +264,42 @@ class PlotCanvas(FigureCanvas):
             add_tuple_offset = lambda a: (a[0] + offset[0], a[1] + offset[1])
             movedPositions = {edge:add_tuple_offset(positions[edge]) for edge in positions}
             draw_networkx_labels(self.network, pos=movedPositions, ax=axes,
-                                 labels={node:"%.2f" % self.NTFNodeLabelDict[node] for node in self.NTFNodeLabelDict})
+                                 labels={node:"%.2f" % self.NTFNodeLabelDict[node] for node in self.NTFNodeLabelDict}, font_size=nodeLabelSize)
 
 
 
 
-        draw_networkx_edge_labels(self.network, pos=positions, ax=axes, edge_labels=lbls)
+        draw_networkx_edge_labels(self.network, pos=positions, ax=axes, edge_labels=lbls, font_size=edgeLabelSize)
         self.draw_idle()  # Draw only if necessary
-        
+
+    def zoom(self, factor):
+
+        smaller = lambda val: factor*val         # Returns smaller value if factor < 1, i.e. if zooming out
+        bigger = lambda val: (1./factor)*val     # Returns bigger value if factor < 1, i.e. if zooming out
+
+        # Scale axis
+        self.Xlim = tuple(bigger(entry) for entry in self.Xlim)
+        self.Ylim = tuple(bigger(entry) for entry in self.Ylim)
+
+        # Scale node size
+        self.nodeSize = smaller(self.nodeSize)
+
+        # Scale font size of node labels
+        self.nodeLabelFontSize = smaller(self.nodeLabelFontSize)
+
+        # Scale font size of edge labels
+        self.edgeLabelFontSize = smaller(self.edgeLabelFontSize)
+
+        self.update_plot()
+
+    def onscroll(self, event):
+        if event.xdata is None or event.ydata is None:
+            return
+
+        xAbsolute, yAbsolute = event.xdata, event.ydata
+        action = event.button   # 'up'/'down' Note: 'up' == zoom in,'down' == zoom out
+        sFactor = 1-0.1         # zoom out velocity
+        bFactor = 1./sFactor    # zoom in velocity, chosen s.t. sFactor * bFactor ~=ye 1
+
+        factor = bFactor if action == 'up' else sFactor
+        self.zoom(factor)
