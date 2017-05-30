@@ -22,7 +22,8 @@ from networkx import draw_networkx_nodes, draw_networkx_edges, draw_networkx_lab
 
 # Config
 SIMILARITY_DIST = 9  # Maximal distance at which a click is recognized as a click on a node/edge
-TIME_DIFF = 0.3  # Minimum time between mouse press and release s.t. it is recognized as "drag and drop" (in seconds)
+DRAG_DROP_TIME_DIFF = 0.3  # Minimum time between mouse press and release s.t. it is recognized as "drag and drop" (in seconds)
+MOVE_AXIS_TIME_DIFF = 0.15
 
 
 # ======================================================================================================================
@@ -72,6 +73,10 @@ class PlotCanvas(FigureCanvas):
         self.mousePressTime = None
         self.pressedNode = None
         self.releasedNode = None
+        self.mouseWheelPressedPosition = None
+        self.mouseWheelPressedTime = None
+        self.mouseWheelReleasedPosition = None
+        self.mouseWheelReleasedTime = None
 
         self.focusNode = None
         self.focusEdge = None
@@ -81,13 +86,22 @@ class PlotCanvas(FigureCanvas):
         Onclick-event handling
         :param event: event which is emitted by matplotlib
         """
-        self.mousePressed = True
-        self.mousePressTime = time.time()
 
         if event.xdata is None or event.ydata is None:
             return
-        # Note: event.button = mouse(1,2,3), event.x/y = relative position, event.xdata/ydata = absolute position
+
+        # Note: event.x/y = relative position, event.xdata/ydata = absolute position
         xAbsolute, yAbsolute = event.xdata, event.ydata
+
+        action = event.button   # event.button = mouse(1,2,3)
+        if action == 2:
+            # Wheel was clicked, prepare to move visible part of canvas
+            self.mouseWheelPressedPosition = (xAbsolute, yAbsolute)
+            self.mouseWheelPressedTime = time.time()
+            return
+
+        self.mousePressed = True
+        self.mousePressTime = time.time()
 
         # Determine whether we clicked an edge or not
         clickedEdge = self.check_edge_clicked((xAbsolute, yAbsolute))
@@ -108,15 +122,34 @@ class PlotCanvas(FigureCanvas):
         Release-Mouse-event handling
         :param event: event which is emitted by matplotlib
         """
-        self.mouseReleased = True
-        self.mouseReleaseTime = time.time()
-        self.update_plot()
 
-        if self.mouseReleaseTime - self.mousePressTime < TIME_DIFF:
-            return
         if event.xdata is None or event.ydata is None:
             return
         xAbsolute, yAbsolute = event.xdata, event.ydata
+
+        action = event.button   # event.button = mouse(1,2,3)
+        if action == 2:
+            # Wheel was released
+            self.mouseWheelReleasedPosition = (xAbsolute, yAbsolute)
+            self.mouseWheelReleasedTime = time.time()
+
+            if self.mouseWheelReleasedTime is not None and self.mouseWheelPressedTime is not None:
+                if self.mouseWheelReleasedTime - self.mouseWheelReleasedTime < MOVE_AXIS_TIME_DIFF:
+                    self.move()
+            return
+
+        self.mouseReleased = True
+        self.mouseReleaseTime = time.time()
+
+
+        if self.mouseReleaseTime - self.mousePressTime < DRAG_DROP_TIME_DIFF:
+            self.update_plot()
+            return
+
+
+
+
+
 
         # Determine whether we clicked a node or not
         clickedNode = self.check_node_clicked((xAbsolute, yAbsolute), edgePossible=True)
@@ -129,13 +162,15 @@ class PlotCanvas(FigureCanvas):
                     self.network.add_edge(self.pressedNode, self.releasedNode, transitTime=0, capacity=0)
                     self.focusEdge = (self.pressedNode, self.releasedNode)
                     self.interface.update_edge_display()
-                    self.update_plot()
+
         elif self.pressedNode is not None and self.pressedNode not in ['s', 't'] and not self.check_edge_clicked((xAbsolute, yAbsolute)):
             # Move the node
             self.network.node[self.pressedNode]['position'] = (xAbsolute, yAbsolute)
             self.focusNode = self.pressedNode
             self.interface.update_node_display()
-            self.update_plot()
+
+
+        self.update_plot()
 
         self.mousePressed = False
         self.mouseReleased = False
@@ -145,6 +180,19 @@ class PlotCanvas(FigureCanvas):
 
         self.mouseReleaseTime = None
         self.mousePressTime = None
+
+    def onscroll(self, event):
+        if event.xdata is None or event.ydata is None:
+            return
+
+        xAbsolute, yAbsolute = event.xdata, event.ydata
+        action = event.button   # 'up'/'down' Note: 'up' == zoom in,'down' == zoom out
+        sFactor = 1-0.1         # zoom out velocity
+        bFactor = 1./sFactor    # zoom in velocity, chosen s.t. sFactor * bFactor ~=ye 1
+
+        factor = bFactor if action == 'up' else sFactor
+        self.zoom(factor)
+
 
     def check_edge_clicked(self, clickpos):
         """
@@ -292,14 +340,11 @@ class PlotCanvas(FigureCanvas):
 
         self.update_plot()
 
-    def onscroll(self, event):
-        if event.xdata is None or event.ydata is None:
-            return
+    def move(self):
+        dx = self.mouseWheelReleasedPosition[0] - self.mouseWheelPressedPosition[0]
+        dy = self.mouseWheelReleasedPosition[1] - self.mouseWheelPressedPosition[1]
 
-        xAbsolute, yAbsolute = event.xdata, event.ydata
-        action = event.button   # 'up'/'down' Note: 'up' == zoom in,'down' == zoom out
-        sFactor = 1-0.1         # zoom out velocity
-        bFactor = 1./sFactor    # zoom in velocity, chosen s.t. sFactor * bFactor ~=ye 1
+        self.Xlim = tuple(entry - dx for entry in self.Xlim)
+        self.Ylim = tuple(entry - dy for entry in self.Ylim)
 
-        factor = bFactor if action == 'up' else sFactor
-        self.zoom(factor)
+        self.update_plot()
