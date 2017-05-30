@@ -54,6 +54,8 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
 
         self.graphCreationCanvas.update_plot()  # Plot for the first time
 
+
+
         # Configure plotNTFFrame to display plots of NTF
         self.plotNTFFrameLayout = QtGui.QVBoxLayout()
         self.plotNTFFrame.setLayout(self.plotNTFFrameLayout)
@@ -388,7 +390,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         item = QtGui.QListWidgetItem(intervalString)
         self.intervalsListWidget.addItem(item)  # Add item to listWidget
 
-        plot = PlotCanvas(lastInterval[2].shortestPathNetwork, self, clickable=False, intervalID=len(self.nashFlow.flowIntervals)-1)
+        plot = PlotCanvas(lastInterval[2].shortestPathNetwork, self, creationBool=False, intervalID=len(self.nashFlow.flowIntervals)-1)
         self.NTFPlotList.append(plot)   # Add NTF Plot to List
 
 

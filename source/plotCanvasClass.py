@@ -23,7 +23,6 @@ from networkx import draw_networkx_nodes, draw_networkx_edges, draw_networkx_lab
 # Config
 SIMILARITY_DIST = 9  # Maximal distance at which a click is recognized as a click on a node/edge
 DRAG_DROP_TIME_DIFF = 0.3  # Minimum time between mouse press and release s.t. it is recognized as "drag and drop" (in seconds)
-MOVE_AXIS_TIME_DIFF = 0.15
 
 
 # ======================================================================================================================
@@ -36,16 +35,16 @@ class PlotCanvas(FigureCanvas):
     Parameters:
         graph:      nx.Digraph instance
         interface:  Interface instance
-        clickable:  (bool) if True then canvas is clickable (i.e. drag&drop, selection, etc)
+        creationBool:  (bool) if True then canvas can be used to create new nodes/edges (i.e. drag&drop, selection, etc)
     """
 
-    def __init__(self, graph, interface, clickable=True, intervalID=None):
+    def __init__(self, graph, interface, creationBool=True, intervalID=None):
         self.figure = matplotlib.figure.Figure()
         super(PlotCanvas, self).__init__(self.figure)  # Call parents constructor
 
         self.network = graph
         self.interface = interface
-        self.displaysNTF = (not clickable)
+        self.displaysNTF = (not creationBool)
 
         # Visualization Settings
         self.Xlim = (-100, 100)
@@ -53,35 +52,37 @@ class PlotCanvas(FigureCanvas):
         self.nodeSize = 300
         self.nodeLabelFontSize = 12 # float but passed as int
         self.edgeLabelFontSize = 10 # float but passed as int
+        self.focusNode = None
+        self.focusEdge = None
 
+        # Internal variables
+        self.selectedNode = None
 
-        if not self.displaysNTF:
-            # Signals
-            self.mpl_connect('button_press_event', self.onclick)
-            self.mpl_connect('button_release_event', self.onrelease)
-        else:
+        if self.displaysNTF:
             flowLabels = self.interface.nashFlow.flowIntervals[intervalID][2].NTFEdgeFlowDict
             self.NTFEdgeFlowDict = {edge:flowLabels[edge] for edge in self.network.edges()}
             self.NTFNodeLabelDict = self.interface.nashFlow.flowIntervals[intervalID][2].NTFNodeLabelDict
 
-        self.mpl_connect('scroll_event', self.onscroll)
+        # Signals
+        self.mpl_connect('button_press_event', self.on_click)
+        self.mpl_connect('button_release_event', self.on_release)
+        self.mpl_connect('motion_notify_event', self.on_motion)
+        self.mpl_connect('scroll_event', self.on_scroll)
 
         # Mouse events
-        self.mouseReleased = False
-        self.mousePressed = False
-        self.mouseReleaseTime = None
-        self.mousePressTime = None
-        self.pressedNode = None
-        self.releasedNode = None
+        # Left mouse
+        self.mouseLeftPressTime = None
+        self.mouseLeftReleaseTime = None
+
+        # Mouse wheel
         self.mouseWheelPressedPosition = None
-        self.mouseWheelPressedTime = None
-        self.mouseWheelReleasedPosition = None
-        self.mouseWheelReleasedTime = None
+        self.mouseWheelPressed = False
 
-        self.focusNode = None
-        self.focusEdge = None
+        # Mouse right
+        self.mouseRightPressed = False
 
-    def onclick(self, event):
+
+    def on_click(self, event):
         """
         Onclick-event handling
         :param event: event which is emitted by matplotlib
@@ -94,94 +95,128 @@ class PlotCanvas(FigureCanvas):
         xAbsolute, yAbsolute = event.xdata, event.ydata
 
         action = event.button   # event.button = mouse(1,2,3)
-        if action == 2:
-            # Wheel was clicked, prepare to move visible part of canvas
-            self.mouseWheelPressedPosition = (xAbsolute, yAbsolute)
-            self.mouseWheelPressedTime = time.time()
+
+        if self.displaysNTF and action != 2:
             return
 
-        self.mousePressed = True
-        self.mousePressTime = time.time()
+        if action == 1:
+            # Leftmouse was clicked, select/create node, select edge or add edge via drag&drop
+            self.mouseLeftPressTime = time.time()
 
-        # Determine whether we clicked an edge or not
-        clickedEdge = self.check_edge_clicked((xAbsolute, yAbsolute))
+            lastID = self.network.graph['lastID']
 
-        # Determine whether we clicked a node or not
-        clickedNode = self.check_node_clicked((xAbsolute, yAbsolute), edgePossible=(clickedEdge is not None))
+            # Determine whether we clicked an edge or not
+            clickedEdge = self.check_edge_clicked((xAbsolute, yAbsolute))
 
-        if clickedEdge is not None and clickedNode is None:
-            self.focusEdge = clickedEdge
-            self.interface.update_edge_display()
-        elif clickedNode is not None:
-            self.pressedNode = clickedNode
-            self.focusNode = clickedNode
-            self.interface.update_node_display()
 
-    def onrelease(self, event):
+            # Determine whether we clicked a node or not
+            clickedNode = self.check_node_clicked((xAbsolute, yAbsolute), edgePossible=(clickedEdge is not None))
+            newNodeCreated = ( self.network.graph['lastID'] > lastID )
+
+
+            if clickedEdge is not None and clickedNode is None:
+                # Selected an existing edge
+                self.focusEdge = clickedEdge
+                self.interface.update_edge_display()
+            elif clickedNode is not None:
+                if not newNodeCreated:
+                    self.selectedNode = clickedNode
+                self.focusNode = clickedNode
+
+        elif action == 2:
+            # Wheel was clicked, move visible part of canvas
+            self.currentXlim = self.Xlim
+            self.currentYlim = self.Ylim
+            self.mouseWheelPressed = True
+            self.mouseWheelPressedPosition = (xAbsolute, yAbsolute)
+            return
+
+        elif action == 3:
+            clickedNode = self.check_node_clicked((xAbsolute, yAbsolute), edgePossible=True)
+            if clickedNode is not None and clickedNode not in ['s','t']:
+                self.selectedNode = clickedNode
+                self.mouseRightPressed = True
+                self.focusNode = self.selectedNode
+                self.interface.update_node_display()
+
+    def on_release(self, event):
         """
         Release-Mouse-event handling
         :param event: event which is emitted by matplotlib
         """
-
         if event.xdata is None or event.ydata is None:
             return
         xAbsolute, yAbsolute = event.xdata, event.ydata
-
         action = event.button   # event.button = mouse(1,2,3)
-        if action == 2:
-            # Wheel was released
-            self.mouseWheelReleasedPosition = (xAbsolute, yAbsolute)
-            self.mouseWheelReleasedTime = time.time()
 
-            if self.mouseWheelReleasedTime is not None and self.mouseWheelPressedTime is not None:
-                if self.mouseWheelReleasedTime - self.mouseWheelReleasedTime < MOVE_AXIS_TIME_DIFF:
-                    self.move()
-            return
-
-        self.mouseReleased = True
-        self.mouseReleaseTime = time.time()
-
-
-        if self.mouseReleaseTime - self.mousePressTime < DRAG_DROP_TIME_DIFF:
-            self.update_plot()
+        if self.displaysNTF and action != 2:
             return
 
 
+        if action == 1:
+            # Leftmouse has been released
+            if not self.mouseLeftPressTime:
+                # Released too fast
+                self.selectedNode = None
+            else:
+                self.mouseLeftReleaseTime = time.time()
+                dtime = self.mouseLeftReleaseTime - self.mouseLeftPressTime
 
+                if dtime < DRAG_DROP_TIME_DIFF:
+                    # Time to short for Drag&Drop, just update_plot to show focusNode/focusEdge
+                    self.update_plot()
+                    self.selectedNode = None
+                    self.mouseLeftPressTime = None
+                    self.mouseLeftReleaseTime = None
 
+                else:
+                    # Determine whether we clicked a node or not
+                    clickedNode = self.check_node_clicked((xAbsolute, yAbsolute), edgePossible=True)
+                    if clickedNode is not None:
+                        if self.selectedNode is not None and self.selectedNode != clickedNode:
+                            # Add the corresponding edge, if valid
+                            if not self.network.has_edge(self.selectedNode, clickedNode):
+                                self.network.add_edge(self.selectedNode, clickedNode, transitTime=0, capacity=0)
 
+                                self.focusEdge = (self.selectedNode, clickedNode)
+                                self.focusNode = clickedNode
 
-        # Determine whether we clicked a node or not
-        clickedNode = self.check_node_clicked((xAbsolute, yAbsolute), edgePossible=True)
+                                self.interface.update_edge_display()
 
-        if clickedNode is not None:
-            self.releasedNode = clickedNode
-            if self.pressedNode is not None and self.pressedNode != self.releasedNode:
-                # Add the corresponding edge, if valid
-                if not self.network.has_edge(self.pressedNode, self.releasedNode):
-                    self.network.add_edge(self.pressedNode, self.releasedNode, transitTime=0, capacity=0)
-                    self.focusEdge = (self.pressedNode, self.releasedNode)
-                    self.interface.update_edge_display()
-
-        elif self.pressedNode is not None and self.pressedNode not in ['s', 't'] and not self.check_edge_clicked((xAbsolute, yAbsolute)):
-            # Move the node
-            self.network.node[self.pressedNode]['position'] = (xAbsolute, yAbsolute)
-            self.focusNode = self.pressedNode
+                            self.selectedNode = None
+                    self.update_plot()
             self.interface.update_node_display()
 
+        elif action == 2:
+            # Wheel has been released
+            self.mouseWheelPressed = False
+            self.mouseWheelPressedPosition = None
 
-        self.update_plot()
+        elif action == 3:
+            # Right mouse has been released
+            self.mouseRightPressed = False
+            self.selectedNode = None
 
-        self.mousePressed = False
-        self.mouseReleased = False
 
-        self.pressedNode = None
-        self.releasedNode = None
+    def on_motion(self, event):
+        if event.xdata is None or event.ydata is None:
+            return
 
-        self.mouseReleaseTime = None
-        self.mousePressTime = None
+        # Note: event.x/y = relative position, event.xdata/ydata = absolute position
+        xAbsolute, yAbsolute = event.xdata, event.ydata
 
-    def onscroll(self, event):
+        if self.mouseWheelPressed and self.mouseWheelPressedPosition is not None:
+            self.mouseWheelPosition = (xAbsolute, yAbsolute)
+            self.move()
+            self.update_plot()
+        elif self.mouseRightPressed and self.selectedNode is not None:
+            self.network.node[self.selectedNode]['position'] = (xAbsolute, yAbsolute)
+            self.update_plot()
+
+
+
+
+    def on_scroll(self, event):
         if event.xdata is None or event.ydata is None:
             return
 
@@ -341,10 +376,8 @@ class PlotCanvas(FigureCanvas):
         self.update_plot()
 
     def move(self):
-        dx = self.mouseWheelReleasedPosition[0] - self.mouseWheelPressedPosition[0]
-        dy = self.mouseWheelReleasedPosition[1] - self.mouseWheelPressedPosition[1]
+        dx = self.mouseWheelPosition[0] - self.mouseWheelPressedPosition[0]
+        dy = self.mouseWheelPosition[1] - self.mouseWheelPressedPosition[1]
 
-        self.Xlim = tuple(entry - dx for entry in self.Xlim)
-        self.Ylim = tuple(entry - dy for entry in self.Ylim)
-
-        self.update_plot()
+        self.Xlim = tuple(entry - dx for entry in self.currentXlim)
+        self.Ylim = tuple(entry - dy for entry in self.currentYlim)
