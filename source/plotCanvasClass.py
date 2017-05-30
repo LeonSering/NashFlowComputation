@@ -208,9 +208,15 @@ class PlotCanvas(FigureCanvas):
         if self.mouseWheelPressed and self.mouseWheelPressedPosition is not None:
             self.mouseWheelPosition = (xAbsolute, yAbsolute)
             self.move()
-            self.update_plot()
+
+            axes = self.figure.gca()
+            axes.set_xlim(self.Xlim)
+            axes.set_ylim(self.Ylim)
+            self.draw_idle()
+
         elif self.mouseRightPressed and self.selectedNode is not None:
             self.network.node[self.selectedNode]['position'] = (xAbsolute, yAbsolute)
+
             self.update_plot()
 
 
@@ -381,3 +387,4 @@ class PlotCanvas(FigureCanvas):
 
         self.Xlim = tuple(entry - dx for entry in self.currentXlim)
         self.Ylim = tuple(entry - dy for entry in self.currentYlim)
+
