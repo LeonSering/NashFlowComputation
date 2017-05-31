@@ -439,7 +439,7 @@ class PlotCanvas(FigureCanvas):
 
     def update_edges(self, added=False, removal=False, moved=False, color=False):
         if removal:
-            # Edges has been deleted
+            # Edges have been deleted
             collectionIndex = 0
             toDeleteIndices = []
             for edges, edgeCollection in self.edgeCollections:
@@ -464,7 +464,8 @@ class PlotCanvas(FigureCanvas):
                         deletedLabel = self.edgeLabelCollection.pop(edge)
                         deletedLabel.remove()
 
-                    collectionIndex += 1
+                collectionIndex += 1
+
             for index in reversed(toDeleteIndices):
                 del self.edgeCollections[index]
                 del self.arrowCollections[index]
