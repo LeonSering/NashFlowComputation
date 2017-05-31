@@ -15,7 +15,6 @@ from plotAnimationCanvasClass import PlotAnimationCanvas
 from plotValuesCanvasClass import PlotValuesCanvas
 from ui import mainWdw
 import networkx as nx
-import numpy as np
 
 import ConfigParser
 
@@ -51,9 +50,6 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.plotFrame.setLayout(self.plotFrameLayout)
         self.graphCreationCanvas = PlotCanvas(self.network, self)  # Initialize PlotCanvas
         self.plotFrameLayout.addWidget(self.graphCreationCanvas)
-
-        self.graphCreationCanvas.update_plot()  # Plot for the first time
-
 
 
         # Configure plotNTFFrame to display plots of NTF
@@ -128,6 +124,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
             self.nodeNameLineEdit.setText(self.network.node[vertex]['label'])
             self.nodeXLineEdit.setText(str(self.network.node[vertex]['position'][0]))
             self.nodeYLineEdit.setText(str(self.network.node[vertex]['position'][1]))
+
         else:
             self.nodeNameLineEdit.setText("")
             self.nodeXLineEdit.setText("")
@@ -141,10 +138,19 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         if len(nodeName) > 0 and len(XPos) > 0 and len(YPos) > 0:
             # TO DO: Check for valid input
             vertex = self.graphCreationCanvas.focusNode
+
             self.network.node[vertex]['label'] = nodeName
+            movedBool = ( self.network.node[vertex]['position'] != (int(XPos), int(YPos)) )
             self.network.node[vertex]['position'] = (int(XPos), int(YPos))
 
-            self.graphCreationCanvas.update_plot()  # Update UI
+            self.graphCreationCanvas.update_nodes(moved=movedBool)  # Update UI
+            if movedBool:
+                self.graphCreationCanvas.update_edges(moved=movedBool)
+
+            if vertex in self.graphCreationCanvas.focusEdge:
+                # Label also changes in focusEdge display
+                self.update_edge_display()
+
 
     def delete_node(self):
         """Delete focusNode from network"""
@@ -153,12 +159,18 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
             return
 
         if vertex in self.network:
+            self.graphCreationCanvas.update_nodes(removal=True, color=True)
+            numberOfEdges = self.network.number_of_edges()
             self.network.remove_node(vertex)
+            removedEdgeBool = ( numberOfEdges > self.network.number_of_edges() )
             self.graphCreationCanvas.focusNode = None
+
+            if removedEdgeBool:
+                self.graphCreationCanvas.update_edges(removal=True)
 
             # Update UI
             self.update_node_display()
-            self.graphCreationCanvas.update_plot()
+
 
     def update_edge_display(self):
         """Update display of the properties of the currently focussed edge focusEdge, if existing"""
@@ -193,13 +205,14 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
             # Update the edges attributes
             self.network[tail][head]['transitTime'] = transitText
             self.network[tail][head]['capacity'] = capacityText
+            self.graphCreationCanvas.update_edges()
         else:
             # Add a new edge
             self.network.add_edge(tail, head, transitTime=transitText, capacity=capacityText)
             self.graphCreationCanvas.focusEdge = (tail, head)
+            self.graphCreationCanvas.update_edges(added=True, color=True)
 
         # Update UI
-        self.graphCreationCanvas.update_plot()
         self.update_edge_display()
 
     def delete_edge(self):
@@ -209,12 +222,14 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
             return
 
         if self.network.has_edge(edge[0], edge[1]):
-            self.network.remove_edge(edge[0], edge[1])
+            self.network.remove_edge(edge[0], edge[1])  # Deletion before update, as opposed to delete_node()
+            self.graphCreationCanvas.update_edges(removal=True)
+
             self.graphCreationCanvas.focusEdge = None
 
             # Update UI
             self.update_edge_display()
-            self.graphCreationCanvas.update_plot()
+
 
     def clear_application(self, NoNewGraph=False):
         """

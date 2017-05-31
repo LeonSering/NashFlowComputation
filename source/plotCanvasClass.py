@@ -15,6 +15,7 @@ import time
 from math import sqrt
 import matplotlib.figure
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.colors import colorConverter
 import os
 
 from networkx import draw_networkx_nodes, draw_networkx_edges, draw_networkx_labels, draw_networkx_edge_labels
@@ -55,6 +56,7 @@ class PlotCanvas(FigureCanvas):
         self.focusNode = None
         self.focusEdge = None
 
+
         # Internal variables
         self.selectedNode = None
 
@@ -77,9 +79,12 @@ class PlotCanvas(FigureCanvas):
         # Mouse wheel
         self.mouseWheelPressedPosition = None
         self.mouseWheelPressed = False
+        self.lastMoveTime = time.time()
 
         # Mouse right
         self.mouseRightPressed = False
+
+        self.init_plot()  # Plot for the first time
 
 
     def on_click(self, event):
@@ -118,10 +123,14 @@ class PlotCanvas(FigureCanvas):
                 # Selected an existing edge
                 self.focusEdge = clickedEdge
                 self.interface.update_edge_display()
+                self.update_edges(color=True)
             elif clickedNode is not None:
+                self.focusNode = clickedNode
                 if not newNodeCreated:
                     self.selectedNode = clickedNode
-                self.focusNode = clickedNode
+                else:
+                    self.mouseLeftPressTime = None
+                    self.update_nodes(added=True, color=True)
 
         elif action == 2:
             # Wheel was clicked, move visible part of canvas
@@ -137,6 +146,7 @@ class PlotCanvas(FigureCanvas):
                 self.selectedNode = clickedNode
                 self.mouseRightPressed = True
                 self.focusNode = self.selectedNode
+                self.update_nodes(color=True)
                 self.interface.update_node_display()
 
     def on_release(self, event):
@@ -156,7 +166,7 @@ class PlotCanvas(FigureCanvas):
         if action == 1:
             # Leftmouse has been released
             if not self.mouseLeftPressTime:
-                # Released too fast
+                # Released too fast or node has been created
                 self.selectedNode = None
             else:
                 self.mouseLeftReleaseTime = time.time()
@@ -164,7 +174,7 @@ class PlotCanvas(FigureCanvas):
 
                 if dtime < DRAG_DROP_TIME_DIFF:
                     # Time to short for Drag&Drop, just update_plot to show focusNode/focusEdge
-                    self.update_plot()
+                    self.update_nodes(color=True)
                     self.selectedNode = None
                     self.mouseLeftPressTime = None
                     self.mouseLeftReleaseTime = None
@@ -182,9 +192,12 @@ class PlotCanvas(FigureCanvas):
                                 self.focusNode = clickedNode
 
                                 self.interface.update_edge_display()
-
+                                self.update_edges(added=True, color=True)
                             self.selectedNode = None
-                    self.update_plot()
+
+                        #self.update_edges(color=True)
+
+            self.update_nodes(color=True)
             self.interface.update_node_display()
 
         elif action == 2:
@@ -197,7 +210,6 @@ class PlotCanvas(FigureCanvas):
             self.mouseRightPressed = False
             self.selectedNode = None
 
-
     def on_motion(self, event):
         if event.xdata is None or event.ydata is None:
             return
@@ -206,20 +218,17 @@ class PlotCanvas(FigureCanvas):
         xAbsolute, yAbsolute = event.xdata, event.ydata
 
         if self.mouseWheelPressed and self.mouseWheelPressedPosition is not None:
+            if time.time() - self.lastMoveTime < 1e-1:
+                return
+            self.lastMoveTime = time.time()
             self.mouseWheelPosition = (xAbsolute, yAbsolute)
             self.move()
-
-            axes = self.figure.gca()
-            axes.set_xlim(self.Xlim)
-            axes.set_ylim(self.Ylim)
             self.draw_idle()
 
         elif self.mouseRightPressed and self.selectedNode is not None:
             self.network.node[self.selectedNode]['position'] = (xAbsolute, yAbsolute)
-
-            self.update_plot()
-
-
+            self.update_nodes(moved=True)
+            self.update_edges(moved=True)
 
 
     def on_scroll(self, event):
@@ -233,6 +242,7 @@ class PlotCanvas(FigureCanvas):
 
         factor = bFactor if action == 'up' else sFactor
         self.zoom(factor)
+
 
 
     def check_edge_clicked(self, clickpos):
@@ -304,62 +314,244 @@ class PlotCanvas(FigureCanvas):
             return nodeID
         return clickedNode
 
-    def update_plot(self):
+    def init_plot(self):
         """
         Update canvas to plot new graph
         """
         self.figure.clf()  # Clear current figure window
-        axes = self.figure.add_axes([0, 0, 1, 1])
+        self.axes = self.figure.add_axes([0, 0, 1, 1])
 
-
-        axes.set_xlim(self.Xlim)
-        axes.set_ylim(self.Ylim)
-        axes.axis('off')  # Hide axes in the plot
+        self.axes.set_xlim(self.Xlim)
+        self.axes.set_ylim(self.Ylim)
+        self.axes.axis('off')  # Hide axes in the plot
 
         nodeLabelSize = int(round(self.nodeLabelFontSize))
         edgeLabelSize = int(round(self.edgeLabelFontSize))
 
         positions = nx.get_node_attributes(self.network, 'position')
-        if self.focusNode is not None:
-            draw_networkx_nodes(self.network, pos=positions, ax=axes,
-                                nodelist=[self.focusNode], node_color='b', node_size=self.nodeSize)
-            remainingNodes = [node for node in self.network.nodes() if node != self.focusNode]
-            draw_networkx_nodes(self.network, pos=positions, ax=axes, nodelist=remainingNodes, node_size=self.nodeSize)
-        else:
-            draw_networkx_nodes(self.network, pos=positions, ax=axes, node_size=self.nodeSize)
-
-        draw_networkx_labels(self.network, pos=positions, ax=axes, labels=nx.get_node_attributes(self.network, 'label'), font_size=nodeLabelSize)
-
-        if self.focusEdge is not None:
-            draw_networkx_edges(self.network, pos=positions, ax=axes, arrow=True,
-                                edgelist=[self.focusEdge], edge_color='b')
-            remainingEdges = [edge for edge in self.network.edges() if edge != self.focusEdge]
-            draw_networkx_edges(self.network, pos=positions, ax=axes, arrow=True,
-                                edgelist=remainingEdges)
-        else:
-            draw_networkx_edges(self.network, pos=positions, ax=axes, arrow=True)
 
 
+        # Plot Nodes
+        self.nodeCollections = []
+        nodeColor = lambda v: 'r' if v != self.focusNode else 'b'
+        nodeColorList = [nodeColor(v) for v in self.network.nodes()]
+        self.nodeCollections.append((self.network.nodes(), draw_networkx_nodes(self.network, pos=positions, ax=self.axes, node_size=self.nodeSize, node_color=nodeColorList)))
+
+        # Plot Node Labels
+        self.nodeLabelCollection = draw_networkx_labels(self.network, pos=positions, ax=self.axes, labels=nx.get_node_attributes(self.network, 'label'), font_size=nodeLabelSize)
+
+        # Plot Edges
+        self.edgeCollections, self.arrowCollections = [], []
+        edgeColor = lambda v,w: 'black' if (v,w) != self.focusEdge else 'b'
+        edgeColorList = [edgeColor(v,w) for v, w in self.network.edges()]
+        if edgeColorList:
+            edgeCollection, arrowCollection = Utilities.draw_edges(self.network, pos=positions, ax=self.axes, arrow=True,
+                                    edge_color=edgeColorList)
+            self.edgeCollections.append((self.network.edges(), edgeCollection))
+            self.arrowCollections.append((self.network.edges(), arrowCollection))
+
+        # Plot Edge Labels
         if not self.displaysNTF:
             # Plot actual edge labels
-            lbls = Utilities.join_dicts(nx.get_edge_attributes(self.network, 'capacity'),
-                                        nx.get_edge_attributes(self.network, 'transitTime'))  # Edge labels
+            self.edgeLabels = Utilities.join_intersect_dicts(nx.get_edge_attributes(self.network, 'capacity'),
+                                                  nx.get_edge_attributes(self.network, 'transitTime'))  # Edge labels
         else:
             # Plot flow value
-            lbls = {edge:"%.2f" % self.NTFEdgeFlowDict[edge] for edge in self.NTFEdgeFlowDict}
+            self.edgeLabels = {edge:"%.2f" % self.NTFEdgeFlowDict[edge] for edge in self.NTFEdgeFlowDict}
 
             # Plot NTFNodeLabels
             offset = (0, 8)
             add_tuple_offset = lambda a: (a[0] + offset[0], a[1] + offset[1])
             movedPositions = {edge:add_tuple_offset(positions[edge]) for edge in positions}
-            draw_networkx_labels(self.network, pos=movedPositions, ax=axes,
-                                 labels={node:"%.2f" % self.NTFNodeLabelDict[node] for node in self.NTFNodeLabelDict}, font_size=nodeLabelSize)
+            self.NTFNodeLabelCollection = draw_networkx_labels(self.network, pos=movedPositions, ax=self.axes,
+                                                               labels={node:"%.2f" % self.NTFNodeLabelDict[node] for node in self.NTFNodeLabelDict}, font_size=nodeLabelSize)
+
+
+
+        self.edgeLabelCollection = draw_networkx_edge_labels(self.network, pos=positions, ax=self.axes, edge_labels=self.edgeLabels, font_size=edgeLabelSize)
 
 
 
 
-        draw_networkx_edge_labels(self.network, pos=positions, ax=axes, edge_labels=lbls, font_size=edgeLabelSize)
-        self.draw_idle()  # Draw only if necessary
+        self.draw_idle()
+
+    def update_plot(self):
+        self.update_nodes()
+        self.update_edges()
+
+    def update_nodes(self, added=False, removal=False, moved=False, color=False):
+        nodeLabelSize = int(round(self.nodeLabelFontSize))
+        if removal or moved:
+            # A node has been deleted
+            v = self.focusNode
+            collectionIndex = 0
+            for nodes, nodeCollection in self.nodeCollections:
+                if v in nodes:
+                    nodeCollection.remove()
+                    nodes = [node for node in nodes if node != v]
+                    if nodes:
+                        positions = {v:self.network.node[v]['position'] for v in self.network.nodes()}
+                        newNodeCollection = draw_networkx_nodes(self.network,
+                                                                      pos=positions,
+                                                                      ax=self.axes, node_size=self.nodeSize,
+                                                                    nodelist=nodes, node_color='r')
+                        self.nodeCollections[collectionIndex] = (nodes, newNodeCollection)
+                    else:
+                        del self.nodeCollections[collectionIndex]
+
+                    break
+
+                collectionIndex += 1
+            if not moved:
+                # Delete node label
+                deletedLabel = self.nodeLabelCollection.pop(self.focusNode)
+                deletedLabel.remove()
+
+            else:
+                self.nodeCollections.append(([v], draw_networkx_nodes(self.network,
+                                                                      pos={v: self.network.node[v]['position']},
+                                                                      ax=self.axes, node_size=self.nodeSize,
+                                                                   nodelist=[v], node_color='b')))
+        elif added:
+            # A node has been added (can we do better than plotting all nodes again)
+            if self.focusNode is not None and all([self.focusNode not in entry for entry in self.nodeCollections]):
+                v = self.focusNode
+                self.nodeCollections.append(([v], draw_networkx_nodes(self.network, pos={v:self.network.node[v]['position']}, ax=self.axes, node_size=self.nodeSize, nodelist=[v])))
+                self.nodeLabelCollection.update(draw_networkx_labels(self.network, pos={v:self.network.node[v]['position']}, ax=self.axes, labels={v:self.network.node[v]['label']}, font_size=nodeLabelSize))
+
+        # Update node label texts and positions
+        for v, label in self.nodeLabelCollection.iteritems():    # type(label) = matplotlib.text.Text object
+            if label.get_text() != self.network.node[v]['label']:
+                label.remove()
+                self.nodeLabelCollection[v]=draw_networkx_labels(self.network, pos={v: self.network.node[v]['position']}, ax=self.axes,
+                                         labels={v: self.network.node[v]['label']}, font_size=nodeLabelSize)[v]
+            elif v == self.focusNode and moved:
+                label.set_position(self.network.node[v]['position'])
+
+        if color:
+            nodeColor = lambda v: 'r' if v != self.focusNode else 'b'
+            # Update colors and position
+            for nodes, nodeCollection in self.nodeCollections:
+                nodeColorList = [nodeColor(v) for v in nodes] if not removal else 'r'
+                nodeCollection.set_facecolors(nodeColorList)
+
+        self.draw_idle()
+
+    def update_edges(self, added=False, removal=False, moved=False, color=False):
+        if removal:
+            # Edges has been deleted
+            collectionIndex = 0
+            toDeleteIndices = []
+            for edges, edgeCollection in self.edgeCollections:
+                missingEdges = [edge for edge in edges if edge not in self.network.edges()]
+                if missingEdges:
+                    arrowCollection = self.arrowCollections[collectionIndex][1]
+                    edgeCollection.remove()
+                    arrowCollection.remove()
+                    edges = [edge for edge in edges if edge not in missingEdges]
+                    if edges:
+                        positions = {v:self.network.node[v]['position'] for v in self.network.nodes()}
+                        newEdgeCollection, newArrowCollection = Utilities.draw_edges(self.network, pos=positions, ax=self.axes, arrow=True, edgelist=edges)
+                        self.edgeCollections[collectionIndex] = (edges, newEdgeCollection)
+                        self.arrowCollections[collectionIndex] = (edges, newArrowCollection)
+
+                    else:
+                        toDeleteIndices.append(collectionIndex)
+
+
+                    # Delete edge labels
+                    for edge in missingEdges:
+                        deletedLabel = self.edgeLabelCollection.pop(edge)
+                        deletedLabel.remove()
+
+                    collectionIndex += 1
+            for index in reversed(toDeleteIndices):
+                del self.edgeCollections[index]
+                del self.arrowCollections[index]
+
+
+        elif added:
+            # A node has been added (can we do better than plotting all nodes again)
+            if self.focusEdge is not None:
+                v, w = self.focusEdge
+                edgeCollection, arrowCollection = Utilities.draw_edges(self.network, pos={v:self.network.node[v]['position'], w:self.network.node[w]['position']}, ax=self.axes, arrow=True, edgelist=[self.focusEdge])
+
+                self.edgeCollections.append(([self.focusEdge], edgeCollection))
+                self.arrowCollections.append(([self.focusEdge], arrowCollection))
+                edgeLabelSize = int(round(self.edgeLabelFontSize))
+                lbl = {self.focusEdge:(self.network[v][w]['capacity'], self.network[v][w]['transitTime'])}
+                self.edgeLabelCollection.update(draw_networkx_edge_labels(self.network, pos={v:self.network.node[v]['position'], w:self.network.node[w]['position']}, ax=self.axes, edge_labels=lbl, font_size=edgeLabelSize))
+
+        elif moved:
+            collectionIndex = 0
+            for edges, edgeCollection in self.edgeCollections:
+                pos = nx.get_node_attributes(self.network, 'position')
+                edge_pos = np.asarray([(pos[e[0]], pos[e[1]]) for e in edges])
+                # Move edges
+                edgeCollection.set_segments(edge_pos)
+
+                a_pos = []
+                p = 1.0 - 0.25  # make head segment 25 percent of edge length
+                for src, dst in edge_pos:
+                    x1, y1 = src
+                    x2, y2 = dst
+                    dx = x2 - x1  # x offset
+                    dy = y2 - y1  # y offset
+                    d = np.sqrt(float(dx ** 2 + dy ** 2))  # length of edge
+                    if d == 0:  # source and target at same position
+                        continue
+                    if dx == 0:  # vertical edge
+                        xa = x2
+                        ya = dy * p + y1
+                    if dy == 0:  # horizontal edge
+                        ya = y2
+                        xa = dx * p + x1
+                    else:
+                        theta = np.arctan2(dy, dx)
+                        xa = p * d * np.cos(theta) + x1
+                        ya = p * d * np.sin(theta) + y1
+
+                    a_pos.append(((xa, ya), (x2, y2)))
+
+
+
+                arrowCollection = self.arrowCollections[collectionIndex][1]
+                # Move arrows
+                arrowCollection.set_segments(a_pos)
+
+                collectionIndex += 1
+
+
+        if color:
+            # Update colors
+            edgeColor = lambda v, w: 'black' if (v, w) != self.focusEdge else 'b'
+            collectionIndex = 0
+            for edges, edgeCollection in self.edgeCollections:
+                if edges:
+                    edgeColorList = [colorConverter.to_rgba(edgeColor(v, w), 1) for v, w in edges] if not removal else 'black'
+                    edgeCollection.set_color(edgeColorList)
+
+                    arrowCollection = self.arrowCollections[collectionIndex][1]
+                    arrowCollection.set_color(edgeColorList)
+                    #edgeCollection.set_facecolors(edgeColorList)
+                collectionIndex += 1
+
+        # Update edge label texts and positions
+        for edge, label in self.edgeLabelCollection.iteritems():    # type(label) = matplotlib.text.Text object
+            v, w = edge
+            lblTuple = (self.network[v][w]['capacity'], self.network[v][w]['transitTime'])
+            if label.get_text() != lblTuple:
+                label.set_text(lblTuple)
+            posv = (self.network.node[v]['position'][0]*0.5, self.network.node[v]['position'][1]*0.5)
+            posw = (self.network.node[w]['position'][0]*0.5, self.network.node[w]['position'][1]*0.5)
+            pos = (posv[0] + posw[0], posv[1] + posw[1])
+            label.set_position(pos)
+
+            #label.set_rotation(0.0)
+
+
+        self.draw_idle()
+
 
     def zoom(self, factor):
 
@@ -369,17 +561,32 @@ class PlotCanvas(FigureCanvas):
         # Scale axis
         self.Xlim = tuple(bigger(entry) for entry in self.Xlim)
         self.Ylim = tuple(bigger(entry) for entry in self.Ylim)
+        self.axes.set_xlim(self.Xlim)
+        self.axes.set_ylim(self.Ylim)
 
         # Scale node size
         self.nodeSize = smaller(self.nodeSize)
+        for nodes, nodeCollection in self.nodeCollections:
+            nodeCollection.set_sizes([self.nodeSize for node in nodes])
 
         # Scale font size of node labels
         self.nodeLabelFontSize = smaller(self.nodeLabelFontSize)
+        nodeLabelSize = int(round(self.nodeLabelFontSize))
+        for v, label in self.nodeLabelCollection.iteritems():
+            label.set_fontsize(nodeLabelSize)
 
         # Scale font size of edge labels
         self.edgeLabelFontSize = smaller(self.edgeLabelFontSize)
+        edgeLabelSize = int(round(self.edgeLabelFontSize))
+        for edge, label in self.edgeLabelCollection.iteritems():
+            label.set_fontsize(edgeLabelSize)
 
-        self.update_plot()
+        # Scale font size of NTF Node Labels, if existing
+        if self.displaysNTF:
+            for v, label in self.NTFNodeLabelCollection.iteritems():
+                label.set_fontsize(nodeLabelSize)
+
+        self.draw_idle()
 
     def move(self):
         dx = self.mouseWheelPosition[0] - self.mouseWheelPressedPosition[0]
@@ -388,3 +595,5 @@ class PlotCanvas(FigureCanvas):
         self.Xlim = tuple(entry - dx for entry in self.currentXlim)
         self.Ylim = tuple(entry - dy for entry in self.currentYlim)
 
+        self.axes.set_xlim(self.Xlim)
+        self.axes.set_ylim(self.Ylim)
