@@ -59,6 +59,53 @@ class FlowInterval():
 
 
     def get_NTF(self):
+
+        self.counter = 0
+        #self.naive_NTF_search()
+        self.backtrack_NTF_search_naive(remainingNodes=[v for v in self.shortestPathNetwork.nodes() if v != 's'], E_0=[])
+
+        labels, flow = self.NTF.get_labels_and_flow()
+
+        self.NTFNodeLabelDict.update(labels)
+        self.NTFEdgeFlowDict.update(flow)
+
+        self.assert_NTF()
+
+    def backtrack_NTF_search_naive(self, remainingNodes, E_0):
+        # Guarantees that f.a. nodes w there is at least one edge e=vw in E_0
+
+        if not remainingNodes:
+            NTF = NormalizedThinFlow(shortestPathNetwork=self.shortestPathNetwork, id=self.counter,
+                                     resettingEdges=self.resettingEdges, flowEdges=E_0, inflowRate=self.inflowRate,
+                                     minCapacity=self.minCapacity, outputDirectory=self.rootPath,
+                                     templateFile=self.templateFile, scipFile=self.scipFile)
+            if NTF.is_valid():
+                self.NTF = NTF
+                return True
+            else:
+                # Drop instance (necessary?)
+                del NTF
+                self.counter += 1
+                return False
+
+        w = remainingNodes[0]  # Node handled in this recursive call
+
+        incomingEdges = self.shortestPathNetwork.in_edges(w)
+        k = len(incomingEdges)
+
+        while k>0:
+            for partE_0 in combinations(incomingEdges, k):
+                partE_0 = list(partE_0)
+
+                recursiveCall = self.backtrack_NTF_search_naive(remainingNodes=remainingNodes[1:], E_0=E_0 + partE_0)
+                if recursiveCall:
+                    return True
+            k -= 1
+
+        return False
+
+
+    def naive_NTF_search(self):
         found = False
         k = self.shortestPathNetwork.number_of_edges()
         counter = 0
@@ -67,10 +114,9 @@ class FlowInterval():
             for E_0 in combinations(edges, k):
                 self.numberOfSolvedIPs += 1
                 E_0 = list(E_0)
-                NTF = NormalizedThinFlow(shortestPathNetwork=self.shortestPathNetwork, id=counter,
+                NTF = NormalizedThinFlow(shortestPathNetwork=self.shortestPathNetwork, id=self.counter,
                                          resettingEdges=self.resettingEdges, flowEdges=E_0, inflowRate=self.inflowRate,
                                          minCapacity=self.minCapacity, outputDirectory=self.rootPath, templateFile=self.templateFile, scipFile=self.scipFile)
-
 
                 if NTF.is_valid():
                     found = True
@@ -80,15 +126,8 @@ class FlowInterval():
                     # Drop instance (necessary?)
                     del NTF
 
-                counter += 1
+                self.counter += 1
             k -= 1
-
-        labels, flow = self.NTF.get_labels_and_flow()
-
-        self.NTFNodeLabelDict.update(labels)
-        self.NTFEdgeFlowDict.update(flow)
-
-        self.assert_NTF()
 
     def assert_NTF(self):
         # Works only on shortest path network!!

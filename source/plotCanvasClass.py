@@ -370,9 +370,6 @@ class PlotCanvas(FigureCanvas):
 
         self.edgeLabelCollection = draw_networkx_edge_labels(self.network, pos=positions, ax=self.axes, edge_labels=self.edgeLabels, font_size=edgeLabelSize)
 
-
-
-
         self.draw_idle()
 
     def update_plot(self):
@@ -540,7 +537,10 @@ class PlotCanvas(FigureCanvas):
         # Update edge label texts and positions
         for edge, label in self.edgeLabelCollection.iteritems():    # type(label) = matplotlib.text.Text object
             v, w = edge
-            lblTuple = (self.network[v][w]['capacity'], self.network[v][w]['transitTime'])
+            if not self.displaysNTF:
+                lblTuple = (self.network[v][w]['capacity'], self.network[v][w]['transitTime'])
+            else:
+                lblTuple = "%.2f" % self.NTFEdgeFlowDict[edge]
             if label.get_text() != lblTuple:
                 label.set_text(lblTuple)
             posv = (self.network.node[v]['position'][0]*0.5, self.network.node[v]['position'][1]*0.5)

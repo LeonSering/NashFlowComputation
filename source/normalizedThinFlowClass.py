@@ -47,8 +47,9 @@ class NormalizedThinFlow:
         self.check_result()
 
     def get_labels_and_flow(self):
-        labelPattern = r'l\$(\w)\s*([\d.]+)'
-        flowPattern = r'x\$(\w)\$(\w)\s*([\d.]+)'
+        labelPattern = r'l\$([\w]+)\s*([\d.]+)'
+
+        flowPattern = r'x\$([\w]+)\$([\w]+)\s*([\d.]+)'
 
         labelMatch = re.findall(labelPattern, self.resultLog)
         labelDict = {node:float(val) for node, val in labelMatch}
