@@ -39,11 +39,12 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
 
         # Init graph
         self.network = self.init_graph()
+        self.inflowLineEdit.setText('0')
 
         self.outputDirectory = ''
         self.templateFile = ''
         self.scipFile = ''
-        self.inflowRate = 0
+
         self.numberOfIntervals = -1
         self.configFile = ConfigParser.RawConfigParser()
 
@@ -115,6 +116,9 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         network = nx.DiGraph()
         network.add_nodes_from([('s', {'position': (-90, 0), 'label': 's'}), ('t', {'position': (90, 0), 'label': 't'})])
         network.graph['lastID'] = network.number_of_nodes() - 2  # Keep track of next nodes ID
+        network.graph['inflowRate'] = 0
+
+
 
         return network
 
@@ -250,6 +254,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.graphCreationCanvas.update_plot()
         self.update_node_display()
         self.update_edge_display()
+        self.inflowLineEdit.setText(str(self.network.graph['inflowRate']))
 
     def load_graph(self):
         """Load CurrentGraph instance from '.cg' file"""
@@ -270,6 +275,9 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
 
     def save_graph(self):
         """Save CurrentGraph instance to '.cg' file"""
+
+        self.network.graph['inflowRate'] = float(self.inflowLineEdit.text())
+
         dialog = QtGui.QFileDialog
         fsave = dialog.getSaveFileName(self, "Select File", "", "network files (*.cg)")
 
@@ -331,7 +339,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.configFile.set('Settings', 'outputdir', '')
         self.configFile.set('Settings', 'templatefile', '')
         self.configFile.set('Settings', 'scippath', '')
-        self.configFile.set('Settings', 'inflowrate', '0')
+        #self.configFile.set('Settings', 'inflowrate', '0')
         self.configFile.set('Settings', 'intervals', '-1')
 
 
@@ -344,8 +352,8 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
             self.templateFileLineEdit.setText(self.templateFile)
             self.scipFile = self.configFile.get('Settings', 'scippath')
             self.scipPathLineEdit.setText(self.scipFile)
-            self.inflowRate = self.configFile.get('Settings', 'inflowrate')
-            self.inflowLineEdit.setText(self.inflowRate)
+            #self.inflowRate = self.configFile.get('Settings', 'inflowrate')
+            #self.inflowLineEdit.setText(self.inflowRate)
             self.numberOfIntervals = self.configFile.get('Settings', 'intervals')
             self.intervalsLineEdit.setText(self.numberOfIntervals)
 
@@ -358,7 +366,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.configFile.set('Settings', 'outputdir', self.outputDirectory)
         self.configFile.set('Settings', 'templatefile', self.templateFile)
         self.configFile.set('Settings', 'scippath', self.scipFile)
-        self.configFile.set('Settings', 'inflowrate', self.inflowRate)
+        #self.configFile.set('Settings', 'inflowrate', self.inflowRate)
         self.configFile.set('Settings', 'intervals', self.numberOfIntervals)
 
         with open('config.cfg', 'wb') as configfile:
@@ -370,13 +378,13 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         
         # Get remaining settings
         self.numberOfIntervals = self.intervalsLineEdit.text()
-        self.inflowRate = self.inflowLineEdit.text()
+        inflowRate = float(self.inflowLineEdit.text())
 
         self.save_config()  # Save config-settings to file
         self.tabWidget.setCurrentIndex(1)   # Switch to next tab
 
 
-        self.nashFlow = NashFlow(self, self.network, float(self.inflowRate), float(self.numberOfIntervals), self.outputDirectory, self.templateFile, self.scipFile)
+        self.nashFlow = NashFlow(self, self.network, float(inflowRate), float(self.numberOfIntervals), self.outputDirectory, self.templateFile, self.scipFile)
         self.nashFlow.run()
 
         # Add plotAnimationCanvas
