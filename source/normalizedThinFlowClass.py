@@ -92,7 +92,8 @@ class NormalizedThinFlow:
 
         with open(os.path.join(self.rootPath, 'other.txt'), 'w') as otherWriter:
             otherWriter.write(str(self.inflowRate) + '\n')
-            otherWriter.write(str(self.inflowRate/self.minCapacity) + '\n')
+            M = max(1, self.inflowRate/self.minCapacity)
+            otherWriter.write(str(M) + '\n')
 
 
 

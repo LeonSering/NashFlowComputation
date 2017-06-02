@@ -474,29 +474,41 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
 
         upperBound = float(upperBoundInput)
 
-        inflowXValues = [0]
-        outflowXValues = [0]
-        queueXValues = [0]
-        inflowYValues = [0]
-        outflowYValues = [0]
-        queueYValues = [0]
+        inflowXValues = [0, self.nashFlow.node_label(v, 0)]
+        outflowXValues = [0, self.nashFlow.node_label(w, 0)]
+        queueXValues = [self.nashFlow.node_label(v, 0), self.nashFlow.node_label(w, 0)]
+
+        inflowYValues = [0,0]
+        outflowYValues = [0,0]
+        queueYValues = []
 
         transitTime = self.nashFlow.network[v][w]['transitTime']
         computedUpperBound = self.nashFlow.flowIntervals[-1][1]
         for interval in self.nashFlow.flowIntervals:
             if interval[1] < float('inf'):
                 time = interval[1]
-                inflowXValues.append(self.nashFlow.node_label(v, time))
-                outflowXValues.append(self.nashFlow.node_label(w, time))
+                vTime = self.nashFlow.node_label(v, time)
+                wTime = self.nashFlow.node_label(w, time)
+                inflowXValues.append(vTime)
+                outflowXValues.append(wTime)
 
-                inflowYValues.append(self.nashFlow.cumulative_inflow(v,w,time))
-                outflowYValues.append(self.nashFlow.cumulative_outflow(v,w,time))
+                if vTime + transitTime <= computedUpperBound:
+                    queueXValues.append(vTime)
+                if wTime + transitTime <= computedUpperBound:
+                    queueXValues.append(wTime)
 
+                inflowYValues.append(self.nashFlow.cumulative_inflow(v,w,vTime))
+                outflowYValues.append(self.nashFlow.cumulative_outflow(v,w,wTime))
+                '''
                 if time + transitTime <= computedUpperBound:
                     queueXValues.append(time)
                     queueYValues.append(self.nashFlow.queue_delay(v,w,time))
+                '''
 
+        queueXValues.sort() # Necessary?
+        queueYValues = map(lambda time: self.nashFlow.queue_size(v,w,time), queueXValues)
 
+        '''
         if upperBound > max(inflowXValues[-1], outflowYValues[-1]) and self.nashFlow.flowIntervals[-1][1] == float('inf'):
             inflowXValues.append(self.nashFlow.node_label(v, upperBound))
             outflowXValues.append(self.nashFlow.node_label(v, upperBound))
@@ -507,11 +519,13 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
 
 
         if upperBound > queueXValues[-1] and self.nashFlow.flowIntervals[-1][1] == float('inf'):
-            queueXValues.append(upperBound)
-            queueYValues.append(self.nashFlow.queue_delay(v, w, upperBound))
+            queueXValues.append(self.nashFlow.node_label(upperBound, v))
+            queueYValues.append(self.nashFlow.queue_si(v, w, upperBound))
+        '''
 
         self.plotEdgeFlowCanvas.update_plot(lowerBound, upperBound, inflowXValues, inflowYValues, (outflowXValues, outflowYValues))
         self.plotEdgeQueueCanvas.update_plot(lowerBound, upperBound, queueXValues, queueYValues)
+
 
 
 

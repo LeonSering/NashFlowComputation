@@ -111,15 +111,15 @@ class NashFlow:
         lastIntervalKey, lastIntervalValue = self.network[v][w]['inflow'].popitem(last=True)
         self.network[v][w]['inflow'][lastIntervalKey] = lastIntervalValue
 
-        #assert( time <= lastIntervalKey[1] )
         assert( Utilities.is_geq_tol(lastIntervalKey[1], time))
 
         integral = 0
         for lowerBound, upperBound in self.network[v][w]['inflow']:
+            intervalInflow = self.network[v][w]['inflow'][(lowerBound, upperBound)]
             if time > upperBound + TOL:
-                integral += (upperBound - lowerBound) * self.network[v][w]['inflow'][(lowerBound, upperBound)]
+                integral += (upperBound - lowerBound) * intervalInflow
             elif Utilities.is_geq_tol(time, lowerBound) and Utilities.is_geq_tol(upperBound, time):
-                integral += (time - lowerBound) * self.network[v][w]['inflow'][(lowerBound, upperBound)]
+                integral += (time - lowerBound) * intervalInflow
             else:
                 break
         return integral
@@ -131,15 +131,15 @@ class NashFlow:
         lastIntervalKey, lastIntervalValue = self.network[v][w]['outflow'].popitem(last=True)
         self.network[v][w]['outflow'][lastIntervalKey] = lastIntervalValue
 
-        #assert( time <= lastIntervalKey[1] )
         assert (Utilities.is_geq_tol(lastIntervalKey[1], time))
 
         integral = 0
         for lowerBound, upperBound in self.network[v][w]['outflow']:
+            intervalOutflow = self.network[v][w]['outflow'][(lowerBound, upperBound)]
             if time > upperBound + TOL:
-                integral += (upperBound - lowerBound) * self.network[v][w]['outflow'][(lowerBound, upperBound)]
+                integral += (upperBound - lowerBound) * intervalOutflow
             elif Utilities.is_geq_tol(time, lowerBound) and Utilities.is_geq_tol(upperBound, time):
-                integral += (time - lowerBound) * self.network[v][w]['outflow'][(lowerBound, upperBound)]
+                integral += (time - lowerBound) * intervalOutflow
             else:
                 break
         return integral
