@@ -61,7 +61,7 @@ class FlowInterval():
     def get_NTF(self):
 
         self.counter = 0
-        #self.naive_NTF_search()
+        #self.naive_NTF_search() # Do not use, might lead to unwanted behaviour (i.e. could find solution to LP, even though E_0 was guessed badly -> result is not an NTF)
         self.backtrack_NTF_search_naive(remainingNodes=[v for v in self.shortestPathNetwork.nodes() if v != 's'], E_0=[])
 
         labels, flow = self.NTF.get_labels_and_flow()
@@ -79,6 +79,7 @@ class FlowInterval():
                                      resettingEdges=self.resettingEdges, flowEdges=E_0, inflowRate=self.inflowRate,
                                      minCapacity=self.minCapacity, outputDirectory=self.rootPath,
                                      templateFile=self.templateFile, scipFile=self.scipFile)
+            self.numberOfSolvedIPs += 1
             if NTF.is_valid():
                 self.NTF = NTF
                 return True
@@ -131,7 +132,7 @@ class FlowInterval():
 
     def assert_NTF(self):
         # Works only on shortest path network!!
-        p = lambda (v,w): max([self.NTFNodeLabelDict[v], self.NTFEdgeFlowDict[(v,w)]/self.network[v][w]['capacity']])\
+        p = lambda (v, w): max([self.NTFNodeLabelDict[v], self.NTFEdgeFlowDict[(v,w)]/self.network[v][w]['capacity']])\
                             if (v,w) not in self.resettingEdges \
                             else self.NTFEdgeFlowDict[(v,w)]/self.network[v][w]['capacity']
         for w in self.shortestPathNetwork:

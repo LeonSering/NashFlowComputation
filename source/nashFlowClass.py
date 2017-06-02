@@ -49,6 +49,7 @@ class NashFlow:
             computedUpperBound = self.flowIntervals[-1][1]
             self.interface.add_last_interval_to_list()
             k += 1
+        print(self.numberOfSolvedIPs)
 
     def compute_flowInterval(self):
         # NOTE TO MYSELF: computing shortest paths and resetting edges is only necessary for first flowInterval -> later: implement in flowIntervallClass
@@ -89,6 +90,7 @@ class NashFlow:
 
         self.counter += 1
         self.numberOfSolvedIPs += interval.numberOfSolvedIPs
+
 
     def node_label(self, v, time):
         intervalLowerBoundTime = self.time_interval_correspondence(time)

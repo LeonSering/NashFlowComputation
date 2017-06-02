@@ -9,8 +9,10 @@ import os
 import pickle
 from warnings import filterwarnings
 
-from plotCanvasClass import PlotCanvas
+
 from nashFlowClass import NashFlow
+from plotCanvasClass import PlotCanvas
+from plotNTFCanvasClass import PlotNTFCanvas
 from plotAnimationCanvasClass import PlotAnimationCanvas
 from plotValuesCanvasClass import PlotValuesCanvas
 from ui import mainWdw
@@ -405,7 +407,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         item = QtGui.QListWidgetItem(intervalString)
         self.intervalsListWidget.addItem(item)  # Add item to listWidget
 
-        plot = PlotCanvas(lastInterval[2].shortestPathNetwork, self, creationBool=False, intervalID=len(self.nashFlow.flowIntervals)-1)
+        plot = PlotNTFCanvas(lastInterval[2].shortestPathNetwork, self, intervalID=len(self.nashFlow.flowIntervals)-1)
         self.NTFPlotList.append(plot)   # Add NTF Plot to List
 
 

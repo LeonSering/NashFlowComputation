@@ -9,12 +9,13 @@
 # ===========================================================================
 
 import networkx as nx
-from utilitiesClass import Utilities
+from source.utilitiesClass import Utilities
 import numpy as np
 import time
 from math import sqrt
 import matplotlib.figure
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
+#from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.colors import colorConverter
 import os
 
@@ -39,13 +40,14 @@ class PlotCanvas(FigureCanvas):
         creationBool:  (bool) if True then canvas can be used to create new nodes/edges (i.e. drag&drop, selection, etc)
     """
 
-    def __init__(self, graph, interface, creationBool=True, intervalID=None):
+    def __init__(self, graph, interface):
         self.figure = matplotlib.figure.Figure()
         super(PlotCanvas, self).__init__(self.figure)  # Call parents constructor
 
         self.network = graph
         self.interface = interface
-        self.displaysNTF = (not creationBool)
+        #self.displaysNTF = (not clickableBool and not creationBool)
+        #self.displaysNashFlow = (clickableBool and not creationBool)
 
         # Visualization Settings
         self.Xlim = (-100, 100)
@@ -60,10 +62,12 @@ class PlotCanvas(FigureCanvas):
         # Internal variables
         self.selectedNode = None
 
+        '''
         if self.displaysNTF:
             flowLabels = self.interface.nashFlow.flowIntervals[intervalID][2].NTFEdgeFlowDict
             self.NTFEdgeFlowDict = {edge:flowLabels[edge] for edge in self.network.edges()}
             self.NTFNodeLabelDict = self.interface.nashFlow.flowIntervals[intervalID][2].NTFNodeLabelDict
+        '''
 
         # Signals
         self.mpl_connect('button_press_event', self.on_click)
@@ -86,6 +90,12 @@ class PlotCanvas(FigureCanvas):
 
         self.init_plot()  # Plot for the first time
 
+    def get_additional_node_labels(self):
+        return {}
+
+    def get_edge_labels(self):
+        return Utilities.join_intersect_dicts(nx.get_edge_attributes(self.network, 'capacity'),
+                                                  nx.get_edge_attributes(self.network, 'transitTime'))  # Edge labels
 
     def on_click(self, event):
         """
@@ -100,9 +110,6 @@ class PlotCanvas(FigureCanvas):
         xAbsolute, yAbsolute = event.xdata, event.ydata
 
         action = event.button   # event.button = mouse(1,2,3)
-
-        if self.displaysNTF and action != 2:
-            return
 
         if action == 1:
             # Leftmouse was clicked, select/create node, select edge or add edge via drag&drop
@@ -159,9 +166,10 @@ class PlotCanvas(FigureCanvas):
         xAbsolute, yAbsolute = event.xdata, event.ydata
         action = event.button   # event.button = mouse(1,2,3)
 
+        '''
         if self.displaysNTF and action != 2:
             return
-
+        '''
 
         if action == 1:
             # Leftmouse has been released
@@ -350,11 +358,36 @@ class PlotCanvas(FigureCanvas):
             self.edgeCollections.append((self.network.edges(), edgeCollection))
             self.arrowCollections.append((self.network.edges(), arrowCollection))
 
+
+        additionalNodeLabels = self.get_additional_node_labels()
+        if additionalNodeLabels:
+            # Plot Nash Flow Node Labels
+            offset = (0, 8)
+            add_tuple_offset = lambda a: (a[0] + offset[0], a[1] + offset[1])
+            movedPositions = {node:add_tuple_offset(positions[node]) for node in positions}
+            self.additionalNodeLabelCollection = draw_networkx_labels(self.network, pos=movedPositions, ax=self.axes,
+                                 labels=additionalNodeLabels)
+        else:
+            self.additionalNodeLabelCollection = {}
+
+        self.edgeLabels = self.get_edge_labels()
+
+        self.edgeLabelCollection = draw_networkx_edge_labels(self.network, pos=positions, ax=self.axes, edge_labels=self.edgeLabels, font_size=edgeLabelSize)
+
+        self.draw_idle()
+
+        '''
+
         # Plot Edge Labels
         if not self.displaysNTF:
             # Plot actual edge labels
             self.edgeLabels = Utilities.join_intersect_dicts(nx.get_edge_attributes(self.network, 'capacity'),
                                                   nx.get_edge_attributes(self.network, 'transitTime'))  # Edge labels
+        elif self.displaysNashFlow:
+            self.edgeLabels = {}
+
+
+
         else:
             # Plot flow value
             self.edgeLabels = {edge:"%.2f" % self.NTFEdgeFlowDict[edge] for edge in self.NTFEdgeFlowDict}
@@ -362,15 +395,13 @@ class PlotCanvas(FigureCanvas):
             # Plot NTFNodeLabels
             offset = (0, 8)
             add_tuple_offset = lambda a: (a[0] + offset[0], a[1] + offset[1])
-            movedPositions = {edge:add_tuple_offset(positions[edge]) for edge in positions}
+            movedPositions = {node:add_tuple_offset(positions[node]) for node in positions}
             self.NTFNodeLabelCollection = draw_networkx_labels(self.network, pos=movedPositions, ax=self.axes,
                                                                labels={node:"%.2f" % self.NTFNodeLabelDict[node] for node in self.NTFNodeLabelDict}, font_size=nodeLabelSize)
 
+        '''
 
 
-        self.edgeLabelCollection = draw_networkx_edge_labels(self.network, pos=positions, ax=self.axes, edge_labels=self.edgeLabels, font_size=edgeLabelSize)
-
-        self.draw_idle()
 
     def update_plot(self):
         self.update_nodes()
@@ -535,12 +566,11 @@ class PlotCanvas(FigureCanvas):
                 collectionIndex += 1
 
         # Update edge label texts and positions
+        lbls = self.get_edge_labels()
         for edge, label in self.edgeLabelCollection.iteritems():    # type(label) = matplotlib.text.Text object
             v, w = edge
-            if not self.displaysNTF:
-                lblTuple = (self.network[v][w]['capacity'], self.network[v][w]['transitTime'])
-            else:
-                lblTuple = "%.2f" % self.NTFEdgeFlowDict[edge]
+            lblTuple = lbls[(v,w)] #(self.network[v][w]['capacity'], self.network[v][w]['transitTime'])
+#                lblTuple = "%.2f" % self.NTFEdgeFlowDict[edge]
             if label.get_text() != lblTuple:
                 label.set_text(lblTuple)
             posv = (self.network.node[v]['position'][0]*0.5, self.network.node[v]['position'][1]*0.5)
@@ -582,10 +612,9 @@ class PlotCanvas(FigureCanvas):
         for edge, label in self.edgeLabelCollection.iteritems():
             label.set_fontsize(edgeLabelSize)
 
-        # Scale font size of NTF Node Labels, if existing
-        if self.displaysNTF:
-            for v, label in self.NTFNodeLabelCollection.iteritems():
-                label.set_fontsize(nodeLabelSize)
+        # Scale font size of Additional Node Labels, if existing
+        for v, label in self.additionalNodeLabelCollection.iteritems():
+            label.set_fontsize(nodeLabelSize)
 
         self.draw_idle()
 
@@ -598,3 +627,5 @@ class PlotCanvas(FigureCanvas):
 
         self.axes.set_xlim(self.Xlim)
         self.axes.set_ylim(self.Ylim)
+
+
