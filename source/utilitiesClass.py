@@ -9,6 +9,7 @@ import os
 import time
 import networkx as nx
 import matplotlib
+matplotlib.use("Qt4Agg")
 import numpy as np
 
 

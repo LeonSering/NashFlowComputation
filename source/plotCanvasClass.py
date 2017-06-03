@@ -14,6 +14,7 @@ import numpy as np
 import time
 from math import sqrt
 import matplotlib.figure
+matplotlib.use("Qt4Agg")
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 #from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.colors import colorConverter

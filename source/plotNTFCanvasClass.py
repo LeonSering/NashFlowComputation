@@ -9,6 +9,7 @@
 from plotCanvasClass import PlotCanvas
 import time
 import matplotlib.figure
+matplotlib.use("Qt4Agg")
 
 # ======================================================================================================================
 

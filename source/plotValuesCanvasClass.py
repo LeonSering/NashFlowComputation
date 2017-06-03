@@ -4,7 +4,9 @@
 # File:         plotValuesCanvasClass.py
 # ===========================================================================
 
+import matplotlib
 from matplotlib import figure, lines
+matplotlib.use("Qt4Agg")
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 
 
