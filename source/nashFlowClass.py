@@ -14,8 +14,7 @@ TOL = 1e-8
 class NashFlow:
     """description of class"""
 
-    def __init__(self, interface, graph, inflowRate, numberOfIntervals, outputDirectory, templateFile, scipFile):
-        self.interface = interface
+    def __init__(self, graph, inflowRate, numberOfIntervals, outputDirectory, templateFile, scipFile):
         self.network = graph.copy()
         self.inflowRate = inflowRate  # For the moment: constant
         self.numberOfIntervals = numberOfIntervals
@@ -47,7 +46,6 @@ class NashFlow:
         while computedUpperBound < float('inf') and k <= self.numberOfIntervals:
             self.compute_flowInterval()
             computedUpperBound = self.flowIntervals[-1][1]
-            self.interface.add_last_interval_to_list()
             k += 1
         print(self.numberOfSolvedIPs)
 

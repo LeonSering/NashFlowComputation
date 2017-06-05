@@ -10,6 +10,12 @@
     <height>1077</height>
    </rect>
   </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
@@ -17,6 +23,12 @@
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
      <widget class="QTabWidget" name="tabWidget">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
       <property name="currentIndex">
        <number>0</number>
       </property>
@@ -897,6 +909,8 @@
     <addaction name="actionNew_graph"/>
     <addaction name="actionLoad_graph"/>
     <addaction name="actionSave_graph"/>
+    <addaction name="actionLoad_NashFlow"/>
+    <addaction name="actionSave_NashFlow"/>
     <addaction name="actionExit"/>
    </widget>
    <addaction name="menuFile"/>
@@ -930,6 +944,16 @@
   <action name="actionExit">
    <property name="text">
     <string>Exit</string>
+   </property>
+  </action>
+  <action name="actionLoad_NashFlow">
+   <property name="text">
+    <string>Load NashFlow</string>
+   </property>
+  </action>
+  <action name="actionSave_NashFlow">
+   <property name="text">
+    <string>Save NashFlow</string>
    </property>
   </action>
  </widget>
