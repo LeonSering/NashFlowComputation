@@ -142,3 +142,21 @@ class FlowInterval():
         for v,w in self.shortestPathNetwork.edges():
             minimalCongestion = min(map(p, self.shortestPathNetwork.in_edges(w)))
             assert( Utilities.is_eq_tol(self.NTFEdgeFlowDict[v,w], 0) or Utilities.is_eq_tol(p((v,w)), minimalCongestion) )
+
+
+        # Check if actually an s-t-flow
+        for w in self.shortestPathNetwork:
+            m = 0
+            incomingEdges = self.shortestPathNetwork.in_edges(w)
+            outgoingEdges = self.shortestPathNetwork.out_edges(w)
+            for e in incomingEdges:
+                m += self.NTFEdgeFlowDict[e]
+            for e in outgoingEdges:
+                m -= self.NTFEdgeFlowDict[e]
+
+            if w == 's':
+                assert( Utilities.is_eq_tol(m, (-1)*self.inflowRate) )
+            elif w == 't':
+                assert (Utilities.is_eq_tol(m, self.inflowRate))
+            else:
+                assert (Utilities.is_eq_tol(m, 0))
