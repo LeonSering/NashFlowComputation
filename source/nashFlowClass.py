@@ -9,6 +9,7 @@ from collections import OrderedDict
 from flowIntervalClass import FlowInterval
 from utilitiesClass import Utilities
 import os
+
 TOL = 1e-8
 
 class NashFlow:
@@ -22,10 +23,8 @@ class NashFlow:
         self.templateFile = templateFile
         self.scipFile = scipFile
         self.numberOfSolvedIPs = 0
+        self.infinityReached = False # True if last interval has alpha = +inf
 
-        for v, w in self.network.edges_iter():
-            self.network[v][w]['inflow'] = OrderedDict()
-            self.network[v][w]['outflow'] = OrderedDict()
 
         self.minCapacity = Utilities.compute_min_capacity(self.network)
         self.counter = 0
@@ -47,7 +46,7 @@ class NashFlow:
             self.compute_flowInterval()
             computedUpperBound = self.flowIntervals[-1][1]
             k += 1
-        print(self.numberOfSolvedIPs)
+
 
     def compute_flowInterval(self):
         # NOTE TO MYSELF: computing shortest paths and resetting edges is only necessary for first flowInterval -> later: implement in flowIntervallClass
@@ -73,24 +72,79 @@ class NashFlow:
         interval.compute_alpha({node:self.node_label(node, lowerBoundTime) for node in self.network})
         self.flowIntervals.append((interval.lowerBoundTime, interval.upperBoundTime, interval))
 
-        # Update in-flow rates
+        # Update in/out-flow rates
         if lowerBoundTime == 0:
-            #init inflow
+            #init in/outflow
             for v, w in self.network.edges_iter():
-                self.network[v][w]['inflow'][(0, self.node_label(v, 0))] = 0
-                self.network[v][w]['outflow'][(0, self.node_label(w, 0))] = 0
+                vTimeLower = self.node_label(v, 0)
+                wTimeLower = self.node_label(w, 0)
+
+                self.network[v][w]['inflow'] = OrderedDict()
+                self.network[v][w]['inflow'][(0, vTimeLower)] = 0
+
+                self.network[v][w]['outflow'] = OrderedDict()
+                self.network[v][w]['outflow'][(0, wTimeLower)] = 0
+
+                self.network[v][w]['cumulativeInflow'] = OrderedDict()
+                self.network[v][w]['cumulativeInflow'][0] = 0
+                self.network[v][w]['cumulativeInflow'][vTimeLower] = 0
+
+                self.network[v][w]['cumulativeOutflow'] = OrderedDict()
+                self.network[v][w]['cumulativeOutflow'][0] = 0
+                self.network[v][w]['cumulativeOutflow'][wTimeLower] = 0
+
+                self.network[v][w]['queueSize'] = OrderedDict()
+                self.network[v][w]['queueSize'][0] = 0
+                self.network[v][w]['queueSize'][vTimeLower] = 0
+
+
+
+
+
+
+
 
         for v, w in self.network.edges_iter():
-            if Utilities.is_not_eq_tol(interval.NTFNodeLabelDict[v], 0):
-                self.network[v][w]['inflow'][(self.node_label(v, interval.lowerBoundTime), self.node_label(v, interval.upperBoundTime))] = interval.NTFEdgeFlowDict[(v,w)]/interval.NTFNodeLabelDict[v]
-            if Utilities.is_not_eq_tol(interval.NTFNodeLabelDict[w], 0):
-                self.network[v][w]['outflow'][(self.node_label(w, interval.lowerBoundTime), self.node_label(w, interval.upperBoundTime))] = interval.NTFEdgeFlowDict[(v,w)]/interval.NTFNodeLabelDict[w]
+
+            # Inflow changes
+            vTimeLower, vTimeUpper = self.node_label(v, interval.lowerBoundTime), self.node_label(v, interval.upperBoundTime)
+            inflowChangeBool = Utilities.is_not_eq_tol(interval.NTFNodeLabelDict[v], 0) # Can we extend the inflow interval?
+            inflowVal = interval.NTFEdgeFlowDict[(v, w)] / interval.NTFNodeLabelDict[v] if inflowChangeBool else 0
+            if inflowChangeBool:
+                self.network[v][w]['inflow'][(vTimeLower, vTimeUpper)] = inflowVal
+
+            if vTimeUpper < float('inf'):
+                vLastTime = next(reversed(self.network[v][w]['cumulativeInflow']))
+                self.network[v][w]['cumulativeInflow'][vTimeUpper] = self.network[v][w]['cumulativeInflow'][vLastTime] + inflowVal * (vTimeUpper-vTimeLower)
+
+            # Outflow changes
+            wTimeLower, wTimeUpper = self.node_label(w, interval.lowerBoundTime), self.node_label(w, interval.upperBoundTime)
+            outflowChangeBool = Utilities.is_not_eq_tol(interval.NTFNodeLabelDict[w], 0) # Can we extend the outflow interval?
+            outflowVal = interval.NTFEdgeFlowDict[(v, w)] / interval.NTFNodeLabelDict[w] if outflowChangeBool else 0
+            if outflowChangeBool:
+                self.network[v][w]['outflow'][(wTimeLower, wTimeUpper)] = outflowVal
+
+            if wTimeUpper < float('inf'):
+                wLastTime = next(reversed(self.network[v][w]['cumulativeOutflow']))
+                self.network[v][w]['cumulativeOutflow'][wTimeUpper] = self.network[v][w]['cumulativeOutflow'][wLastTime] + outflowVal * (wTimeUpper-wTimeLower)
+
+            # Queue size changes
+            if vTimeUpper < float('inf'):
+                lastQueueSizeTime = next(reversed(self.network[v][w]['queueSize']))
+                lastQueueSize = self.network[v][w]['queueSize'][lastQueueSizeTime]
+                self.network[v][w]['queueSize'][vTimeUpper] = max(0, lastQueueSize + (inflowVal - self.network[v][w]['capacity'])*(vTimeUpper-vTimeLower))
+
+
 
         self.counter += 1
         self.numberOfSolvedIPs += interval.numberOfSolvedIPs
 
+        self.infinityReached = ( interval.alpha == float('inf') )
+
 
     def node_label(self, v, time):
+        if time == float('inf'):
+            return float('inf')
         intervalLowerBoundTime = self.time_interval_correspondence(time)
         interval = self.lowerBoundsToIntervalDict[intervalLowerBoundTime]
         label = interval.shortestPathNetwork.node[v]['dist'] + (time-intervalLowerBoundTime)*interval.NTFNodeLabelDict[v]
@@ -122,6 +176,28 @@ class NashFlow:
                 break
         return integral
 
+    def cumulative_inflow_work_in_progress(self, v, w, time):
+        if time <= TOL:
+            return 0
+
+        lastCumulativeInflowTime = next(reversed(self.network[v][w]['cumulativeInflow']))
+
+
+        assert( Utilities.is_geq_tol(lastCumulativeInflowTime, time) or self.infinityReached)
+
+        # Find position of element to the left
+        timesList = self.network[v][w]['cumulativeInflow'].keys()
+        pos = Utilities.get_insertion_point_left(timesList, time)
+        if pos == 0:
+            return 0
+        elif pos > len(timesList):
+            lastTime = timesList[pos-1]
+            inflow = self.network[v][w]['inflow'][next(reversed(self.network[v][w]['inflow']))]
+            return self.network[v][w]['cumulativeInflow'][lastTime] + (time-lastTime)*inflow
+        else:
+            pass
+
+
     def cumulative_outflow(self, v, w, time):
         if time <= TOL:
             return 0
@@ -151,26 +227,3 @@ class NashFlow:
         return lastTime
 
 
-#Instance for debugging
-'''
-#TRIVIAL, first alpha = inf
-inflowRate = 10
-nodes = ['s', 'a', 'b', 't']
-edges = [('s', 'a'),  ('a', 't'), ('a', 'b'), ('b', 't')]
-transitTimeList = [1, 2, 1, 4]
-transitTimeDict = {entry[0]:entry[1] for entry in zip(edges, transitTimeList)}
-capacityList = [5, 7, 2, 5]
-capacityDict = {entry[0]:entry[1] for entry in zip(edges, capacityList)}
-
-nf = NashFlow(nodes, edges, transitTimeDict, capacityDict, inflowRate)
-
-inflowRate = 20
-nodes = ['s', 'v', 'w', 't']
-edges = [('s', 'v'),  ('s', 'w'), ('v', 'w'), ('v', 't'), ('w', 't')]
-transitTimeList = [1, 6, 1, 5, 1]
-transitTimeDict = {entry[0]:entry[1] for entry in zip(edges, transitTimeList)}
-capacityList = [2, 1, 1, 2, 1]
-capacityDict = {entry[0]:entry[1] for entry in zip(edges, capacityList)}
-
-nf = NashFlow(nodes, edges, transitTimeDict, capacityDict, inflowRate)
-'''

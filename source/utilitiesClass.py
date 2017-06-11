@@ -11,6 +11,7 @@ import networkx as nx
 import matplotlib
 matplotlib.use("Qt4Agg")
 import numpy as np
+import bisect
 
 
 
@@ -38,6 +39,9 @@ class Utilities:
     def is_geq_tol(a, b, tol=TOL):
         return ( a-b+tol >= 0 )
 
+    @staticmethod
+    def get_insertion_point_left(L, el):
+        return bisect.bisect_left(L, el)
 
     @staticmethod
     def get_shortest_path_network(network, time, labels=None):

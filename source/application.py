@@ -17,7 +17,7 @@ from plotAnimationCanvasClass import PlotAnimationCanvas
 from plotValuesCanvasClass import PlotValuesCanvas
 from ui import mainWdw
 import networkx as nx
-
+from utilitiesClass import Utilities
 import ConfigParser
 
 filterwarnings('ignore')  # For the moment: ignore warnings as pyplot.hold is deprecated
@@ -26,6 +26,8 @@ if os.name == 'posix':
     from PyQt4 import QtGui
 else:
     from PySide import QtGui
+
+TOL = 1e-8
 
 # =======================================================================================================================
 
@@ -492,7 +494,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
 
     def add_intervals_to_list(self):
         for index, interval in enumerate(self.nashFlow.flowIntervals):
-            intervalString = 'Interval ' + str(interval[2].id) + ': [' + str(interval[0]) + ',' + str(interval[1]) + '['
+            intervalString = 'Interval ' + str(interval[2].id) + ': [' + str("%.2f" % interval[0]) + ',' + str("%.2f" % interval[1]) + '['
             item = QtGui.QListWidgetItem(intervalString)
             self.intervalsListWidget.addItem(item)  # Add item to listWidget
 
@@ -553,63 +555,44 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
 
         upperBoundInput = str(self.edgeFlowPlotUpperBoundLineEdit.text())
         if upperBoundInput == "":
-            upperBoundInput = self.nashFlow.node_label(v, self.nashFlow.flowIntervals[-1][1]) if self.nashFlow.flowIntervals[-1][1] < float('inf') else self.nashFlow.node_label(v, self.nashFlow.flowIntervals[-1][0])
+            upperBoundInput = self.nashFlow.node_label(v, self.nashFlow.flowIntervals[-1][1])\
+                if self.nashFlow.flowIntervals[-1][1] < float('inf')\
+                else self.nashFlow.node_label(v, self.nashFlow.flowIntervals[-1][0])
 
         upperBound = float(upperBoundInput)
 
-        inflowXValues = [0, self.nashFlow.node_label(v, 0)]
-        outflowXValues = [0, self.nashFlow.node_label(w, 0)]
-        queueXValues = [self.nashFlow.node_label(v, 0), self.nashFlow.node_label(w, 0)]
 
-        inflowYValues = [0,0]
-        outflowYValues = [0,0]
-        queueYValues = []
+        inflowXValues = self.nashFlow.network[v][w]['cumulativeInflow'].keys()
+        inflowYValues = self.nashFlow.network[v][w]['cumulativeInflow'].values()
 
-        transitTime = self.nashFlow.network[v][w]['transitTime']
-        computedUpperBound = self.nashFlow.flowIntervals[-1][1]
-        for interval in self.nashFlow.flowIntervals:
-            if interval[1] < float('inf'):
-                time = interval[1]
-                vTime = self.nashFlow.node_label(v, time)
-                wTime = self.nashFlow.node_label(w, time)
-                inflowXValues.append(vTime)
-                outflowXValues.append(wTime)
-
-                if vTime + transitTime <= computedUpperBound:
-                    queueXValues.append(vTime)
-                if wTime + transitTime <= computedUpperBound:
-                    queueXValues.append(wTime)
-
-                inflowYValues.append(self.nashFlow.cumulative_inflow(v,w,vTime))
-                outflowYValues.append(self.nashFlow.cumulative_outflow(v,w,wTime))
-                '''
-                if time + transitTime <= computedUpperBound:
-                    queueXValues.append(time)
-                    queueYValues.append(self.nashFlow.queue_delay(v,w,time))
-                '''
-
-        queueXValues.sort() # Necessary?
-        queueYValues = map(lambda time: self.nashFlow.queue_size(v,w,time), queueXValues)
-
-        '''
-        if upperBound > max(inflowXValues[-1], outflowYValues[-1]) and self.nashFlow.flowIntervals[-1][1] == float('inf'):
-            inflowXValues.append(self.nashFlow.node_label(v, upperBound))
-            outflowXValues.append(self.nashFlow.node_label(v, upperBound))
+        if upperBound > inflowXValues[-1] and self.nashFlow.infinityReached:
+            lastInflow = self.nashFlow.network[v][w]['inflow'][next(reversed(self.nashFlow.network[v][w]['inflow']))]
+            val = inflowYValues[-1] + (upperBound-inflowXValues[-1])*lastInflow
+            inflowXValues.append(upperBound)
+            inflowYValues.append(val)
 
 
-            inflowYValues.append(self.nashFlow.cumulative_inflow(v,w,upperBound))
-            outflowYValues.append(self.nashFlow.cumulative_outflow(v,w,upperBound))
+
+        outflowXValues = self.nashFlow.network[v][w]['cumulativeOutflow'].keys()
+        outflowYValues = self.nashFlow.network[v][w]['cumulativeOutflow'].values()
+
+        if upperBound > outflowXValues[-1] and self.nashFlow.infinityReached:
+            lastOutflow = self.nashFlow.network[v][w]['outflow'][next(reversed(self.nashFlow.network[v][w]['outflow']))]
+            val = outflowYValues[-1] + (upperBound-outflowXValues[-1])*lastOutflow
+            outflowXValues.append(upperBound)
+            outflowYValues.append(val)
 
 
-        if upperBound > queueXValues[-1] and self.nashFlow.flowIntervals[-1][1] == float('inf'):
-            queueXValues.append(self.nashFlow.node_label(upperBound, v))
-            queueYValues.append(self.nashFlow.queue_si(v, w, upperBound))
-        '''
+        queueXValues = self.nashFlow.network[v][w]['queueSize'].keys()
+        queueYValues = self.nashFlow.network[v][w]['queueSize'].values()
+
+        if upperBound > queueXValues[-1] and self.nashFlow.infinityReached:
+            # Queue size stays constant
+            queueXValues.append(upperBound)
+            queueYValues.append(queueYValues[-1])
 
         self.plotEdgeFlowCanvas.update_plot(lowerBound, upperBound, inflowXValues, inflowYValues, (outflowXValues, outflowYValues))
         self.plotEdgeQueueCanvas.update_plot(lowerBound, upperBound, queueXValues, queueYValues)
-
-
 
 
 

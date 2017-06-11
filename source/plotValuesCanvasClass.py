@@ -33,7 +33,7 @@ class PlotValuesCanvas(FigureCanvas):
             axes.plot(xVals, yVals, linewidth=2, color='red')
 
         axes.set_xlim(lowerBound, upperBound)
-        axes.set_ylim(yMin, yMax)
+        axes.set_ylim(max(0, yMin), int(max(1,yMax)*1.5))
 
 
         self.draw_idle()
