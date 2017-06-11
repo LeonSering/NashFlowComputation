@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1292</width>
-    <height>1077</height>
+    <height>1084</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -57,9 +57,15 @@
          <rect>
           <x>650</x>
           <y>0</y>
-          <width>121</width>
-          <height>361</height>
+          <width>131</width>
+          <height>311</height>
          </rect>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QGroupBox { 
+     border: 2px solid rgb(0, 0, 127); 
+     border-radius: 1px; 
+ } </string>
         </property>
         <property name="title">
          <string>Edge</string>
@@ -67,8 +73,8 @@
         <widget class="QLabel" name="label_4">
          <property name="geometry">
           <rect>
-           <x>0</x>
-           <y>80</y>
+           <x>10</x>
+           <y>70</y>
            <width>68</width>
            <height>21</height>
           </rect>
@@ -80,7 +86,7 @@
         <widget class="QLabel" name="label_5">
          <property name="geometry">
           <rect>
-           <x>0</x>
+           <x>10</x>
            <y>20</y>
            <width>68</width>
            <height>21</height>
@@ -93,28 +99,28 @@
         <widget class="QLineEdit" name="tailLineEdit">
          <property name="geometry">
           <rect>
-           <x>0</x>
+           <x>10</x>
            <y>40</y>
-           <width>121</width>
-           <height>27</height>
+           <width>111</width>
+           <height>21</height>
           </rect>
          </property>
         </widget>
         <widget class="QLineEdit" name="headLineEdit">
          <property name="geometry">
           <rect>
-           <x>0</x>
-           <y>100</y>
-           <width>121</width>
-           <height>27</height>
+           <x>10</x>
+           <y>90</y>
+           <width>111</width>
+           <height>21</height>
           </rect>
          </property>
         </widget>
         <widget class="QLabel" name="label_6">
          <property name="geometry">
           <rect>
-           <x>0</x>
-           <y>200</y>
+           <x>10</x>
+           <y>170</y>
            <width>81</width>
            <height>21</height>
           </rect>
@@ -126,28 +132,28 @@
         <widget class="QLineEdit" name="transitTimeLineEdit">
          <property name="geometry">
           <rect>
-           <x>0</x>
-           <y>220</y>
-           <width>121</width>
-           <height>27</height>
+           <x>10</x>
+           <y>190</y>
+           <width>111</width>
+           <height>21</height>
           </rect>
          </property>
         </widget>
         <widget class="QLineEdit" name="capacityLineEdit">
          <property name="geometry">
           <rect>
-           <x>0</x>
-           <y>160</y>
-           <width>121</width>
-           <height>27</height>
+           <x>10</x>
+           <y>140</y>
+           <width>111</width>
+           <height>21</height>
           </rect>
          </property>
         </widget>
         <widget class="QLabel" name="label_7">
          <property name="geometry">
           <rect>
-           <x>0</x>
-           <y>140</y>
+           <x>10</x>
+           <y>120</y>
            <width>81</width>
            <height>21</height>
           </rect>
@@ -159,14 +165,14 @@
         <widget class="QPushButton" name="updateEdgeButton">
          <property name="geometry">
           <rect>
-           <x>0</x>
-           <y>260</y>
-           <width>121</width>
-           <height>41</height>
+           <x>10</x>
+           <y>230</y>
+           <width>111</width>
+           <height>31</height>
           </rect>
          </property>
          <property name="text">
-          <string>Update/add edge</string>
+          <string>Add/Upd. edge</string>
          </property>
          <property name="autoDefault">
           <bool>false</bool>
@@ -181,10 +187,10 @@
         <widget class="QPushButton" name="deleteEdgeButton">
          <property name="geometry">
           <rect>
-           <x>0</x>
-           <y>310</y>
-           <width>121</width>
-           <height>41</height>
+           <x>10</x>
+           <y>270</y>
+           <width>111</width>
+           <height>31</height>
           </rect>
          </property>
          <property name="text">
@@ -207,8 +213,14 @@
           <x>790</x>
           <y>0</y>
           <width>131</width>
-          <height>301</height>
+          <height>311</height>
          </rect>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QGroupBox { 
+     border: 2px solid rgb(0, 0, 127); 
+     border-radius: 1px; 
+ } </string>
         </property>
         <property name="title">
          <string>Node</string>
@@ -216,7 +228,7 @@
         <widget class="QLabel" name="label">
          <property name="geometry">
           <rect>
-           <x>0</x>
+           <x>10</x>
            <y>20</y>
            <width>68</width>
            <height>21</height>
@@ -229,28 +241,28 @@
         <widget class="QLineEdit" name="nodeNameLineEdit">
          <property name="geometry">
           <rect>
-           <x>0</x>
+           <x>10</x>
            <y>40</y>
-           <width>121</width>
-           <height>27</height>
+           <width>111</width>
+           <height>21</height>
           </rect>
          </property>
         </widget>
         <widget class="QLineEdit" name="nodeXLineEdit">
          <property name="geometry">
           <rect>
-           <x>0</x>
-           <y>100</y>
-           <width>121</width>
-           <height>27</height>
+           <x>10</x>
+           <y>90</y>
+           <width>111</width>
+           <height>21</height>
           </rect>
          </property>
         </widget>
         <widget class="QLabel" name="label_2">
          <property name="geometry">
           <rect>
-           <x>0</x>
-           <y>80</y>
+           <x>10</x>
+           <y>70</y>
            <width>68</width>
            <height>21</height>
           </rect>
@@ -262,8 +274,8 @@
         <widget class="QLabel" name="label_3">
          <property name="geometry">
           <rect>
-           <x>0</x>
-           <y>140</y>
+           <x>10</x>
+           <y>120</y>
            <width>68</width>
            <height>21</height>
           </rect>
@@ -275,20 +287,20 @@
         <widget class="QLineEdit" name="nodeYLineEdit">
          <property name="geometry">
           <rect>
-           <x>0</x>
-           <y>160</y>
-           <width>121</width>
-           <height>27</height>
+           <x>10</x>
+           <y>140</y>
+           <width>111</width>
+           <height>21</height>
           </rect>
          </property>
         </widget>
         <widget class="QPushButton" name="updateNodeButton">
          <property name="geometry">
           <rect>
-           <x>0</x>
-           <y>200</y>
-           <width>121</width>
-           <height>41</height>
+           <x>10</x>
+           <y>230</y>
+           <width>111</width>
+           <height>31</height>
           </rect>
          </property>
          <property name="text">
@@ -307,10 +319,10 @@
         <widget class="QPushButton" name="deleteNodeButton">
          <property name="geometry">
           <rect>
-           <x>0</x>
-           <y>250</y>
-           <width>121</width>
-           <height>41</height>
+           <x>10</x>
+           <y>270</y>
+           <width>111</width>
+           <height>31</height>
           </rect>
          </property>
          <property name="text">
@@ -336,6 +348,12 @@
           <height>201</height>
          </rect>
         </property>
+        <property name="styleSheet">
+         <string notr="true">QGroupBox { 
+     border: 2px solid rgb(0, 0, 127); 
+     border-radius: 1px; 
+ } </string>
+        </property>
         <property name="title">
          <string>Config</string>
         </property>
@@ -357,8 +375,8 @@
           <rect>
            <x>770</x>
            <y>40</y>
-           <width>113</width>
-           <height>27</height>
+           <width>131</width>
+           <height>21</height>
           </rect>
          </property>
          <property name="text">
@@ -368,7 +386,7 @@
         <widget class="QLabel" name="label_9">
          <property name="geometry">
           <rect>
-           <x>0</x>
+           <x>10</x>
            <y>20</y>
            <width>121</width>
            <height>17</height>
@@ -381,10 +399,10 @@
         <widget class="QLineEdit" name="outputDirectoryLineEdit">
          <property name="geometry">
           <rect>
-           <x>0</x>
+           <x>10</x>
            <y>40</y>
            <width>601</width>
-           <height>27</height>
+           <height>21</height>
           </rect>
          </property>
         </widget>
@@ -392,7 +410,7 @@
          <property name="geometry">
           <rect>
            <x>770</x>
-           <y>80</y>
+           <y>70</y>
            <width>141</width>
            <height>17</height>
           </rect>
@@ -405,9 +423,9 @@
          <property name="geometry">
           <rect>
            <x>770</x>
-           <y>100</y>
-           <width>113</width>
-           <height>27</height>
+           <y>90</y>
+           <width>131</width>
+           <height>21</height>
           </rect>
          </property>
          <property name="text">
@@ -417,8 +435,8 @@
         <widget class="QLabel" name="label_11">
          <property name="geometry">
           <rect>
-           <x>0</x>
-           <y>80</y>
+           <x>10</x>
+           <y>70</y>
            <width>121</width>
            <height>17</height>
           </rect>
@@ -430,20 +448,20 @@
         <widget class="QLineEdit" name="templateFileLineEdit">
          <property name="geometry">
           <rect>
-           <x>0</x>
-           <y>100</y>
+           <x>10</x>
+           <y>90</y>
            <width>601</width>
-           <height>27</height>
+           <height>21</height>
           </rect>
          </property>
         </widget>
         <widget class="QPushButton" name="outputDirectoryPushButton">
          <property name="geometry">
           <rect>
-           <x>610</x>
+           <x>620</x>
            <y>40</y>
            <width>131</width>
-           <height>27</height>
+           <height>21</height>
           </rect>
          </property>
          <property name="text">
@@ -453,10 +471,10 @@
         <widget class="QPushButton" name="templateFilePushButton">
          <property name="geometry">
           <rect>
-           <x>610</x>
-           <y>100</y>
+           <x>620</x>
+           <y>90</y>
            <width>131</width>
-           <height>27</height>
+           <height>21</height>
           </rect>
          </property>
          <property name="text">
@@ -466,18 +484,18 @@
         <widget class="QLineEdit" name="scipPathLineEdit">
          <property name="geometry">
           <rect>
-           <x>0</x>
-           <y>160</y>
+           <x>10</x>
+           <y>140</y>
            <width>601</width>
-           <height>27</height>
+           <height>21</height>
           </rect>
          </property>
         </widget>
         <widget class="QLabel" name="label_12">
          <property name="geometry">
           <rect>
-           <x>0</x>
-           <y>140</y>
+           <x>10</x>
+           <y>120</y>
            <width>121</width>
            <height>17</height>
           </rect>
@@ -489,10 +507,10 @@
         <widget class="QPushButton" name="scipPathPushButton">
          <property name="geometry">
           <rect>
-           <x>610</x>
-           <y>160</y>
+           <x>620</x>
+           <y>140</y>
            <width>131</width>
-           <height>27</height>
+           <height>21</height>
           </rect>
          </property>
          <property name="text">
@@ -504,9 +522,9 @@
         <property name="geometry">
          <rect>
           <x>780</x>
-          <y>570</y>
-          <width>141</width>
-          <height>51</height>
+          <y>550</y>
+          <width>131</width>
+          <height>71</height>
          </rect>
         </property>
         <property name="text">
@@ -533,8 +551,14 @@
           <x>670</x>
           <y>10</y>
           <width>271</width>
-          <height>541</height>
+          <height>591</height>
          </rect>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QGroupBox { 
+     border: 2px solid rgb(0, 0, 127); 
+     border-radius: 1px; 
+ } </string>
         </property>
         <property name="title">
          <string>Edge</string>
@@ -546,7 +570,7 @@
          <property name="geometry">
           <rect>
            <x>10</x>
-           <y>20</y>
+           <y>40</y>
            <width>251</width>
            <height>241</height>
           </rect>
@@ -559,7 +583,7 @@
          <property name="geometry">
           <rect>
            <x>10</x>
-           <y>270</y>
+           <y>310</y>
            <width>251</width>
            <height>241</height>
           </rect>
@@ -572,7 +596,7 @@
          <property name="geometry">
           <rect>
            <x>110</x>
-           <y>520</y>
+           <y>560</y>
            <width>16</width>
            <height>21</height>
           </rect>
@@ -585,7 +609,7 @@
          <property name="geometry">
           <rect>
            <x>10</x>
-           <y>520</y>
+           <y>560</y>
            <width>61</width>
            <height>21</height>
           </rect>
@@ -598,7 +622,7 @@
          <property name="geometry">
           <rect>
            <x>160</x>
-           <y>520</y>
+           <y>560</y>
            <width>101</width>
            <height>21</height>
           </rect>
@@ -611,7 +635,7 @@
          <property name="geometry">
           <rect>
            <x>70</x>
-           <y>520</y>
+           <y>560</y>
            <width>31</width>
            <height>21</height>
           </rect>
@@ -624,13 +648,39 @@
          <property name="geometry">
           <rect>
            <x>120</x>
-           <y>520</y>
+           <y>560</y>
            <width>31</width>
            <height>21</height>
           </rect>
          </property>
          <property name="text">
           <string/>
+         </property>
+        </widget>
+        <widget class="QLabel" name="label_19">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>20</y>
+           <width>191</width>
+           <height>17</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Cumulative in- and outflow</string>
+         </property>
+        </widget>
+        <widget class="QLabel" name="label_20">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>290</y>
+           <width>191</width>
+           <height>17</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Queue size</string>
          </property>
         </widget>
        </widget>
@@ -643,6 +693,12 @@
           <height>321</height>
          </rect>
         </property>
+        <property name="styleSheet">
+         <string notr="true">QGroupBox { 
+     border: 2px solid rgb(0, 0, 127); 
+     border-radius: 1px; 
+ } </string>
+        </property>
         <property name="title">
          <string>Node</string>
         </property>
@@ -650,7 +706,7 @@
          <property name="geometry">
           <rect>
            <x>10</x>
-           <y>20</y>
+           <y>40</y>
            <width>251</width>
            <height>241</height>
           </rect>
@@ -663,7 +719,7 @@
          <property name="geometry">
           <rect>
            <x>10</x>
-           <y>270</y>
+           <y>290</y>
            <width>61</width>
            <height>21</height>
           </rect>
@@ -676,7 +732,7 @@
          <property name="geometry">
           <rect>
            <x>110</x>
-           <y>270</y>
+           <y>290</y>
            <width>16</width>
            <height>21</height>
           </rect>
@@ -689,7 +745,7 @@
          <property name="geometry">
           <rect>
            <x>70</x>
-           <y>270</y>
+           <y>290</y>
            <width>31</width>
            <height>21</height>
           </rect>
@@ -702,7 +758,7 @@
          <property name="geometry">
           <rect>
            <x>160</x>
-           <y>270</y>
+           <y>290</y>
            <width>101</width>
            <height>21</height>
           </rect>
@@ -715,7 +771,7 @@
          <property name="geometry">
           <rect>
            <x>120</x>
-           <y>270</y>
+           <y>290</y>
            <width>31</width>
            <height>21</height>
           </rect>
@@ -724,28 +780,34 @@
           <string/>
          </property>
         </widget>
-       </widget>
-       <widget class="QSlider" name="timeSlider">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>430</y>
-          <width>631</width>
-          <height>19</height>
-         </rect>
-        </property>
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
+        <widget class="QLabel" name="label_21">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>20</y>
+           <width>221</width>
+           <height>17</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Dynamic shortest path distances</string>
+         </property>
+        </widget>
        </widget>
        <widget class="QGroupBox" name="groupBox_4">
         <property name="geometry">
          <rect>
           <x>0</x>
-          <y>460</y>
+          <y>490</y>
           <width>651</width>
           <height>431</height>
          </rect>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QGroupBox { 
+     border: 2px solid rgb(0, 0, 127); 
+     border-radius: 1px; 
+ } </string>
         </property>
         <property name="title">
          <string>Normalized Thin Flows</string>
@@ -770,11 +832,20 @@
           <x>0</x>
           <y>10</y>
           <width>651</width>
-          <height>421</height>
+          <height>471</height>
          </rect>
         </property>
+        <property name="autoFillBackground">
+         <bool>false</bool>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QGroupBox { 
+     border: 2px solid rgb(0, 0, 127); 
+     border-radius: 1px; 
+ } </string>
+        </property>
         <property name="title">
-         <string>Nash Flow over Time</string>
+         <string>Nash Flow over time</string>
         </property>
         <widget class="QFrame" name="plotAnimationFrame">
          <property name="geometry">
@@ -789,102 +860,117 @@
           <enum>QFrame::Box</enum>
          </property>
         </widget>
-       </widget>
-       <widget class="QGroupBox" name="groupBox_8">
-        <property name="geometry">
-         <rect>
-          <x>700</x>
-          <y>670</y>
-          <width>541</width>
-          <height>261</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <weight>50</weight>
-          <bold>false</bold>
-          <kerning>true</kerning>
-         </font>
-        </property>
-        <property name="styleSheet">
-         <string notr="true"/>
-        </property>
-        <property name="title">
-         <string>Animation</string>
-        </property>
-        <widget class="QLineEdit" name="animationStartLineEdit">
-         <property name="geometry">
-          <rect>
-           <x>50</x>
-           <y>30</y>
-           <width>51</width>
-           <height>27</height>
-          </rect>
-         </property>
-        </widget>
-        <widget class="QLabel" name="label_13">
+        <widget class="QSlider" name="timeSlider">
          <property name="geometry">
           <rect>
            <x>10</x>
-           <y>30</y>
-           <width>41</width>
-           <height>21</height>
+           <y>420</y>
+           <width>631</width>
+           <height>19</height>
           </rect>
          </property>
-         <property name="text">
-          <string>Start</string>
-         </property>
-        </widget>
-        <widget class="QLineEdit" name="animationEndLineEdit">
-         <property name="geometry">
-          <rect>
-           <x>150</x>
-           <y>30</y>
-           <width>51</width>
-           <height>27</height>
-          </rect>
-         </property>
-        </widget>
-        <widget class="QLabel" name="label_14">
-         <property name="geometry">
-          <rect>
-           <x>110</x>
-           <y>30</y>
-           <width>41</width>
-           <height>21</height>
-          </rect>
-         </property>
-         <property name="text">
-          <string>End</string>
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
          </property>
         </widget>
         <widget class="QPushButton" name="generateAnimationPushButton">
          <property name="geometry">
           <rect>
-           <x>210</x>
-           <y>30</y>
+           <x>250</x>
+           <y>440</y>
            <width>99</width>
-           <height>27</height>
+           <height>21</height>
           </rect>
          </property>
          <property name="text">
           <string>Generate</string>
          </property>
         </widget>
+        <widget class="QLabel" name="label_13">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>440</y>
+           <width>121</width>
+           <height>21</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Animation range:</string>
+         </property>
+        </widget>
+        <widget class="QLineEdit" name="animationStartLineEdit">
+         <property name="geometry">
+          <rect>
+           <x>140</x>
+           <y>440</y>
+           <width>41</width>
+           <height>21</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+        <widget class="QLabel" name="label_14">
+         <property name="geometry">
+          <rect>
+           <x>190</x>
+           <y>440</y>
+           <width>21</width>
+           <height>21</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>-</string>
+         </property>
+        </widget>
+        <widget class="QLineEdit" name="animationEndLineEdit">
+         <property name="geometry">
+          <rect>
+           <x>200</x>
+           <y>440</y>
+           <width>41</width>
+           <height>21</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </widget>
+       <widget class="QGroupBox" name="groupBox_8">
+        <property name="geometry">
+         <rect>
+          <x>970</x>
+          <y>340</y>
+          <width>291</width>
+          <height>241</height>
+         </rect>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QGroupBox { 
+     border: 2px solid rgb(0, 0, 127); 
+     border-radius: 1px; 
+ } </string>
+        </property>
+        <property name="title">
+         <string>NTF list</string>
+        </property>
         <widget class="QListWidget" name="intervalsListWidget">
          <property name="geometry">
           <rect>
            <x>10</x>
-           <y>60</y>
-           <width>201</width>
-           <height>181</height>
+           <y>20</y>
+           <width>251</width>
+           <height>211</height>
           </rect>
          </property>
          <property name="frameShape">
-          <enum>QFrame::StyledPanel</enum>
+          <enum>QFrame::Box</enum>
          </property>
          <property name="frameShadow">
-          <enum>QFrame::Sunken</enum>
+          <enum>QFrame::Plain</enum>
          </property>
         </widget>
        </widget>
