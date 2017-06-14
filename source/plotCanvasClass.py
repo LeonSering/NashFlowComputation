@@ -84,7 +84,6 @@ class PlotCanvas(FigureCanvas):
         # Mouse wheel
         self.mouseWheelPressedPosition = None
         self.mouseWheelPressed = False
-        self.lastMoveTime = time.time()
 
         # Mouse right
         self.mouseRightPressed = False
@@ -142,8 +141,6 @@ class PlotCanvas(FigureCanvas):
 
         elif action == 2:
             # Wheel was clicked, move visible part of canvas
-            self.currentXlim = self.Xlim
-            self.currentYlim = self.Ylim
             self.mouseWheelPressed = True
             self.mouseWheelPressedPosition = (xAbsolute, yAbsolute)
             return
@@ -227,9 +224,6 @@ class PlotCanvas(FigureCanvas):
         xAbsolute, yAbsolute = event.xdata, event.ydata
 
         if self.mouseWheelPressed and self.mouseWheelPressedPosition is not None:
-            if time.time() - self.lastMoveTime < 1e-1:
-                return
-            self.lastMoveTime = time.time()
             self.mouseWheelPosition = (xAbsolute, yAbsolute)
             self.move()
             self.draw_idle()
@@ -377,30 +371,7 @@ class PlotCanvas(FigureCanvas):
 
         self.draw_idle()
 
-        '''
 
-        # Plot Edge Labels
-        if not self.displaysNTF:
-            # Plot actual edge labels
-            self.edgeLabels = Utilities.join_intersect_dicts(nx.get_edge_attributes(self.network, 'capacity'),
-                                                  nx.get_edge_attributes(self.network, 'transitTime'))  # Edge labels
-        elif self.displaysNashFlow:
-            self.edgeLabels = {}
-
-
-
-        else:
-            # Plot flow value
-            self.edgeLabels = {edge:"%.2f" % self.NTFEdgeFlowDict[edge] for edge in self.NTFEdgeFlowDict}
-
-            # Plot NTFNodeLabels
-            offset = (0, 8)
-            add_tuple_offset = lambda a: (a[0] + offset[0], a[1] + offset[1])
-            movedPositions = {node:add_tuple_offset(positions[node]) for node in positions}
-            self.NTFNodeLabelCollection = draw_networkx_labels(self.network, pos=movedPositions, ax=self.axes,
-                                                               labels={node:"%.2f" % self.NTFNodeLabelDict[node] for node in self.NTFNodeLabelDict}, font_size=nodeLabelSize)
-
-        '''
 
 
 
@@ -623,8 +594,9 @@ class PlotCanvas(FigureCanvas):
         dx = self.mouseWheelPosition[0] - self.mouseWheelPressedPosition[0]
         dy = self.mouseWheelPosition[1] - self.mouseWheelPressedPosition[1]
 
-        self.Xlim = tuple(entry - dx for entry in self.currentXlim)
-        self.Ylim = tuple(entry - dy for entry in self.currentYlim)
+
+        self.Xlim = tuple(entry - dx for entry in self.Xlim)
+        self.Ylim = tuple(entry - dy for entry in self.Ylim)
 
         self.axes.set_xlim(self.Xlim)
         self.axes.set_ylim(self.Ylim)
