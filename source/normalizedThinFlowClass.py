@@ -7,7 +7,7 @@
 import networkx as nx
 from utilitiesClass import Utilities
 import os
-from shutil import copy
+from shutil import copy, rmtree
 import subprocess
 import re
 
@@ -96,6 +96,8 @@ class NormalizedThinFlow:
             otherWriter.write(str(M) + '\n')
 
 
+    def clean_up(self):
+        rmtree(self.rootPath)
 
 
 

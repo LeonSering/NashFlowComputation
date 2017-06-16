@@ -23,7 +23,7 @@ import ConfigParser
 filterwarnings('ignore')  # For the moment: ignore warnings as pyplot.hold is deprecated
 
 if os.name == 'posix':
-    from PyQt4 import QtGui
+    from PyQt4 import QtGui, QtCore
 else:
     from PySide import QtGui
 
@@ -49,6 +49,9 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.scipFile = ''
 
         self.numberOfIntervals = -1
+
+        self.cleanUpEnabled = True
+
         self.configFile = ConfigParser.RawConfigParser()
 
 
@@ -67,6 +70,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.templateFilePushButton.clicked.connect(self.select_template_file)
         self.scipPathPushButton.clicked.connect(self.select_scip_binary)
         self.computeFlowPushButton.clicked.connect(self.compute_nash_flow)
+        self.cleanUpCheckBox.clicked.connect(self.change_cleanup_state)
 
         # Configure Slider
         self.timeSlider.setMinimum(0)
@@ -438,7 +442,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.configFile.set('Settings', 'outputdir', '')
         self.configFile.set('Settings', 'templatefile', '')
         self.configFile.set('Settings', 'scippath', '')
-        #self.configFile.set('Settings', 'inflowrate', '0')
+        self.configFile.set('Settings', 'cleanup', '1')
         self.configFile.set('Settings', 'intervals', '-1')
 
 
@@ -451,8 +455,10 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
             self.templateFileLineEdit.setText(self.templateFile)
             self.scipFile = self.configFile.get('Settings', 'scippath')
             self.scipPathLineEdit.setText(self.scipFile)
-            #self.inflowRate = self.configFile.get('Settings', 'inflowrate')
-            #self.inflowLineEdit.setText(self.inflowRate)
+
+            self.cleanUpEnabled = ( self.configFile.get('Settings', 'cleanup') == '1' )
+            self.cleanUpCheckBox.setChecked(self.cleanUpEnabled)
+
             self.numberOfIntervals = self.configFile.get('Settings', 'intervals')
             self.intervalsLineEdit.setText(self.numberOfIntervals)
 
@@ -465,7 +471,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.configFile.set('Settings', 'outputdir', self.outputDirectory)
         self.configFile.set('Settings', 'templatefile', self.templateFile)
         self.configFile.set('Settings', 'scippath', self.scipFile)
-        #self.configFile.set('Settings', 'inflowrate', self.inflowRate)
+        self.configFile.set('Settings', 'cleanup', self.cleanUpEnabled)
         self.configFile.set('Settings', 'intervals', self.numberOfIntervals)
 
         with open('config.cfg', 'wb') as configfile:
@@ -480,7 +486,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.save_config()  # Save config-settings to file
         self.tabWidget.setCurrentIndex(1)   # Switch to next tab
 
-        self.nashFlow = NashFlow(self.network, float(inflowRate), float(self.numberOfIntervals), self.outputDirectory, self.templateFile, self.scipFile)
+        self.nashFlow = NashFlow(self.network, float(inflowRate), float(self.numberOfIntervals), self.outputDirectory, self.templateFile, self.scipFile, self.cleanUpEnabled)
         self.nashFlow.run()
 
         self.re_init_nashFlow_app()
@@ -599,3 +605,6 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
     def set_edge_range(self):
         if self.plotAnimationCanvas.focusEdge is not None:
             self.update_edge_graphs()
+
+    def change_cleanup_state(self):
+        self.cleanUpEnabled = ( self.cleanUpCheckBox.isChecked() )

@@ -80,9 +80,6 @@ class PlotNTFCanvas(PlotCanvas):
         xAbsolute, yAbsolute = event.xdata, event.ydata
 
         if self.mouseWheelPressed and self.mouseWheelPressedPosition is not None:
-            if time.time() - self.lastMoveTime < 1e-1:
-                return
-            self.lastMoveTime = time.time()
             self.mouseWheelPosition = (xAbsolute, yAbsolute)
             self.move()
             self.draw_idle()

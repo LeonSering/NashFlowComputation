@@ -15,13 +15,14 @@ TOL = 1e-8
 class NashFlow:
     """description of class"""
 
-    def __init__(self, graph, inflowRate, numberOfIntervals, outputDirectory, templateFile, scipFile):
+    def __init__(self, graph, inflowRate, numberOfIntervals, outputDirectory, templateFile, scipFile, cleanUpBool):
         self.network = graph.copy()
         self.inflowRate = inflowRate  # For the moment: constant
         self.numberOfIntervals = numberOfIntervals
         self.outputDirectory = outputDirectory
         self.templateFile = templateFile
         self.scipFile = scipFile
+        self.cleanUpBool = cleanUpBool
         self.numberOfSolvedIPs = 0
         self.infinityReached = False # True if last interval has alpha = +inf
 
@@ -59,7 +60,7 @@ class NashFlow:
         #resettingEdges = [(v,w) for v, w in self.network.edges_iter() if self.queue_size(v,w,self.node_label(v,lowerBoundTime)) > TOL] if lowerBoundTime > 0 else []
         resettingEdges = [(v,w) for v, w in self.network.edges_iter() if self.node_label(w, lowerBoundTime) > self.node_label(v, lowerBoundTime) + self.network[v][w]['transitTime'] + TOL] if lowerBoundTime > 0 else []
 
-        interval = FlowInterval(self.network, resettingEdges=resettingEdges, lowerBoundTime=lowerBoundTime, inflowRate=self.inflowRate, minCapacity=self.minCapacity, counter=self.counter, outputDirectory=self.rootPath, templateFile=self.templateFile, scipFile=self.scipFile)
+        interval = FlowInterval(self.network, resettingEdges=resettingEdges, lowerBoundTime=lowerBoundTime, inflowRate=self.inflowRate, minCapacity=self.minCapacity, counter=self.counter, outputDirectory=self.rootPath, templateFile=self.templateFile, scipFile=self.scipFile, cleanUpBool=self.cleanUpBool)
 
         if lowerBoundTime == 0:
             interval.shortestPathNetwork = Utilities.get_shortest_path_network(self.network, lowerBoundTime)  # Compute shortest path network
