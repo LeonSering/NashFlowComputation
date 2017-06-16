@@ -9,6 +9,7 @@ from collections import OrderedDict
 from flowIntervalClass import FlowInterval
 from utilitiesClass import Utilities
 import os
+from shutil import rmtree
 
 TOL = 1e-8
 
@@ -48,6 +49,10 @@ class NashFlow:
             computedUpperBound = self.flowIntervals[-1][1]
             k += 1
 
+        # Clean up
+        if self.cleanUpBool:
+            rmtree(self.rootPath)
+
 
     def compute_flowInterval(self):
         # NOTE TO MYSELF: computing shortest paths and resetting edges is only necessary for first flowInterval -> later: implement in flowIntervallClass
@@ -60,7 +65,7 @@ class NashFlow:
         #resettingEdges = [(v,w) for v, w in self.network.edges_iter() if self.queue_size(v,w,self.node_label(v,lowerBoundTime)) > TOL] if lowerBoundTime > 0 else []
         resettingEdges = [(v,w) for v, w in self.network.edges_iter() if self.node_label(w, lowerBoundTime) > self.node_label(v, lowerBoundTime) + self.network[v][w]['transitTime'] + TOL] if lowerBoundTime > 0 else []
 
-        interval = FlowInterval(self.network, resettingEdges=resettingEdges, lowerBoundTime=lowerBoundTime, inflowRate=self.inflowRate, minCapacity=self.minCapacity, counter=self.counter, outputDirectory=self.rootPath, templateFile=self.templateFile, scipFile=self.scipFile, cleanUpBool=self.cleanUpBool)
+        interval = FlowInterval(self.network, resettingEdges=resettingEdges, lowerBoundTime=lowerBoundTime, inflowRate=self.inflowRate, minCapacity=self.minCapacity, counter=self.counter, outputDirectory=self.rootPath, templateFile=self.templateFile, scipFile=self.scipFile)
 
         if lowerBoundTime == 0:
             interval.shortestPathNetwork = Utilities.get_shortest_path_network(self.network, lowerBoundTime)  # Compute shortest path network

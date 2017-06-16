@@ -15,7 +15,7 @@ TOL = 1e-8
 class FlowInterval():
     """description of class"""
 
-    def __init__(self, network, resettingEdges, lowerBoundTime, inflowRate, minCapacity, counter, outputDirectory, templateFile, scipFile, cleanUpBool):
+    def __init__(self, network, resettingEdges, lowerBoundTime, inflowRate, minCapacity, counter, outputDirectory, templateFile, scipFile):
 
         self.network = network
         self.resettingEdges = resettingEdges
@@ -27,7 +27,6 @@ class FlowInterval():
         self.outputDirectory = outputDirectory
         self.templateFile = templateFile
         self.scipFile = scipFile
-        self.cleanUpBool = cleanUpBool
         self.alpha      = None
         self.shortestPathNetwork = None # to be set from NashFlowClass
         self.numberOfSolvedIPs = 0
@@ -87,10 +86,6 @@ class FlowInterval():
                 self.NTF = NTF
                 return True
             else:
-                # Clean up
-                if self.cleanUpBool:
-                    NTF.clean_up()
-
                 # Drop instance (necessary?)
                 del NTF
                 self.counter += 1

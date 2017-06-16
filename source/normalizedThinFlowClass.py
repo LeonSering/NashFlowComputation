@@ -96,9 +96,5 @@ class NormalizedThinFlow:
             otherWriter.write(str(M) + '\n')
 
 
-    def clean_up(self):
-        rmtree(self.rootPath)
-
-
 
 
