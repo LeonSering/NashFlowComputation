@@ -8,19 +8,20 @@
 
 from plotCanvasClass import PlotCanvas
 from networkx import draw_networkx_labels, get_node_attributes
+
+
 # ======================================================================================================================
 
 
 
 class PlotAnimationCanvas(PlotCanvas):
-
     def __init__(self, nashflow, interface, upperBound):
         self.nashFlow = nashflow
         self.upperBound = upperBound
         self.network = self.nashFlow.network
         self.currentTimeIndex = 0
         self.precompute_information()
-        PlotCanvas.__init__(self, graph=self.network, interface=interface) # Call parents constructor
+        PlotCanvas.__init__(self, graph=self.network, interface=interface)  # Call parents constructor
 
         positions = get_node_attributes(self.network, 'position')
         offset = (0, 8)
@@ -46,17 +47,18 @@ class PlotAnimationCanvas(PlotCanvas):
 
         nodeLabelSize = int(round(self.nodeLabelFontSize))
 
-        for v, label in self.additionalNodeLabelCollection.iteritems():    # type(label) = matplotlib.text.Text object
-                label.remove()
+        for v, label in self.additionalNodeLabelCollection.iteritems():  # type(label) = matplotlib.text.Text object
+            label.remove()
 
-        self.additionalNodeLabelCollection=draw_networkx_labels(self.network, pos=self.movedPositions, ax=self.axes,
-                                 labels=self.get_additional_node_labels(), font_size=nodeLabelSize)
+        self.additionalNodeLabelCollection = draw_networkx_labels(self.network, pos=self.movedPositions, ax=self.axes,
+                                                                  labels=self.get_additional_node_labels(),
+                                                                  font_size=nodeLabelSize)
 
         self.draw_idle()
 
-
     def get_additional_node_labels(self):
-        return {node: "%.2f" % self.nodeLabelByTimeDict[node][self.timePoints[self.currentTimeIndex]] for node in self.network.nodes()}
+        return {node: "%.2f" % self.nodeLabelByTimeDict[node][self.timePoints[self.currentTimeIndex]] for node in
+                self.network.nodes()}
 
     def get_edge_labels(self):
         return {}
@@ -73,7 +75,7 @@ class PlotAnimationCanvas(PlotCanvas):
         # Note: event.x/y = relative position, event.xdata/ydata = absolute position
         xAbsolute, yAbsolute = event.xdata, event.ydata
 
-        action = event.button   # event.button = mouse(1,2,3)
+        action = event.button  # event.button = mouse(1,2,3)
 
         if action == 1:
             # Leftmouse was clicked, select/create node, select edge or add edge via drag&drop
@@ -81,9 +83,8 @@ class PlotAnimationCanvas(PlotCanvas):
             # Determine whether we clicked an edge or not
             clickedEdge = self.check_edge_clicked((xAbsolute, yAbsolute))
 
-
             # Determine whether we clicked a node or not
-            clickedNode = self.check_node_clicked((xAbsolute, yAbsolute), edgePossible=True) # never add a new node
+            clickedNode = self.check_node_clicked((xAbsolute, yAbsolute), edgePossible=True)  # never add a new node
 
             if clickedEdge is not None and clickedNode is None:
                 # Selected an existing edge

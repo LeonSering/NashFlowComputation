@@ -9,14 +9,17 @@ import os
 import time
 import networkx as nx
 import matplotlib
+
 matplotlib.use("Qt4Agg")
 import numpy as np
 import bisect
 
-
-
 TOL = 1e-8
+
+
 class Utilities:
+    def __init__(self):
+        pass
 
     @staticmethod
     def create_dir(path):
@@ -29,32 +32,36 @@ class Utilities:
 
     @staticmethod
     def is_eq_tol(a, b, tol=TOL):
-        return ( abs(a-b) <= tol )
+        return abs(a - b) <= tol
 
     @staticmethod
     def is_not_eq_tol(a, b, tol=TOL):
-        return ( abs(a-b) > tol )
+        return abs(a - b) > tol
 
     @staticmethod
     def is_geq_tol(a, b, tol=TOL):
-        return ( a-b+tol >= 0 )
+        return a - b + tol >= 0
 
     @staticmethod
     def get_insertion_point_left(L, el):
         return bisect.bisect_left(L, el)
 
     @staticmethod
-    def get_shortest_path_network(network, time, labels=None):
-        shortestPathNetwork = None
+    def get_shortest_path_network(network, labels=None):
 
         if not labels:
             # Use transit-times as edge weight
-            labels = nx.single_source_dijkstra_path_length(G=network, source='s', weight='transitTime')    # Compute node distance from source
+            labels = nx.single_source_dijkstra_path_length(G=network, source='s',
+                                                           weight='transitTime')  # Compute node distance from source
 
         # Create shortest path network containing _all_ shortest paths
-        #shortestPathEdges = [(edge[0], edge[1]) for edge in network.edges() if labels[edge[0]] + network[edge[0]][edge[1]]['transitTime'] <= labels[edge[1]]]
+        # shortestPathEdges = [(edge[0], edge[1]) for edge in network.edges() if labels[edge[0]] + network[edge[0]][edge[1]]['transitTime'] <= labels[edge[1]]]
 
-        shortestPathEdges = [(edge[0], edge[1]) for edge in network.edges() if Utilities.is_geq_tol(labels[edge[1]], labels[edge[0]] + network[edge[0]][edge[1]]['transitTime'])]
+        shortestPathEdges = [(edge[0], edge[1]) for edge in network.edges() if Utilities.is_geq_tol(labels[edge[1]],
+                                                                                                    labels[edge[0]] +
+                                                                                                    network[edge[0]][
+                                                                                                        edge[1]][
+                                                                                                        'transitTime'])]
         shortestPathNetwork = nx.DiGraph()
         shortestPathNetwork.add_nodes_from(network)
         shortestPathNetwork.add_edges_from(shortestPathEdges)
@@ -71,7 +78,6 @@ class Utilities:
 
         return shortestPathNetwork
 
-
     @staticmethod
     def compute_min_capacity(network):
         minimumCapacity = float('inf')
@@ -83,22 +89,22 @@ class Utilities:
 
     @staticmethod
     def join_intersect_dicts(dict1, dict2):
-        return {key:(dict1[key], dict2[key]) for key in dict1 if key in dict2}
+        return {key: (dict1[key], dict2[key]) for key in dict1 if key in dict2}
 
     @staticmethod
     def draw_edges(G, pos,
-                            edgelist=None,
-                            width=1.0,
-                            edge_color='k',
-                            style='solid',
-                            alpha=1.0,
-                            edge_cmap=None,
-                            edge_vmin=None,
-                            edge_vmax=None,
-                            ax=None,
-                            arrows=True,
-                            label=None,
-                            **kwds):
+                   edgelist=None,
+                   width=1.0,
+                   edge_color='k',
+                   style='solid',
+                   alpha=1.0,
+                   edge_cmap=None,
+                   edge_vmin=None,
+                   edge_vmax=None,
+                   ax=None,
+                   arrows=True,
+                   label=None,
+                   **kwds):
         try:
             import matplotlib
             import matplotlib.pyplot as plt
@@ -157,17 +163,17 @@ class Utilities:
                     'edge_color must be a single color or list of exactly m colors where m is the number or edges')
 
         edgeCollection = nx.draw_networkx_edges(G, pos,
-                            edgelist,
-                            width,
-                            edge_color,
-                            style,
-                            alpha,
-                            edge_cmap,
-                            edge_vmin,
-                            edge_vmax,
-                            ax,
-                            arrows=False,
-                            label=label)
+                                                edgelist,
+                                                width,
+                                                edge_color,
+                                                style,
+                                                alpha,
+                                                edge_cmap,
+                                                edge_vmin,
+                                                edge_vmax,
+                                                ax,
+                                                arrows=False,
+                                                label=label)
 
         if G.is_directed() and arrows:
 
@@ -212,20 +218,21 @@ class Utilities:
         return edgeCollection, arrow_collection
 
     '''Modified function networkx.draw_networkx_edges'''
+
     @staticmethod
     def draw_edges_for_animation(G, pos,
-                            edgelist=None,
-                            width=1.0,
-                            edge_color='k',
-                            style='solid',
-                            alpha=1.0,
-                            edge_cmap=None,
-                            edge_vmin=None,
-                            edge_vmax=None,
-                            ax=None,
-                            arrows=True,
-                            label=None,
-                            **kwds):
+                                 edgelist=None,
+                                 width=1.0,
+                                 edge_color='k',
+                                 style='solid',
+                                 alpha=1.0,
+                                 edge_cmap=None,
+                                 edge_vmin=None,
+                                 edge_vmax=None,
+                                 ax=None,
+                                 arrows=True,
+                                 label=None,
+                                 **kwds):
 
         try:
             import matplotlib
@@ -338,29 +345,27 @@ class Utilities:
                 xa = p * d * numpy.cos(theta) + x1
                 ya = p * d * numpy.sin(theta) + y1
 
-
-
             a_size = 4
-            normFac = 1. / numpy.sqrt(float((ya-y1) ** 2 + (-(xa-x1)) ** 2))
-            perp = (normFac * (ya-y1), normFac * (-1) * (xa-x1))  # vector orthogonal to line segment ((xa, ya), (x2, y2))
+            normFac = 1. / numpy.sqrt(float((ya - y1) ** 2 + (-(xa - x1)) ** 2))
+            perp = (
+                normFac * (ya - y1),
+                normFac * (-1) * (xa - x1))  # vector orthogonal to line segment ((xa, ya), (x2, y2))
             x1a, y1a = xa + a_size * perp[0], ya + a_size * perp[1]
             x2a, y2a = xa - a_size * perp[0], ya - a_size * perp[1]
             pBase = 0.05
-            xBase1, yBase1 = x1 + pBase*dx + a_size * perp[0], y1 + pBase*dy + a_size * perp[1]
-            xBase2, yBase2 = x1 + pBase*dx - a_size * perp[0], y1 + pBase*dy - a_size * perp[1]
+            xBase1, yBase1 = x1 + pBase * dx + a_size * perp[0], y1 + pBase * dy + a_size * perp[1]
+            xBase2, yBase2 = x1 + pBase * dx - a_size * perp[0], y1 + pBase * dy - a_size * perp[1]
 
-
-
-            #box_lines.append(((x1a, y1a), (x2a, y2a)))
+            # box_lines.append(((x1a, y1a), (x2a, y2a)))
             box_lines.append(((xBase1, yBase1), (xBase2, yBase2)))
         arrow_colors = edge_colors
         box_line_collection = LineCollection(box_lines,
-                       colors=edge_colors,
-                       linewidths=lw,
-                       antialiaseds=(1,),
-                       linestyle=style,
-                       transOffset=ax.transData,
-                       )
+                                             colors=edge_colors,
+                                             linewidths=lw,
+                                             antialiaseds=(1,),
+                                             linestyle=style,
+                                             transOffset=ax.transData,
+                                             )
 
         box_line_collection.set_zorder(1)  # edges go behind nodes
         box_line_collection.set_label(label)

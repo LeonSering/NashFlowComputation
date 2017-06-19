@@ -5,10 +5,10 @@
 # ===========================================================================
 
 import matplotlib
-from matplotlib import figure, lines
+from matplotlib import figure
+
 matplotlib.use("Qt4Agg")
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
-
 
 
 # ======================================================================================================================
@@ -20,9 +20,7 @@ class PlotValuesCanvas(FigureCanvas):
         self.figure = figure.Figure()
         super(PlotValuesCanvas, self).__init__(self.figure)  # Call parents constructor
 
-
     def update_plot(self, lowerBound, upperBound, xValues, yValues, *additional_values):
-
         self.figure.clf()
 
         axes = self.figure.add_subplot(111)
@@ -33,7 +31,6 @@ class PlotValuesCanvas(FigureCanvas):
             axes.plot(xVals, yVals, linewidth=2, color='red')
 
         axes.set_xlim(lowerBound, upperBound)
-        axes.set_ylim(max(0, yMin), int(max(1,yMax)*1.5))
-
+        axes.set_ylim(max(0, yMin), int(max(1, yMax) * 1.5))
 
         self.draw_idle()

@@ -4,18 +4,19 @@
 # File:         normalizedThinFlowClass.py
 # Description:  
 # ===========================================================================
-import networkx as nx
-from utilitiesClass import Utilities
 import os
-from shutil import copy, rmtree
-import subprocess
 import re
+import subprocess
+from shutil import copy
+
+from utilitiesClass import Utilities
 
 
 class NormalizedThinFlow:
     """description of class"""
 
-    def __init__(self, shortestPathNetwork, id, resettingEdges, flowEdges, inflowRate, minCapacity, outputDirectory, templateFile, scipFile):
+    def __init__(self, shortestPathNetwork, id, resettingEdges, flowEdges, inflowRate, minCapacity, outputDirectory,
+                 templateFile, scipFile):
 
         self.network = shortestPathNetwork
         self.id = id
@@ -52,28 +53,25 @@ class NormalizedThinFlow:
         flowPattern = r'x\$([\w]+)\$([\w]+)\s*([\d.e-]+)'
 
         labelMatch = re.findall(labelPattern, self.resultLog)
-        labelDict = {node:float(val) for node, val in labelMatch}
+        labelDict = {node: float(val) for node, val in labelMatch}
 
         flowMatch = re.findall(flowPattern, self.resultLog)
-        flowDict = {(v,w):float(val) for v, w, val in flowMatch}
+        flowDict = {(v, w): float(val) for v, w, val in flowMatch}
 
         return labelDict, flowDict
 
-
     def check_result(self):
-        pattern = r'[optimal solution found]' # Maybe switch to regex
+        pattern = r'[optimal solution found]'  # Maybe switch to regex
 
         with open(self.logFile, 'r') as logFileReader:
             self.resultLog = logFileReader.read()
-        self.isValid = ( pattern in self.resultLog )
+        self.isValid = (pattern in self.resultLog)
 
     def start_process(self):
         cmd = [self.scipFile, '-f', self.templateFile, '-l', self.logFile]
         devNull = open(os.devnull, 'w')
         rc = subprocess.call(cmd, stdout=devNull)
         devNull.close()
-
-
 
     def write_zimpl_files(self):
         # Write files
@@ -92,9 +90,5 @@ class NormalizedThinFlow:
 
         with open(os.path.join(self.rootPath, 'other.txt'), 'w') as otherWriter:
             otherWriter.write(str(self.inflowRate) + '\n')
-            M = max(1, self.inflowRate/self.minCapacity)
+            M = max(1, self.inflowRate / self.minCapacity)
             otherWriter.write(str(M) + '\n')
-
-
-
-
