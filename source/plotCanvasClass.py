@@ -63,12 +63,6 @@ class PlotCanvas(FigureCanvas):
         # Internal variables
         self.selectedNode = None
 
-        '''
-        if self.displaysNTF:
-            flowLabels = self.interface.nashFlow.flowIntervals[intervalID][2].NTFEdgeFlowDict
-            self.NTFEdgeFlowDict = {edge:flowLabels[edge] for edge in self.network.edges()}
-            self.NTFNodeLabelDict = self.interface.nashFlow.flowIntervals[intervalID][2].NTFNodeLabelDict
-        '''
 
         # Signals
         self.mpl_connect('button_press_event', self.on_click)

@@ -573,9 +573,16 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         queueYValues = self.nashFlow.network[v][w]['queueSize'].values()
 
         if upperBound > queueXValues[-1] and self.nashFlow.infinityReached:
-            # Queue size stays constant
+            # Queue size stays constant or grows (but queue is never empty, if not already)
+            lastQueueSize = queueYValues[-1]
+            lastInflowInterval = next(reversed(self.nashFlow.network[v][w]['inflow']))
+            lastInflow = self.nashFlow.network[v][w]['inflow'][lastInflowInterval]
+
+            val = max(0, lastQueueSize + (lastInflow - self.network[v][w]['capacity']) * (upperBound - lastInflowInterval[0]))
+
             queueXValues.append(upperBound)
-            queueYValues.append(queueYValues[-1])
+            queueYValues.append(val)
+
 
         self.plotEdgeFlowCanvas.update_plot(lowerBound, upperBound, inflowXValues, inflowYValues,
                                             (outflowXValues, outflowYValues))
