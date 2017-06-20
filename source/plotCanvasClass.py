@@ -156,10 +156,6 @@ class PlotCanvas(FigureCanvas):
         xAbsolute, yAbsolute = event.xdata, event.ydata
         action = event.button  # event.button = mouse(1,2,3)
 
-        '''
-        if self.displaysNTF and action != 2:
-            return
-        '''
 
         if action == 1:
             # Leftmouse has been released
@@ -174,8 +170,6 @@ class PlotCanvas(FigureCanvas):
                     # Time to short for Drag&Drop, just update_plot to show focusNode/focusEdge
                     self.update_nodes(color=True)
                     self.selectedNode = None
-                    self.mouseLeftPressTime = None
-                    self.mouseLeftReleaseTime = None
 
                 else:
                     # Determine whether we clicked a node or not
@@ -193,9 +187,11 @@ class PlotCanvas(FigureCanvas):
                                 self.update_edges(added=True, color=True)
                             self.selectedNode = None
 
-                            # self.update_edges(color=True)
+                    self.update_nodes(color=True)
 
-            self.update_nodes(color=True)
+            self.mouseLeftPressTime = None
+            self.mouseLeftReleaseTime = None
+
             self.interface.update_node_display()
 
         elif action == 2:
