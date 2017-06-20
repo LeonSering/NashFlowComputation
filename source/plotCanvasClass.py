@@ -139,7 +139,7 @@ class PlotCanvas(FigureCanvas):
 
         elif action == 3:
             clickedNode = self.check_node_clicked((xAbsolute, yAbsolute), edgePossible=True)
-            if clickedNode is not None and clickedNode not in ['s', 't']:
+            if clickedNode is not None:
                 self.selectedNode = clickedNode
                 self.mouseRightPressed = True
                 self.focusNode = self.selectedNode
