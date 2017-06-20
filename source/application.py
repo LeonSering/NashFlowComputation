@@ -42,7 +42,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         # Init graph
         self.network = self.init_graph()
         self.init_graph_creation_app()
-        self.inflowLineEdit.setText('0')
+        self.inflowLineEdit.setText('1')
 
         self.outputDirectory = ''
         self.templateFile = ''
@@ -638,6 +638,3 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
             self.delete_node()
         elif self.graphCreationCanvas.focusEdge is not None:
             self.delete_edge()
-
-    def pressed_enter(self):
-        print "enter"
