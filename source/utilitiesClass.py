@@ -46,6 +46,9 @@ class Utilities:
     def get_insertion_point_left(L, el):
         return bisect.bisect_left(L, el)
 
+
+
+
     @staticmethod
     def get_shortest_path_network(network, labels=None):
 
@@ -220,20 +223,19 @@ class Utilities:
     '''Modified function networkx.draw_networkx_edges'''
 
     @staticmethod
-    def draw_edges_for_animation(G, pos,
-                                 edgelist=None,
-                                 width=1.0,
-                                 edge_color='k',
-                                 style='solid',
-                                 alpha=1.0,
-                                 edge_cmap=None,
-                                 edge_vmin=None,
-                                 edge_vmax=None,
-                                 ax=None,
-                                 arrows=True,
-                                 label=None,
-                                 **kwds):
-
+    def draw_animation_edges(G, pos,
+                   edgelist=None,
+                   width=1.0,
+                   edge_color='k',
+                   style='solid',
+                   alpha=1.0,
+                   edge_cmap=None,
+                   edge_vmin=None,
+                   edge_vmax=None,
+                   ax=None,
+                   arrows=True,
+                   label=None,
+                   **kwds):
         try:
             import matplotlib
             import matplotlib.pyplot as plt
@@ -291,99 +293,57 @@ class Utilities:
                 raise ValueError(
                     'edge_color must be a single color or list of exactly m colors where m is the number or edges')
 
-        edge_collection = LineCollection(edge_pos,
-                                         colors=edge_colors,
-                                         linewidths=lw,
-                                         antialiaseds=(1,),
-                                         linestyle=style,
-                                         transOffset=ax.transData,
-                                         )
+        edgeCollection = nx.draw_networkx_edges(G, pos,
+                                                edgelist,
+                                                width,
+                                                edge_color,
+                                                style,
+                                                alpha,
+                                                edge_cmap,
+                                                edge_vmin,
+                                                edge_vmax,
+                                                ax,
+                                                arrows=False,
+                                                label=label)
 
-        edge_collection.set_zorder(1)  # edges go behind nodes
-        edge_collection.set_label(label)
-        ax.add_collection(edge_collection)
+        if G.is_directed() and arrows:
 
-        # Note: there was a bug in mpl regarding the handling of alpha values for
-        # each line in a LineCollection.  It was fixed in matplotlib in r7184 and
-        # r7189 (June 6 2009).  We should then not set the alpha value globally,
-        # since the user can instead provide per-edge alphas now.  Only set it
-        # globally if provided as a scalar.
-        if cb.is_numlike(alpha):
-            edge_collection.set_alpha(alpha)
+            # a directed graph hack
+            # draw thick line segments at head end of edge
+            # waiting for someone else to implement arrows that will work
+            arrow_colors = edge_colors
+            a_pos = []
+            p = 1.0 - 0.25  # make head segment 25 percent of edge length
+            for src, dst in edge_pos:
+                x1, y1 = src
+                x2, y2 = dst
+                dx = x2 - x1  # x offset
+                dy = y2 - y1  # y offset
+                d = np.sqrt(float(dx ** 2 + dy ** 2))  # length of edge
+                if d == 0:  # source and target at same position
+                    continue
+                if dx == 0:  # vertical edge
+                    xa = x2
+                    ya = dy * p + y1
+                if dy == 0:  # horizontal edge
+                    ya = y2
+                    xa = dx * p + x1
+                else:
+                    theta = numpy.arctan2(dy, dx)
+                    xa = p * d * numpy.cos(theta) + x1
+                    ya = p * d * numpy.sin(theta) + y1
 
-        if edge_colors is None:
-            if edge_cmap is not None:
-                assert (isinstance(edge_cmap, Colormap))
-            edge_collection.set_array(numpy.asarray(edge_color))
-            edge_collection.set_cmap(edge_cmap)
-            if edge_vmin is not None or edge_vmax is not None:
-                edge_collection.set_clim(edge_vmin, edge_vmax)
-            else:
-                edge_collection.autoscale()
+                a_pos.append(((xa, ya), (x2, y2)))
 
-        arrow_collection = None
+            arrow_collection = LineCollection(a_pos,
+                                              colors=arrow_colors,
+                                              linewidths=[4 * ww for ww in lw],
+                                              antialiaseds=(1,),
+                                              transOffset=ax.transData,
+                                              )
 
-        box_line_collection = None
-        p = 0.3  # box length to edge ratio
-        box_lines = []
-        for src, dst in edge_pos:
-            x1, y1 = src
-            x2, y2 = dst
-            dx = x2 - x1  # x offset
-            dy = y2 - y1  # y offset
-            d = numpy.sqrt(float(dx ** 2 + dy ** 2))  # length of edge
-            if d == 0:  # source and target at same position
-                continue
-            if dx == 0:  # vertical edge
-                xa = x2
-                ya = dy * p + y1
-            if dy == 0:  # horizontal edge
-                ya = y2
-                xa = dx * p + x1
-            else:
-                theta = numpy.arctan2(dy, dx)
-                xa = p * d * numpy.cos(theta) + x1
-                ya = p * d * numpy.sin(theta) + y1
+            arrow_collection.set_zorder(1)  # edges go behind nodes
+            arrow_collection.set_label(label)
+            ax.add_collection(arrow_collection)
 
-            a_size = 4
-            normFac = 1. / numpy.sqrt(float((ya - y1) ** 2 + (-(xa - x1)) ** 2))
-            perp = (
-                normFac * (ya - y1),
-                normFac * (-1) * (xa - x1))  # vector orthogonal to line segment ((xa, ya), (x2, y2))
-            x1a, y1a = xa + a_size * perp[0], ya + a_size * perp[1]
-            x2a, y2a = xa - a_size * perp[0], ya - a_size * perp[1]
-            pBase = 0.05
-            xBase1, yBase1 = x1 + pBase * dx + a_size * perp[0], y1 + pBase * dy + a_size * perp[1]
-            xBase2, yBase2 = x1 + pBase * dx - a_size * perp[0], y1 + pBase * dy - a_size * perp[1]
-
-            # box_lines.append(((x1a, y1a), (x2a, y2a)))
-            box_lines.append(((xBase1, yBase1), (xBase2, yBase2)))
-        arrow_colors = edge_colors
-        box_line_collection = LineCollection(box_lines,
-                                             colors=edge_colors,
-                                             linewidths=lw,
-                                             antialiaseds=(1,),
-                                             linestyle=style,
-                                             transOffset=ax.transData,
-                                             )
-
-        box_line_collection.set_zorder(1)  # edges go behind nodes
-        box_line_collection.set_label(label)
-        ax.add_collection(box_line_collection)
-
-        # update view
-        minx = numpy.amin(numpy.ravel(edge_pos[:, :, 0]))
-        maxx = numpy.amax(numpy.ravel(edge_pos[:, :, 0]))
-        miny = numpy.amin(numpy.ravel(edge_pos[:, :, 1]))
-        maxy = numpy.amax(numpy.ravel(edge_pos[:, :, 1]))
-
-        w = maxx - minx
-        h = maxy - miny
-        padx, pady = 0.05 * w, 0.05 * h
-        corners = (minx - padx, miny - pady), (maxx + padx, maxy + pady)
-        ax.update_datalim(corners)
-        ax.autoscale_view()
-
-        #    if arrow_collection:
-
-        return edge_collection
+        return edgeCollection, arrow_collection

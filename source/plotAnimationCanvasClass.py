@@ -8,6 +8,7 @@
 
 from plotCanvasClass import PlotCanvas
 from networkx import draw_networkx_labels, get_node_attributes
+from utilitiesClass import Utilities
 
 
 # ======================================================================================================================
@@ -21,6 +22,7 @@ class PlotAnimationCanvas(PlotCanvas):
         self.network = self.nashFlow.network
         self.currentTimeIndex = 0
         self.precompute_information()
+
         PlotCanvas.__init__(self, graph=self.network, interface=interface)  # Call parents constructor
 
         positions = get_node_attributes(self.network, 'position')
@@ -32,11 +34,32 @@ class PlotAnimationCanvas(PlotCanvas):
         self.timePoints = [float(i) / 99 * self.upperBound for i in range(100)]
         self.nodeLabelByTimeDict = {node: dict() for node in self.network.nodes()}
 
-        # Node Labels
-        for timeIndex in range(100):
-            time = self.timePoints[timeIndex]
+
+        self.flowOnEntireEdge = {edge:{i:dict() for i in range(len(self.nashFlow.flowIntervals))} for edge in self.network.edges()}
+        self.flowOnEdgeNotQueue = {edge: {i: dict() for i in range(len(self.nashFlow.flowIntervals))} for edge in
+                                 self.network.edges()}
+        self.flowOnQueue = {edge: {i: dict() for i in range(len(self.nashFlow.flowIntervals))} for edge in
+                                 self.network.edges()}
+
+        for time in self.timePoints:
+            # Node Labels
             for v in self.network.nodes():
                 self.nodeLabelByTimeDict[v][time] = self.nashFlow.node_label(v, time)
+
+        for fk in range(len(self.nashFlow.flowIntervals)):
+            for edge in self.network.edges():
+                for time in self.timePoints:
+                    v, w = edge
+                    inflowInterval, outflowInterval = self.nashFlow.animationIntervals[edge][fk]
+                    vTimeLower, vTimeUpper = inflowInterval
+                    wTimeLower, wTimeUpper = outflowInterval
+                    capacity = self.network[v][w]['capacity']
+                    inflow = self.network[v][w]['inflow'][inflowInterval] # Could this lead to KeyError?
+                    outflow = self.network[v][w]['outflow'][outflowInterval]
+                    self.flowOnEntireEdge[edge][fk][time] = max(0, max(0, inflow*(min(time, vTimeUpper)-vTimeLower))
+                                                                 - max(0, outflow*(min(time, wTimeUpper)-wTimeLower)))
+                    self.flowOnEdgeNotQueue[edge][fk][time] = max(0, outflow*(min(time, wTimeUpper - capacity)-(wTimeLower - capacity)))
+                    self.flowOnQueue[edge][fk][time] = self.flowOnEntireEdge[edge][fk][time] - self.flowOnEdgeNotQueue[edge][fk][time]
 
     def time_changed(self, sliderVal):
         self.currentTimeIndex = sliderVal
@@ -104,3 +127,48 @@ class PlotAnimationCanvas(PlotCanvas):
             self.mouseWheelPressed = True
             self.mouseWheelPressedPosition = (xAbsolute, yAbsolute)
             return
+
+    def draw_edges(self, G, pos,
+                   edgelist=None,
+                   width=1.0,
+                   edge_color='k',
+                   style='solid',
+                   alpha=1.0,
+                   edge_cmap=None,
+                   edge_vmin=None,
+                   edge_vmax=None,
+                   ax=None,
+                   arrows=True,
+                   label=None,
+                   **kwds):
+
+        return Utilities.draw_animation_edges(G, pos,
+                   edgelist,
+                   width,
+                   edge_color,
+                   style,
+                   alpha,
+                   edge_cmap,
+                   edge_vmin,
+                   edge_vmax,
+                   ax,
+                   arrows,
+                   label)
+
+
+    def get_inflow_interval(self, edge, time):
+        v,w = edge
+        for lowerBound, upperBound in self.network[v][w]['inflow']:
+            if lowerBound <= time <= upperBound:
+                return (lowerBound, upperBound)
+
+        return -1
+
+
+    def get_outflow_interval(self, edge, time):
+        v,w = edge
+        for lowerBound, upperBound in self.network[v][w]['outflow']:
+            if lowerBound <= time <= upperBound:
+                return (lowerBound, upperBound)
+
+        return -1

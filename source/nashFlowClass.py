@@ -37,6 +37,7 @@ class NashFlow:
 
         self.flowIntervals = []
         self.lowerBoundsToIntervalDict = OrderedDict()
+        self.animationIntervals = {edge:[] for edge in self.network.edges()}
 
     def run(self):
         computedUpperBound = 0
@@ -143,6 +144,9 @@ class NashFlow:
                 lastQueueSize = self.network[v][w]['queueSize'][lastQueueSizeTime]
                 self.network[v][w]['queueSize'][vTimeUpper] = max(0, lastQueueSize + (
                     inflowVal - self.network[v][w]['capacity']) * (vTimeUpper - vTimeLower))
+
+            self.animationIntervals[(v,w)].append(((vTimeLower, vTimeUpper), (wTimeLower, wTimeUpper)))
+
 
         self.counter += 1
         self.numberOfSolvedIPs += interval.numberOfSolvedIPs

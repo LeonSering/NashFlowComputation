@@ -15,7 +15,7 @@ from math import sqrt
 
 import networkx as nx
 
-from source.utilitiesClass import Utilities
+from utilitiesClass import Utilities
 
 matplotlib.use("Qt4Agg")
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
@@ -339,7 +339,7 @@ class PlotCanvas(FigureCanvas):
         edgeColor = lambda v, w: 'black' if (v, w) != self.focusEdge else 'b'
         edgeColorList = [edgeColor(v, w) for v, w in self.network.edges()]
         if edgeColorList:
-            edgeCollection, arrowCollection = Utilities.draw_edges(self.network, pos=positions, ax=self.axes,
+            edgeCollection, arrowCollection = self.draw_edges(self.network, pos=positions, ax=self.axes,
                                                                    arrow=True,
                                                                    edge_color=edgeColorList)
             self.edgeCollections.append((self.network.edges(), edgeCollection))
@@ -445,7 +445,7 @@ class PlotCanvas(FigureCanvas):
                     edges = [edge for edge in edges if edge not in missingEdges]
                     if edges:
                         positions = {v: self.network.node[v]['position'] for v in self.network.nodes()}
-                        newEdgeCollection, newArrowCollection = Utilities.draw_edges(self.network, pos=positions,
+                        newEdgeCollection, newArrowCollection = self.draw_edges(self.network, pos=positions,
                                                                                      ax=self.axes, arrow=True,
                                                                                      edgelist=edges)
                         self.edgeCollections[collectionIndex] = (edges, newEdgeCollection)
@@ -470,7 +470,7 @@ class PlotCanvas(FigureCanvas):
             # A node has been added (can we do better than plotting all nodes again)
             if self.focusEdge is not None:
                 v, w = self.focusEdge
-                edgeCollection, arrowCollection = Utilities.draw_edges(self.network,
+                edgeCollection, arrowCollection = self.draw_edges(self.network,
                                                                        pos={v: self.network.node[v]['position'],
                                                                             w: self.network.node[w]['position']},
                                                                        ax=self.axes, arrow=True,
@@ -599,3 +599,31 @@ class PlotCanvas(FigureCanvas):
 
         self.axes.set_xlim(self.Xlim)
         self.axes.set_ylim(self.Ylim)
+
+    def draw_edges(self, G, pos,
+                   edgelist=None,
+                   width=1.0,
+                   edge_color='k',
+                   style='solid',
+                   alpha=1.0,
+                   edge_cmap=None,
+                   edge_vmin=None,
+                   edge_vmax=None,
+                   ax=None,
+                   arrows=True,
+                   label=None,
+                   **kwds):
+
+        return Utilities.draw_edges(G, pos,
+                   edgelist,
+                   width,
+                   edge_color,
+                   style,
+                   alpha,
+                   edge_cmap,
+                   edge_vmin,
+                   edge_vmax,
+                   ax,
+                   arrows,
+                   label)
+
