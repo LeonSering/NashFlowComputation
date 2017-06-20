@@ -22,7 +22,7 @@ from ui import mainWdw
 filterwarnings('ignore')  # For the moment: ignore warnings as pyplot.hold is deprecated
 
 if os.name == 'posix':
-    from PyQt4 import QtGui
+    from PyQt4 import QtGui, QtCore
 else:
     from PySide import QtGui
 
@@ -32,7 +32,6 @@ TOL = 1e-8
 # =======================================================================================================================
 
 
-# noinspection PyCallByClass
 class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
     """Controls GUI"""
 
@@ -224,6 +223,10 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         labels = nx.get_node_attributes(self.network, 'label')
         tail = labels.keys()[labels.values().index(tailLabel)]
         head = labels.keys()[labels.values().index(headLabel)]
+
+        if capacityText <= 0 or transitText < 0:
+            # This is not allowed
+            return
 
         if self.network.has_edge(tail, head):
             # Update the edges attributes
