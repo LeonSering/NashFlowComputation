@@ -26,7 +26,7 @@ from networkx import draw_networkx_nodes, draw_networkx_labels, draw_networkx_ed
 
 # Config
 SIMILARITY_DIST = 9  # Maximal distance at which a click is recognized as a click on a node/edge
-DRAG_DROP_TIME_DIFF = 0.3  # Minimum time between mouse press and release s.t. it is recognized as "drag and drop" (in seconds)
+
 
 
 # ======================================================================================================================
@@ -73,10 +73,6 @@ class PlotCanvas(FigureCanvas):
         self.mpl_connect('scroll_event', self.on_scroll)
 
         # Mouse events
-        # Left mouse
-        self.mouseLeftPressTime = None
-        self.mouseLeftReleaseTime = None
-
         # Mouse wheel
         self.mouseWheelPressedPosition = None
         self.mouseWheelPressed = False
@@ -109,7 +105,6 @@ class PlotCanvas(FigureCanvas):
 
         if action == 1:
             # Leftmouse was clicked, select/create node, select edge or add edge via drag&drop
-            self.mouseLeftPressTime = time.time()
 
             lastID = self.network.graph['lastID']
 
@@ -137,7 +132,6 @@ class PlotCanvas(FigureCanvas):
                 if not newNodeCreated:
                     self.selectedNode = clickedNode
                 else:
-                    self.mouseLeftPressTime = None
                     self.update_nodes(added=True, color=True)
 
 
@@ -172,39 +166,23 @@ class PlotCanvas(FigureCanvas):
 
         if action == 1:
             # Leftmouse has been released
-            if not self.mouseLeftPressTime:
-                # Released too fast or node has been created
-                self.selectedNode = None
-            else:
-                self.mouseLeftReleaseTime = time.time()
-                dtime = self.mouseLeftReleaseTime - self.mouseLeftPressTime
+            # Determine whether we clicked a node or not
+            clickedNode = self.check_node_clicked((xAbsolute, yAbsolute), edgePossible=True)
+            if clickedNode is not None:
+                if self.selectedNode is not None and self.selectedNode != clickedNode:
+                    # Add the corresponding edge, if valid
+                    if not self.network.has_edge(self.selectedNode, clickedNode):
+                        self.network.add_edge(self.selectedNode, clickedNode, transitTime=1, capacity=1)
 
-                if dtime < DRAG_DROP_TIME_DIFF:
-                    # Time to short for Drag&Drop, just update_plot to show focusNode/focusEdge
-                    self.update_nodes(color=True)
-                    self.selectedNode = None
-
-                else:
-                    # Determine whether we clicked a node or not
-                    clickedNode = self.check_node_clicked((xAbsolute, yAbsolute), edgePossible=True)
-                    if clickedNode is not None:
-                        if self.selectedNode is not None and self.selectedNode != clickedNode:
-                            # Add the corresponding edge, if valid
-                            if not self.network.has_edge(self.selectedNode, clickedNode):
-                                self.network.add_edge(self.selectedNode, clickedNode, transitTime=1, capacity=1)
-
-                                self.focusEdge = (self.selectedNode, clickedNode)
-                                self.focusNode = None
+                        self.focusEdge = (self.selectedNode, clickedNode)
+                        self.focusNode = None
 
 
-                                self.interface.update_edge_display()
-                                self.update_edges(added=True, color=True)
-                            self.selectedNode = None
+                        self.interface.update_edge_display()
+                        self.update_edges(added=True, color=True)
 
-                    self.update_nodes(color=True)
-
-            self.mouseLeftPressTime = None
-            self.mouseLeftReleaseTime = None
+            self.selectedNode = None
+            self.update_nodes(color=True)
 
             self.interface.update_node_display()
 

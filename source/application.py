@@ -117,7 +117,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         network.add_nodes_from(
             [('s', {'position': (-90, 0), 'label': 's'}), ('t', {'position': (90, 0), 'label': 't'})])
         network.graph['lastID'] = network.number_of_nodes() - 2  # Keep track of next nodes ID
-        network.graph['inflowRate'] = 0
+        network.graph['inflowRate'] = 1
 
         return network
 
