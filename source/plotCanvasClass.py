@@ -129,11 +129,8 @@ class PlotCanvas(FigureCanvas):
                 self.focusEdge = None
                 self.update_edges(color=True)
                 self.interface.update_edge_display()
-                if not newNodeCreated:
-                    self.selectedNode = clickedNode
-                else:
-                    self.update_nodes(added=True, color=True)
-
+                self.selectedNode = clickedNode
+                self.update_nodes(added=newNodeCreated, color=True)
 
         elif action == 2:
             # Wheel was clicked, move visible part of canvas
@@ -166,9 +163,17 @@ class PlotCanvas(FigureCanvas):
 
         if action == 1:
             # Leftmouse has been released
-            # Determine whether we clicked a node or not
-            clickedNode = self.check_node_clicked((xAbsolute, yAbsolute), edgePossible=True)
+            # Determine whether we clicked a node or not (or create one!)
+            lastID = self.network.graph['lastID']
+            clickedEdge = self.check_edge_clicked((xAbsolute, yAbsolute))
+            clickedNode = self.check_node_clicked((xAbsolute, yAbsolute), edgePossible=(clickedEdge is not None))
+            newNodeCreated = (self.network.graph['lastID'] > lastID)
             if clickedNode is not None:
+                if newNodeCreated:
+                    self.focusNode = clickedNode
+                    self.update_nodes(added=True, color=True)
+                    self.focusNode = None
+
                 if self.selectedNode is not None and self.selectedNode != clickedNode:
                     # Add the corresponding edge, if valid
                     if not self.network.has_edge(self.selectedNode, clickedNode):
@@ -176,7 +181,6 @@ class PlotCanvas(FigureCanvas):
 
                         self.focusEdge = (self.selectedNode, clickedNode)
                         self.focusNode = None
-
 
                         self.interface.update_edge_display()
                         self.update_edges(added=True, color=True)
