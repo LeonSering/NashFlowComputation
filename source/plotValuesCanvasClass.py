@@ -34,3 +34,7 @@ class PlotValuesCanvas(FigureCanvas):
         axes.set_ylim(max(0, yMin), int(max(1, yMax) * 1.5))
 
         self.draw_idle()
+
+    def clear_plot(self):
+        self.figure.clf()
+        self.draw_idle()

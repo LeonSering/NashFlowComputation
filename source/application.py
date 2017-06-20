@@ -92,6 +92,23 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.setNodeLabelRangePushButton.clicked.connect(self.set_node_label_range)
         self.setEdgeFlowRangePushButton.clicked.connect(self.set_edge_range)
 
+        # Keyboard shortcuts
+        QtGui.QShortcut(QtGui.QKeySequence(QtCore.Qt.Key_Delete), self).activated.connect(
+            self.pressed_delete)  # Pressed Delete
+        # Edge shortcuts
+        self.tailLineEdit.returnPressed.connect(self.update_add_edge)
+        self.headLineEdit.returnPressed.connect(self.update_add_edge)
+        self.capacityLineEdit.returnPressed.connect(self.update_add_edge)
+        self.transitTimeLineEdit.returnPressed.connect(self.update_add_edge)
+        # Node shortcuts
+        self.nodeNameLineEdit.returnPressed.connect(self.update_node)
+        self.nodeXLineEdit.returnPressed.connect(self.update_node)
+        self.nodeYLineEdit.returnPressed.connect(self.update_node)
+
+
+
+
+
     @staticmethod
     def init_graph():
 
@@ -157,12 +174,15 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
 
     def update_node(self):
         """Update attributes of focusNode"""
+        if self.graphCreationCanvas.focusNode is None:
+            return
         nodeName = str(self.nodeNameLineEdit.text())
         XPos = str(self.nodeXLineEdit.text())
         YPos = str(self.nodeYLineEdit.text())
         if len(nodeName) > 0 and len(XPos) > 0 and len(YPos) > 0:
             # TO DO: Check for valid input
             vertex = self.graphCreationCanvas.focusNode
+
 
             self.network.node[vertex]['label'] = nodeName
             movedBool = (self.network.node[vertex]['position'] != (int(XPos), int(YPos)))
@@ -172,9 +192,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
             if movedBool:
                 self.graphCreationCanvas.update_edges(moved=movedBool)
 
-            if vertex in self.graphCreationCanvas.focusEdge:
-                # Label also changes in focusEdge display
-                self.update_edge_display()
+
 
     def delete_node(self):
         """Delete focusNode from network"""
@@ -214,6 +232,8 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
 
     def update_add_edge(self):
         """Add an edge or update attributes of focusNode, if existing"""
+        if self.graphCreationCanvas.focusEdge is None:
+            return
         tailLabel = str(self.tailLineEdit.text())
         headLabel = str(self.headLineEdit.text())
         transitText = float(self.transitTimeLineEdit.text())
@@ -512,6 +532,11 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.plotAnimationCanvas.time_changed(self.timeSlider.value())
 
     def update_node_label_graph(self):
+        if self.plotAnimationCanvas.focusNode is None:
+            # Clear the plot
+            self.plotNodeLabelCanvas.clear_plot()
+            return
+
         v = self.plotAnimationCanvas.focusNode
         lowerBoundInput = str(self.nodeLabelPlotLowerBoundLineEdit.text())
         lowerBound = float(lowerBoundInput) if lowerBoundInput != "" else 0
@@ -541,6 +566,12 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
             self.update_node_label_graph()
 
     def update_edge_graphs(self):
+        if self.plotAnimationCanvas.focusEdge is None:
+            # Clear the plot
+            self.plotEdgeFlowCanvas.clear_plot()
+            self.plotEdgeQueueCanvas.clear_plot()
+            return
+
         v, w = self.plotAnimationCanvas.focusEdge[0], self.plotAnimationCanvas.focusEdge[1]
 
         lowerBoundInput = str(self.edgeFlowPlotLowerBoundLineEdit.text())
@@ -597,3 +628,16 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
 
     def change_cleanup_state(self):
         self.cleanUpEnabled = (self.cleanUpCheckBox.isChecked())
+
+    def pressed_delete(self):
+        if self.tabWidget.currentIndex() != 0:
+            # Deletion only possible in graph creation mode (i.e. tab 1 is focussed)
+            return
+
+        if self.graphCreationCanvas.focusNode is not None:
+            self.delete_node()
+        elif self.graphCreationCanvas.focusEdge is not None:
+            self.delete_edge()
+
+    def pressed_enter(self):
+        print "enter"

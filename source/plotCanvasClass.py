@@ -57,6 +57,8 @@ class PlotCanvas(FigureCanvas):
         self.nodeSize = 300
         self.nodeLabelFontSize = 12  # float but passed as int
         self.edgeLabelFontSize = 10  # float but passed as int
+
+        # Only one of them can be not None
         self.focusNode = None
         self.focusEdge = None
 
@@ -121,15 +123,23 @@ class PlotCanvas(FigureCanvas):
             if clickedEdge is not None and clickedNode is None:
                 # Selected an existing edge
                 self.focusEdge = clickedEdge
+                self.focusNode = None
+
+                self.interface.update_node_display()
                 self.interface.update_edge_display()
+                self.update_nodes(color=True)
                 self.update_edges(color=True)
             elif clickedNode is not None:
                 self.focusNode = clickedNode
+                self.focusEdge = None
+                self.update_edges(color=True)
+                self.interface.update_edge_display()
                 if not newNodeCreated:
                     self.selectedNode = clickedNode
                 else:
                     self.mouseLeftPressTime = None
                     self.update_nodes(added=True, color=True)
+
 
         elif action == 2:
             # Wheel was clicked, move visible part of canvas
@@ -143,7 +153,10 @@ class PlotCanvas(FigureCanvas):
                 self.selectedNode = clickedNode
                 self.mouseRightPressed = True
                 self.focusNode = self.selectedNode
+                self.focusEdge = None
+                self.update_edges(color=True)
                 self.update_nodes(color=True)
+                self.interface.update_edge_display()
                 self.interface.update_node_display()
 
     def on_release(self, event):
@@ -181,7 +194,8 @@ class PlotCanvas(FigureCanvas):
                                 self.network.add_edge(self.selectedNode, clickedNode, transitTime=1, capacity=1)
 
                                 self.focusEdge = (self.selectedNode, clickedNode)
-                                self.focusNode = clickedNode
+                                self.focusNode = None
+
 
                                 self.interface.update_edge_display()
                                 self.update_edges(added=True, color=True)
