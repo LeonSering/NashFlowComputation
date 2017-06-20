@@ -178,7 +178,7 @@ class PlotCanvas(FigureCanvas):
                         if self.selectedNode is not None and self.selectedNode != clickedNode:
                             # Add the corresponding edge, if valid
                             if not self.network.has_edge(self.selectedNode, clickedNode):
-                                self.network.add_edge(self.selectedNode, clickedNode, transitTime=0, capacity=0)
+                                self.network.add_edge(self.selectedNode, clickedNode, transitTime=1, capacity=1)
 
                                 self.focusEdge = (self.selectedNode, clickedNode)
                                 self.focusNode = clickedNode
