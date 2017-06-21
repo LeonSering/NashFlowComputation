@@ -55,7 +55,7 @@ class PlotValuesCanvas(FigureCanvas):
         self.draw_idle()
 
         if self.verticalLine is not None:
-            # verticalLine is automatically removed by self.figure.clf()
+            # self.verticalLine is automatically removed by self.figure.clf()
             self.verticalLine = None
 
         self.visibleBool = False
