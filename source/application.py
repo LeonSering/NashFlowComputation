@@ -523,6 +523,8 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
 
         self.add_intervals_to_list()
 
+        self.intervalsListWidget.setCurrentRow(0)
+
     def add_intervals_to_list(self):
         for index, interval in enumerate(self.nashFlow.flowIntervals):
             intervalString = 'Interval ' + str(interval[2].id) + ': [' + str("%.2f" % interval[0]) + ',' + str(
@@ -553,6 +555,17 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.plotNodeLabelCanvas.change_vline_position(time)
 
         self.currentSliderTimeLabel.setText("%.2f" % time)
+
+        # Adjust NTF if necessary
+
+        for index, interval in enumerate(self.nashFlow.flowIntervals):
+            lowerBound = interval[0]
+            upperBound = interval[1]
+            if lowerBound <= time <= upperBound:
+                break
+
+        self.intervalsListWidget.setCurrentRow(index)
+
 
 
     def update_node_label_graph(self):
@@ -637,11 +650,6 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
             queueXValues.append(upperBound)
             queueYValues.append(val)
 
-        '''
-        self.plotEdgeFlowCanvas.update_plot(lowerBound, upperBound, inflowXValues, inflowYValues,
-                                            (outflowXValues, outflowYValues))
-        self.plotEdgeQueueCanvas.update_plot(lowerBound, upperBound, queueXValues, queueYValues)
-        '''
         self.plotEdgeCanvas.update_plot(lowerBound, upperBound, inflowXValues, inflowYValues, (outflowXValues, outflowYValues), (queueXValues, queueYValues))
 
     def set_plot_range(self):
