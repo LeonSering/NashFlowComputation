@@ -65,6 +65,9 @@ class PlotAnimationCanvas(PlotCanvas):
         self.currentTimeIndex = sliderVal
         self.update_time_labels()
 
+    def get_time_from_tick(self, sliderVal):
+        return self.timePoints[sliderVal]
+
     def update_time_labels(self):
         # Update additional node labels and positions
 

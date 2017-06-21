@@ -547,6 +547,12 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
     def slider_value_change(self):
         self.plotAnimationCanvas.time_changed(self.timeSlider.value())
 
+        time = self.plotAnimationCanvas.get_time_from_tick(self.timeSlider.value())
+        self.plotEdgeCanvas.change_vline_position(time)
+        self.plotNodeLabelCanvas.change_vline_position(time)
+
+
+
     def update_node_label_graph(self):
         if self.plotAnimationCanvas.focusNode is None:
             # Clear the plot
