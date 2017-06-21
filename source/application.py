@@ -18,6 +18,7 @@ from plotCanvasClass import PlotCanvas
 from plotNTFCanvasClass import PlotNTFCanvas
 from plotValuesCanvasClass import PlotValuesCanvas
 from ui import mainWdw
+from utilitiesClass import Utilities
 
 filterwarnings('ignore')  # For the moment: ignore warnings as pyplot.hold is deprecated
 
@@ -143,13 +144,13 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         # Configure plotNodeLabelFrame to display node label plot
         self.plotNodeLabelFrameLayout = QtGui.QVBoxLayout()
         self.plotNodeLabelFrame.setLayout(self.plotNodeLabelFrameLayout)
-        self.plotNodeLabelCanvas = PlotValuesCanvas()
+        self.plotNodeLabelCanvas = PlotValuesCanvas(callback=self.callback_plotValuesCanvas)
         self.plotNodeLabelFrameLayout.addWidget(self.plotNodeLabelCanvas)
 
         # Configure plotEdgeFrame to display edge in- and outflow
         self.plotEdgeFrameLayout = QtGui.QVBoxLayout()
         self.plotEdgeFrame.setLayout(self.plotEdgeFrameLayout)
-        self.plotEdgeCanvas = PlotValuesCanvas()
+        self.plotEdgeCanvas = PlotValuesCanvas(callback=self.callback_plotValuesCanvas)
         self.plotEdgeFrameLayout.addWidget(self.plotEdgeCanvas)
 
 
@@ -330,13 +331,13 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         # Configure plotNodeLabelFrame to display node label plot
         if self.plotNodeLabelCanvas is not None:
             self.plotNodeLabelCanvas.setParent(None)
-        self.plotNodeLabelCanvas = PlotValuesCanvas()
+        self.plotNodeLabelCanvas = PlotValuesCanvas(callback=self.callback_plotValuesCanvas)
         self.plotNodeLabelFrameLayout.addWidget(self.plotNodeLabelCanvas)
 
         # Configure plotEdgeFrame to display edge in-/outflow and queue size
         if self.plotEdgeCanvas is not None:
             self.plotEdgeCanvas.setParent(None)
-        self.plotEdgeCanvas = PlotValuesCanvas()
+        self.plotEdgeCanvas = PlotValuesCanvas(callback=self.callback_plotValuesCanvas)
         self.plotEdgeFrameLayout.addWidget(self.plotEdgeCanvas)
 
         '''
@@ -661,3 +662,20 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
             self.delete_node()
         elif self.graphCreationCanvas.focusEdge is not None:
             self.delete_edge()
+
+    def callback_plotValuesCanvas(self, xVal):
+        xVal = float("%.2f" % xVal)
+
+        valueTol = 1e-2
+        if not (self.plotAnimationCanvas.timePoints[0] <= xVal <= self.plotAnimationCanvas.timePoints[-1]):
+            return
+
+        try:
+            # Check if there already exists a timepoint which is sufficiently close
+            xVal = next(time for time in self.plotAnimationCanvas.timePoints if Utilities.is_eq_tol(time, xVal, valueTol))
+        except StopIteration:
+            # Add the time point
+            self.plotAnimationCanvas.add_time(xVal)
+            self.timeSlider.setMaximum(self.timeSlider.maximum() + 1)
+
+        self.timeSlider.setValue(self.plotAnimationCanvas.timePoints.index(xVal))

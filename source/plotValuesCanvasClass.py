@@ -16,15 +16,19 @@ from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 
 
 class PlotValuesCanvas(FigureCanvas):
-    def __init__(self):
+    def __init__(self, callback=None):
         self.figure = figure.Figure()
         super(PlotValuesCanvas, self).__init__(self.figure)  # Call parents constructor
 
         self.additionalColors = ['red', 'blue']
         self.verticalLine = None
         self.verticalLinePos = 0
+        self.callback = callback
 
         self.visibleBool = False
+
+        # Signals
+        self.mpl_connect('button_press_event', self.on_click)
 
     def update_plot(self, lowerBound, upperBound, xValues, yValues, *additional_values):
         self.figure.clf()
@@ -77,3 +81,15 @@ class PlotValuesCanvas(FigureCanvas):
 
                 self.draw_idle()
 
+
+    def on_click(self, event):
+        if event.xdata is None or event.ydata is None:
+            return
+
+        # Note: event.x/y = relative position, event.xdata/ydata = absolute position
+        xAbsolute, yAbsolute = event.xdata, event.ydata
+
+        action = event.button  # event.button = mouse(1,2,3)
+
+        if action == 1:
+            self.callback(xAbsolute)
