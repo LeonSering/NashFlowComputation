@@ -853,6 +853,32 @@
           <string/>
          </property>
         </widget>
+        <widget class="QLabel" name="label_17">
+         <property name="geometry">
+          <rect>
+           <x>430</x>
+           <y>440</y>
+           <width>91</width>
+           <height>21</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Current time:</string>
+         </property>
+        </widget>
+        <widget class="QLabel" name="currentSliderTimeLabel">
+         <property name="geometry">
+          <rect>
+           <x>530</x>
+           <y>440</y>
+           <width>111</width>
+           <height>21</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>0</string>
+         </property>
+        </widget>
        </widget>
        <widget class="QGroupBox" name="groupBox_8">
         <property name="geometry">

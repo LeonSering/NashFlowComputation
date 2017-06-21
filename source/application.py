@@ -551,6 +551,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.plotEdgeCanvas.change_vline_position(time)
         self.plotNodeLabelCanvas.change_vline_position(time)
 
+        self.currentSliderTimeLabel.setText("%.2f" % time)
 
 
     def update_node_label_graph(self):
