@@ -80,6 +80,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.timeSlider.setTickInterval(1)
 
         self.timeSlider.valueChanged.connect(self.slider_value_change)
+        self.timeSlider.sliderReleased.connect(self.slider_released)
 
         self.actionNew_graph.triggered.connect(self.re_init_graph_creation_app)
         self.actionLoad_graph.triggered.connect(self.load_graph)
@@ -545,7 +546,6 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
 
         self.plotNTFCanvas = self.NTFPlotList[rowID]
         self.plotNTFFrameLayout.addWidget(self.plotNTFCanvas)
-        # self.plotNTFCanvas.update_plot()
 
     def slider_value_change(self):
         self.plotAnimationCanvas.time_changed(self.timeSlider.value())
@@ -556,16 +556,17 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
 
         self.currentSliderTimeLabel.setText("%.2f" % time)
 
-        # Adjust NTF if necessary
 
+
+    def slider_released(self):
+        time = self.plotAnimationCanvas.get_time_from_tick(self.timeSlider.value())
+        # Adjust NTF if necessary
         for index, interval in enumerate(self.nashFlow.flowIntervals):
             lowerBound = interval[0]
             upperBound = interval[1]
             if lowerBound <= time <= upperBound:
+                self.intervalsListWidget.setCurrentRow(index)
                 break
-
-        self.intervalsListWidget.setCurrentRow(index)
-
 
 
     def update_node_label_graph(self):
@@ -687,3 +688,4 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
             self.timeSlider.setMaximum(self.timeSlider.maximum() + 1)
 
         self.timeSlider.setValue(self.plotAnimationCanvas.timePoints.index(xVal))
+        self.slider_released()
