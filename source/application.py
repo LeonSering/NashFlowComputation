@@ -89,7 +89,8 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.actionLoad_NashFlow.triggered.connect(self.load_nashflow)
         self.actionSave_NashFlow.triggered.connect(self.save_nashflow)
 
-        self.intervalsListWidget.currentItemChanged.connect(self.update_NTF_display)
+        #self.intervalsListWidget.currentItemChanged.connect(self.update_NTF_display)
+        self.intervalsListWidget.itemClicked.connect(self.update_NTF_display)
 
 
         self.setPlotRangePushButton.clicked.connect(self.set_plot_range)
@@ -547,6 +548,8 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.plotNTFCanvas = self.NTFPlotList[rowID]
         self.plotNTFFrameLayout.addWidget(self.plotNTFCanvas)
 
+        self.callback_plotValuesCanvas(self.nashFlow.flowIntervals[rowID][0], False)
+
     def slider_value_change(self):
         self.plotAnimationCanvas.time_changed(self.timeSlider.value())
 
@@ -566,7 +569,11 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
             upperBound = interval[1]
             if lowerBound <= time <= upperBound:
                 self.intervalsListWidget.setCurrentRow(index)
-                break
+                if self.plotNTFCanvas is not None:
+                    self.plotNTFCanvas.setParent(None)
+
+                self.plotNTFCanvas = self.NTFPlotList[index]
+                self.plotNTFFrameLayout.addWidget(self.plotNTFCanvas)
 
 
     def update_node_label_graph(self):
@@ -672,7 +679,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         elif self.graphCreationCanvas.focusEdge is not None:
             self.delete_edge()
 
-    def callback_plotValuesCanvas(self, xVal):
+    def callback_plotValuesCanvas(self, xVal, updateNTF=True):
         xVal = float("%.2f" % xVal)
 
         valueTol = 1e-2
@@ -688,4 +695,5 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
             self.timeSlider.setMaximum(self.timeSlider.maximum() + 1)
 
         self.timeSlider.setValue(self.plotAnimationCanvas.timePoints.index(xVal))
-        self.slider_released()
+        if updateNTF:
+            self.slider_released()
