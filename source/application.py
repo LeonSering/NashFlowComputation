@@ -45,6 +45,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.init_graph_creation_app()
         self.inflowLineEdit.setText('1')
 
+
         self.outputDirectory = ''
         self.templateFile = ''
         self.scipFile = ''
@@ -52,6 +53,9 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.numberOfIntervals = -1
 
         self.cleanUpEnabled = True
+
+        self.animationLowerBound = 0
+        self.animationUpperBound = 1
 
         self.configFile = ConfigParser.RawConfigParser()
 
@@ -92,8 +96,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         #self.intervalsListWidget.currentItemChanged.connect(self.update_NTF_display)
         self.intervalsListWidget.itemClicked.connect(self.update_NTF_display)
 
-
-        self.setPlotRangePushButton.clicked.connect(self.set_plot_range)
+        self.generateAnimationPushButton.clicked.connect(self.generate_animation)
 
         # Keyboard shortcuts
         QtGui.QShortcut(QtGui.QKeySequence(QtCore.Qt.Key_Delete), self).activated.connect(
@@ -143,32 +146,35 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.plotAnimationFrame.setLayout(self.plotAnimationFrameLayout)
         self.plotAnimationCanvas = None
 
-        # Configure plotNodeLabelFrame to display node label plot
-        self.plotNodeLabelFrameLayout = QtGui.QVBoxLayout()
-        self.plotNodeLabelFrame.setLayout(self.plotNodeLabelFrameLayout)
-        self.plotNodeLabelCanvas = PlotValuesCanvas(callback=self.callback_plotValuesCanvas)
-        self.plotNodeLabelFrameLayout.addWidget(self.plotNodeLabelCanvas)
-
-        # Configure plotEdgeFrame to display edge in- and outflow
-        self.plotEdgeFrameLayout = QtGui.QVBoxLayout()
-        self.plotEdgeFrame.setLayout(self.plotEdgeFrameLayout)
-        self.plotEdgeCanvas = PlotValuesCanvas(callback=self.callback_plotValuesCanvas)
-        self.plotEdgeFrameLayout.addWidget(self.plotEdgeCanvas)
+        # Configure plotDiagramFrame to display edge in- and outflow, queue-size and node labels
+        self.plotDiagramLayout = QtGui.QVBoxLayout()
+        self.plotDiagramFrame.setLayout(self.plotDiagramLayout)
+        self.plotDiagramCanvas = PlotValuesCanvas(callback=self.callback_plotValuesCanvas)
+        self.plotDiagramLayout.addWidget(self.plotDiagramCanvas)
 
 
-        '''
-        # Configure plotEdgeFlowFrame to display edge in- and outflow
-        self.plotEdgeFlowFrameLayout = QtGui.QVBoxLayout()
-        self.plotEdgeFlowFrame.setLayout(self.plotEdgeFlowFrameLayout)
-        self.plotEdgeFlowCanvas = PlotValuesCanvas()
-        self.plotEdgeFlowFrameLayout.addWidget(self.plotEdgeFlowCanvas)
+    def generate_animation(self):
 
-        # Configure plotEdgeQueueFrame to display edge in- and outflow
-        self.plotEdgeQueueFrameLayout = QtGui.QVBoxLayout()
-        self.plotEdgeQueueFrame.setLayout(self.plotEdgeQueueFrameLayout)
-        self.plotEdgeQueueCanvas = PlotValuesCanvas()
-        self.plotEdgeQueueFrameLayout.addWidget(self.plotEdgeQueueCanvas)
-        '''
+        lowerBoundInput = str(self.animationStartLineEdit.text())
+        lowerBound = float(lowerBoundInput) if lowerBoundInput != "" else 0
+
+        upperBoundInput = str(self.animationEndLineEdit.text())
+        if upperBoundInput == "":
+            upperBoundInput = self.nashFlow.flowIntervals[-1][1] \
+                if self.nashFlow.flowIntervals[-1][1] < float('inf') \
+                else Utilities.add_3_and_round_up(self.nashFlow.flowIntervals[-1][0])
+
+        upperBound = float(upperBoundInput)
+
+
+        self.animationLowerBound = lowerBound
+        self.animationUpperBound = upperBound
+        self.set_plot_range()
+
+        self.timeSlider.setValue(0)
+        self.plotAnimationCanvas.reset_upperbound(self.animationUpperBound)
+
+
 
     def update_node_display(self):
         """Update display of the properties of the currently focussed node self.graphCreationCanvas.focusNode, if existing"""
@@ -321,40 +327,26 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         if self.plotAnimationCanvas is not None:
             self.plotAnimationCanvas.setParent(None)
 
-        # Add plotAnimationCanvas
-        if self.nashFlow.flowIntervals[-1][1] < float('inf'):
-            upperBound = self.nashFlow.flowIntervals[-1][1]
-        else:
-            upperBound = self.nashFlow.flowIntervals[-1][0]
+        self.animationUpperBound = self.nashFlow.flowIntervals[-1][1] \
+                if self.nashFlow.flowIntervals[-1][1] < float('inf') \
+                else Utilities.add_3_and_round_up(self.nashFlow.flowIntervals[-1][0])
 
-        self.plotAnimationCanvas = PlotAnimationCanvas(nashflow=self.nashFlow, interface=self, upperBound=upperBound)
+        self.animationStartLineEdit.setText("%.2f" % self.animationLowerBound)
+        self.animationEndLineEdit.setText("%.2f" % self.animationUpperBound)
+
+        self.timeSlider.setValue(0)
+
+        self.plotAnimationCanvas = PlotAnimationCanvas(nashflow=self.nashFlow, interface=self, upperBound=self.animationUpperBound)
         self.plotAnimationFrameLayout.addWidget(self.plotAnimationCanvas)
 
-        # Configure plotNodeLabelFrame to display node label plot
-        if self.plotNodeLabelCanvas is not None:
-            self.plotNodeLabelCanvas.setParent(None)
-        self.plotNodeLabelCanvas = PlotValuesCanvas(callback=self.callback_plotValuesCanvas)
-        self.plotNodeLabelFrameLayout.addWidget(self.plotNodeLabelCanvas)
 
-        # Configure plotEdgeFrame to display edge in-/outflow and queue size
-        if self.plotEdgeCanvas is not None:
-            self.plotEdgeCanvas.setParent(None)
-        self.plotEdgeCanvas = PlotValuesCanvas(callback=self.callback_plotValuesCanvas)
-        self.plotEdgeFrameLayout.addWidget(self.plotEdgeCanvas)
+        # Configure plotDiagramFrame
+        if self.plotDiagramCanvas is not None:
+            self.plotDiagramCanvas.setParent(None)
+        self.plotDiagramCanvas = PlotValuesCanvas(callback=self.callback_plotValuesCanvas)
+        self.plotDiagramLayout.addWidget(self.plotDiagramCanvas)
 
-        '''
-        # Configure plotEdgeFlowFrame to display edge in- and outflow
-        if self.plotEdgeFlowCanvas is not None:
-            self.plotEdgeFlowCanvas.setParent(None)
-        self.plotEdgeFlowCanvas = PlotValuesCanvas()
-        self.plotEdgeFlowFrameLayout.addWidget(self.plotEdgeFlowCanvas)
 
-        # Configure plotEdgeQueueFrame to display edge in- and outflow
-        if self.plotEdgeQueueCanvas is not None:
-            self.plotEdgeQueueCanvas.setParent(None)
-        self.plotEdgeQueueCanvas = PlotValuesCanvas()
-        self.plotEdgeQueueFrameLayout.addWidget(self.plotEdgeQueueCanvas)
-        '''
     def load_graph(self):
         """Load CurrentGraph instance from '.cg' file"""
         dialog = QtGui.QFileDialog
@@ -554,11 +546,9 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.plotAnimationCanvas.time_changed(self.timeSlider.value())
 
         time = self.plotAnimationCanvas.get_time_from_tick(self.timeSlider.value())
-        self.plotEdgeCanvas.change_vline_position(time)
-        self.plotNodeLabelCanvas.change_vline_position(time)
+        self.plotDiagramCanvas.change_vline_position(time)
 
         self.currentSliderTimeLabel.setText("%.2f" % time)
-
 
 
     def slider_released(self):
@@ -578,11 +568,10 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
 
     def update_node_label_graph(self):
         if self.plotAnimationCanvas.focusNode is None:
-            # Clear the plot
-            self.plotNodeLabelCanvas.clear_plot()
             return
 
         v = self.plotAnimationCanvas.focusNode
+        '''
         lowerBoundInput = str(self.plotLowerBoundLineEdit.text())
         lowerBound = float(lowerBoundInput) if lowerBoundInput != "" else 0
 
@@ -592,6 +581,9 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
                 'inf') else self.nashFlow.flowIntervals[-1][0]
 
         upperBound = float(upperBoundInput)
+        '''
+        lowerBound = self.animationLowerBound
+        upperBound = self.animationUpperBound
 
         xValues = [0]
         yValues = [self.nashFlow.node_label(v, 0)]
@@ -604,17 +596,14 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
             xValues.append(upperBound)
             yValues.append(self.nashFlow.node_label(v, upperBound))
 
-        self.plotNodeLabelCanvas.update_plot(lowerBound, upperBound, xValues, yValues)
+        self.plotDiagramCanvas.update_plot(lowerBound, upperBound, xValues, yValues)
 
 
     def update_edge_graphs(self):
         if self.plotAnimationCanvas.focusEdge is None:
-            # Clear the plot
-            self.plotEdgeCanvas.clear_plot()
             return
-
         v, w = self.plotAnimationCanvas.focusEdge[0], self.plotAnimationCanvas.focusEdge[1]
-
+        '''
         lowerBoundInput = str(self.plotLowerBoundLineEdit.text())
         lowerBound = float(lowerBoundInput) if lowerBoundInput != "" else 0
 
@@ -625,6 +614,11 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
                 else self.nashFlow.node_label(v, self.nashFlow.flowIntervals[-1][0])
 
         upperBound = float(upperBoundInput)
+        '''
+
+        lowerBound = self.animationLowerBound
+        upperBound = self.animationUpperBound
+
 
         inflowXValues = self.nashFlow.network[v][w]['cumulativeInflow'].keys()
         inflowYValues = self.nashFlow.network[v][w]['cumulativeInflow'].values()
@@ -658,7 +652,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
             queueXValues.append(upperBound)
             queueYValues.append(val)
 
-        self.plotEdgeCanvas.update_plot(lowerBound, upperBound, inflowXValues, inflowYValues, (outflowXValues, outflowYValues), (queueXValues, queueYValues))
+        self.plotDiagramCanvas.update_plot(lowerBound, upperBound, inflowXValues, inflowYValues, (outflowXValues, outflowYValues), (queueXValues, queueYValues))
 
     def set_plot_range(self):
         if self.plotAnimationCanvas.focusEdge is not None:

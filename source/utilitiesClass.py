@@ -10,6 +10,7 @@ import time
 import networkx as nx
 import matplotlib
 
+
 matplotlib.use("Qt4Agg")
 import numpy as np
 import bisect
@@ -93,6 +94,11 @@ class Utilities:
     @staticmethod
     def join_intersect_dicts(dict1, dict2):
         return {key: (dict1[key], dict2[key]) for key in dict1 if key in dict2}
+
+    @staticmethod
+    def add_3_and_round_up(x):
+        x += 3
+        return x if x % 10 == 0 else x + 10 - x % 10
 
     @staticmethod
     def draw_edges(G, pos,
@@ -206,6 +212,10 @@ class Utilities:
                     ya = p * d * numpy.sin(theta) + y1
 
                 a_pos.append(((xa, ya), (x2, y2)))
+
+                #r1 = matplotlib.patches.Rectangle((0, 0), 20, 40, color="blue", alpha=0.50)
+                #ax.add_patch(r1)
+                # MAYBE DRAW POLYGON INSTEAD OF RECTANGLE
 
             arrow_collection = LineCollection(a_pos,
                                               colors=arrow_colors,

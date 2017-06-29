@@ -65,6 +65,11 @@ class PlotAnimationCanvas(PlotCanvas):
                     self.flowOnEdgeNotQueue[edge][fk][time] = max(0, outflow*(min(time, wTimeUpper - capacity)-(wTimeLower - capacity)))
                     self.flowOnQueue[edge][fk][time] = self.flowOnEntireEdge[edge][fk][time] - self.flowOnEdgeNotQueue[edge][fk][time]
 
+    def reset_upperbound(self, upperBound):
+        self.upperBound = upperBound
+        self.timePoints = [float(i) / 99 * self.upperBound for i in range(100)]
+        self.precompute_information()
+
     def add_time(self, time):
         insort(self.timePoints, time)
         self.precompute_information(timeList=[time])
