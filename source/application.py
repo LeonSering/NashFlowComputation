@@ -50,6 +50,8 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.templateFile = ''
         self.scipFile = ''
 
+        self.defaultLoadSaveDir = ''
+
         self.numberOfIntervals = -1
 
         self.cleanUpEnabled = True
@@ -81,7 +83,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.timeSlider.setMinimum(0)
         self.timeSlider.setMaximum(99)
         self.timeSlider.setValue(0)
-        # self.timeSlider.setTickPosition(2) # Set ticks below horizontal slider
+        self.timeSlider.setTickPosition(2) # Set ticks below horizontal slider
         self.timeSlider.setTickInterval(1)
 
         self.timeSlider.valueChanged.connect(self.slider_value_change)
@@ -358,7 +360,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         """Load CurrentGraph instance from '.cg' file"""
         dialog = QtGui.QFileDialog
         # noinspection PyCallByClass
-        fopen = dialog.getOpenFileName(self, "Select File", "", "network files (*.cg)")
+        fopen = dialog.getOpenFileName(self, "Select File", self.defaultLoadSaveDir, "network files (*.cg)")
 
         if os.name != 'posix':
             fopen = fopen[0]
@@ -369,7 +371,8 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         # Read file         
         with open(fopen, 'rb') as f:
             self.network = pickle.load(f)
-
+        self.defaultLoadSaveDir = os.path.dirname(fopen)
+        self.save_config()
         self.re_init_graph_creation_app(NoNewGraph=True)
 
     def save_graph(self):
@@ -388,7 +391,8 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
 
         if not fsave.endswith('cg'):
             fsave += ".cg"
-
+        self.defaultLoadSaveDir = os.path.dirname(fsave)
+        self.save_config()
         # Save network instance to file
         with open(fsave, 'wb') as f:
             pickle.dump(self.network, f)
@@ -407,7 +411,8 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         # Read file
         with open(fopen, 'rb') as f:
             self.nashFlow = pickle.load(f)
-
+        self.defaultLoadSaveDir = os.path.dirname(fopen)
+        self.save_config()
         self.re_init_nashflow_app()
         self.add_intervals_to_list()
 
@@ -425,15 +430,17 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
 
         if not fsave.endswith('nf'):
             fsave += ".nf"
-
+        self.defaultLoadSaveDir = os.path.dirname(fsave)
+        self.save_config()
         # Save network instance to file
         with open(fsave, 'wb') as f:
             pickle.dump(self.nashFlow, f)
 
     def select_output_directory(self):
         """Select output directory for nash flow computation"""
+        defaultDir = self.outputDirectory
         dialog = QtGui.QFileDialog
-        fselect = dialog.getExistingDirectory(self, "Select Directory")
+        fselect = dialog.getExistingDirectory(self, "Select Directory", defaultDir)
 
         if os.name != 'posix':
             fselect = fselect[0]
@@ -445,8 +452,9 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
 
     def select_template_file(self):
         """Select zimpl template file"""
+        defaultDir = '' if not os.path.isfile(self.templateFile) else os.path.dirname(self.templateFile)
         dialog = QtGui.QFileDialog
-        fselect = dialog.getOpenFileName(self, "Select File", "", "zimpl files (*.zpl)")
+        fselect = dialog.getOpenFileName(self, "Select File", defaultDir, "zimpl files (*.zpl)")
 
         if os.name != 'posix':
             fselect = fselect[0]
@@ -456,11 +464,12 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.templateFileLineEdit.setText(fselect)
         self.templateFile = fselect
 
-    # noinspection PyCallByClass
+
     def select_scip_binary(self):
         """Select scip binary"""
+        defaultDir = '' if not os.path.isfile(self.scipFile) else os.path.dirname(self.scipFile)
         dialog = QtGui.QFileDialog
-        fselect = dialog.getOpenFileName(self, "Select File", "")
+        fselect = dialog.getOpenFileName(self, "Select File", defaultDir)
 
         if os.name != 'posix':
             fselect = fselect[0]
@@ -477,6 +486,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.configFile.set('Settings', 'scippath', '')
         self.configFile.set('Settings', 'cleanup', '1')
         self.configFile.set('Settings', 'intervals', '-1')
+        self.configFile.set('Settings', 'defaultloadsavedir', '')
 
         try:
             self.configFile.read('config.cfg')
@@ -494,6 +504,8 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
             self.numberOfIntervals = self.configFile.get('Settings', 'intervals')
             self.intervalsLineEdit.setText(self.numberOfIntervals)
 
+            self.defaultLoadSaveDir = self.configFile.get('Settings', 'defaultloadsavedir')
+
         except Exception as err:
             return
 
@@ -503,6 +515,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.configFile.set('Settings', 'scippath', self.scipFile)
         self.configFile.set('Settings', 'cleanup', self.cleanUpEnabled)
         self.configFile.set('Settings', 'intervals', self.numberOfIntervals)
+        self.configFile.set('Settings', 'defaultloadsavedir', self.defaultLoadSaveDir)
 
         with open('config.cfg', 'wb') as configfile:
             self.configFile.write(configfile)
