@@ -112,6 +112,9 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.nodeXLineEdit.returnPressed.connect(self.update_node)
         self.nodeYLineEdit.returnPressed.connect(self.update_node)
 
+        # Animation generation shortcuts
+        self.animationStartLineEdit.returnPressed.connect(self.generate_animation)
+        self.animationEndLineEdit.returnPressed.connect(self.generate_animation)
 
 
 
@@ -154,8 +157,10 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.plotDiagramLayout.addWidget(self.plotDiagramCanvas)
 
 
-    def generate_animation(self):
 
+
+
+    def generate_animation(self):
         lowerBoundInput = str(self.animationStartLineEdit.text())
         lowerBound = float(lowerBoundInput) if lowerBoundInput != "" else 0
 
