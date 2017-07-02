@@ -121,17 +121,25 @@ class PlotValuesCanvas(FigureCanvas):
             self.callback(xAbsolute)
 
     def export(self, path):
-        # Hide verticalLine for export
+        # Hide Lines for export
         if self.verticalLine is not None:
             self.verticalLine.set_visible(False)
-            self.draw_idle()
+            for l in self.hLines:
+                l.set_visible(False)
+            for label in self.hLinesLabels:
+                label.set_visible(False)
 
+        self.draw_idle()
         self.figure.savefig(path)
 
-        # Show verticalLine
+        # Show Lines again
         if self.verticalLine is not None:
             self.verticalLine.set_visible(True)
-            self.draw_idle()
+            for l in self.hLines:
+                l.set_visible(True)
+            for label in self.hLinesLabels:
+                label.set_visible(True)
+        self.draw_idle()
 
     def add_hline_to_plots(self):
         for l in self.hLines:

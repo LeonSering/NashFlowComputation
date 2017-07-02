@@ -693,9 +693,8 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
 
     def export_diagram(self):
         fileType = 'pdf' if self.exportComboBox.currentIndex() == 0 else 'pgf'
-
         dialog = QtGui.QFileDialog
-        fsave = dialog.getSaveFileName(self, "Select File", "", fileType + " files (*." + fileType + ")")
+        fsave = dialog.getSaveFileName(self, "Select File", self.defaultLoadSaveDir, fileType + " files (*." + fileType + ")")
 
         if os.name != 'posix':
             fsave = fsave[0]
@@ -705,5 +704,8 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
 
         if not fsave.endswith('.' + fileType):
             fsave += '.' + fileType
+
+        self.defaultLoadSaveDir = os.path.dirname(fsave)
+        self.save_config()
 
         self.plotDiagramCanvas.export(path=fsave)
