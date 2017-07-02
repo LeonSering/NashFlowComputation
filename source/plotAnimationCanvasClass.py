@@ -150,6 +150,31 @@ class PlotAnimationCanvas(PlotCanvas):
             self.mouseWheelPressedPosition = (xAbsolute, yAbsolute)
             return
 
+    def on_release(self, event):
+        """
+        Release-Mouse-event handling
+        :param event: event which is emitted by matplotlib
+        """
+        if event.xdata is None or event.ydata is None:
+            return
+        xAbsolute, yAbsolute = event.xdata, event.ydata
+        action = event.button  # event.button = mouse(1,2,3)
+
+
+        if action == 1:
+            # Nothing should happen here, as no new node can be created
+            return
+
+        elif action == 2:
+            # Wheel has been released
+            self.mouseWheelPressed = False
+            self.mouseWheelPressedPosition = None
+
+        elif action == 3:
+            # Right mouse has been released
+            self.mouseRightPressed = False
+            self.selectedNode = None
+
     def draw_edges(self, G, pos,
                    edgelist=None,
                    width=1.0,
