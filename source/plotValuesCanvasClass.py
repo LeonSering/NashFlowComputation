@@ -6,7 +6,7 @@
 
 import matplotlib
 from matplotlib import figure
-
+from utilitiesClass import Utilities
 matplotlib.use("Qt4Agg")
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 
@@ -20,9 +20,17 @@ class PlotValuesCanvas(FigureCanvas):
         self.figure = figure.Figure()
         super(PlotValuesCanvas, self).__init__(self.figure)  # Call parents constructor
 
-        self.additionalColors = ['red', 'blue']
+
+        self.plots = []
+        self.hLines = []
+        self.hLinesLabels = []
+        self.additionalColors = ['green', 'red', 'blue']
         self.verticalLine = None
         self.verticalLinePos = 0
+        self.verticalLineColor = 'grey'
+        self.verticalLineWidth = 0.5
+
+
         self.callback = callback
 
         self.visibleBool = False
@@ -39,23 +47,29 @@ class PlotValuesCanvas(FigureCanvas):
 
     def update_plot(self, lowerBound, upperBound, labels, xValues, yValues, *additional_values):
         self.figure.clf()
+        self.plots = []
+        self.hLines = []
+        self.hLinesLabels = []
 
         axes = self.figure.add_subplot(111)
 
         yMin, yMax = min(yValues), max(yValues)
-        axes.plot(xValues, yValues, linewidth=2, color='green', label=labels[0])
-        colorCounter = 0
+        axes.plot(xValues, yValues, linewidth=2, color=self.additionalColors[0], label=labels[0])
+        self.plots.append((xValues, yValues))
+        colorCounter = 1
         for xVals, yVals in additional_values:
             yMin, yMax = min(yMin, min(yVals)), max(yMax, max(yVals))
-            axes.plot(xVals, yVals, linewidth=2, color=self.additionalColors[colorCounter], label=labels[colorCounter + 1])
+            axes.plot(xVals, yVals, linewidth=2, color=self.additionalColors[colorCounter], label=labels[colorCounter])
+            self.plots.append((xVals, yVals))
             colorCounter += 1
 
         axes.set_xlim(lowerBound, upperBound)
         axes.set_ylim(max(0, yMin), int(max(1, yMax) * 1.5))
 
         if lowerBound <= self.verticalLinePos <= upperBound:
-            self.verticalLine = axes.axvline(self.verticalLinePos)
-            self.verticalLine.set_color('blue')
+            self.verticalLine = axes.axvline(self.verticalLinePos, linewidth=self.verticalLineWidth)
+            self.verticalLine.set_color(self.verticalLineColor)
+            self.add_hline_to_plots()
         else:
             self.verticalLine = None
 
@@ -65,6 +79,9 @@ class PlotValuesCanvas(FigureCanvas):
 
     def clear_plot(self):
         self.figure.clf()
+        self.plots = []
+        self.hLines = []
+        self.hLinesLabels = []
         self.draw_idle()
 
         if self.verticalLine is not None:
@@ -85,9 +102,9 @@ class PlotValuesCanvas(FigureCanvas):
             lowerBound, upperBound = axes.get_xlim()
 
             if lowerBound <= self.verticalLinePos <= upperBound:
-                self.verticalLine = axes.axvline(self.verticalLinePos)
-                self.verticalLine.set_color('blue')
-
+                self.verticalLine = axes.axvline(self.verticalLinePos, linewidth=self.verticalLineWidth)
+                self.verticalLine.set_color(self.verticalLineColor)
+                self.add_hline_to_plots()
                 self.draw_idle()
 
 
@@ -115,3 +132,36 @@ class PlotValuesCanvas(FigureCanvas):
         if self.verticalLine is not None:
             self.verticalLine.set_visible(True)
             self.draw_idle()
+
+    def add_hline_to_plots(self):
+        for l in self.hLines:
+            l.remove()
+        self.hLines = []
+
+        for label in self.hLinesLabels:
+            label.remove()
+        self.hLinesLabels = []
+
+        for plot in self.plots:
+            xVals, yVals = plot
+
+            # Get the y-value of self.verticalLinePos
+            index = Utilities.get_insertion_point_left(xVals, self.verticalLinePos)
+            if index == len(xVals) or index == 0:
+                continue
+            x1, x, x2 = xVals[index-1], self.verticalLinePos, xVals[index]
+            y1, y2 = yVals[index-1], yVals[index]
+            # It holds xVals[index-1] < self.verticalLinePos <= xVals[index]
+            fac = float(x-x2)/(x1-x2)
+            y = fac*y1 + (1-fac)*y2 # this obviously only works if plots are piecewise linear
+
+            axes = self.figure.gca()
+            lowerBound, upperBound = axes.get_xlim()
+            lineBeginFac = float(x)/(upperBound-lowerBound)
+            l = axes.axhline(y=y, xmin=lineBeginFac, xmax=1, linewidth=self.verticalLineWidth)
+            l.set_color(self.verticalLineColor)
+            self.hLines.append(l)
+            t = axes.text(1.02, y, "%.2f" % y, va='center', ha="left", bbox=dict(facecolor="w", alpha=0.5),
+                    transform=axes.get_yaxis_transform())
+            t.set_fontsize(8)
+            self.hLinesLabels.append(t)
