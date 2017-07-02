@@ -157,7 +157,7 @@ class PlotValuesCanvas(FigureCanvas):
 
             axes = self.figure.gca()
             lowerBound, upperBound = axes.get_xlim()
-            lineBeginFac = float(x)/(upperBound-lowerBound)
+            lineBeginFac = float(x-lowerBound)/(upperBound-lowerBound)
             l = axes.axhline(y=y, xmin=lineBeginFac, xmax=1, linewidth=self.verticalLineWidth)
             l.set_color(self.verticalLineColor)
             self.hLines.append(l)

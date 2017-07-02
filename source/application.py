@@ -173,7 +173,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.set_plot_range()
 
         self.timeSlider.setValue(0)
-        self.plotAnimationCanvas.reset_upperbound(self.animationUpperBound)
+        self.plotAnimationCanvas.reset_bounds(self.animationLowerBound, self.animationUpperBound)
 
 
 
@@ -554,6 +554,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
 
 
     def slider_released(self):
+
         time = self.plotAnimationCanvas.get_time_from_tick(self.timeSlider.value())
         # Adjust NTF if necessary
         for index, interval in enumerate(self.nashFlow.flowIntervals):
@@ -573,17 +574,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
             return
 
         v = self.plotAnimationCanvas.focusNode
-        '''
-        lowerBoundInput = str(self.plotLowerBoundLineEdit.text())
-        lowerBound = float(lowerBoundInput) if lowerBoundInput != "" else 0
 
-        upperBoundInput = str(self.plotUpperBoundLineEdit.text())
-        if upperBoundInput == "":
-            upperBoundInput = self.nashFlow.flowIntervals[-1][1] if self.nashFlow.flowIntervals[-1][1] < float(
-                'inf') else self.nashFlow.flowIntervals[-1][0]
-
-        upperBound = float(upperBoundInput)
-        '''
         lowerBound = self.animationLowerBound
         upperBound = self.animationUpperBound
 

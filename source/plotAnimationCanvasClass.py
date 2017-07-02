@@ -22,7 +22,8 @@ class PlotAnimationCanvas(PlotCanvas):
         self.upperBound = upperBound
         self.network = self.nashFlow.network
         self.currentTimeIndex = 0
-        self.timePoints = [float(i) / 99 * self.upperBound for i in range(100)]
+        self.maxTimeIndex = 99
+        self.timePoints = [float(i) / self.maxTimeIndex * self.upperBound for i in range(self.maxTimeIndex + 1)]
         self.nodeLabelByTimeDict = {node: dict() for node in self.network.nodes()}
 
 
@@ -65,13 +66,16 @@ class PlotAnimationCanvas(PlotCanvas):
                     self.flowOnEdgeNotQueue[edge][fk][time] = max(0, outflow*(min(time, wTimeUpper - capacity)-(wTimeLower - capacity)))
                     self.flowOnQueue[edge][fk][time] = self.flowOnEntireEdge[edge][fk][time] - self.flowOnEdgeNotQueue[edge][fk][time]
 
-    def reset_upperbound(self, upperBound):
+    def reset_bounds(self, lowerBound, upperBound):
+        self.lowerBound = lowerBound
         self.upperBound = upperBound
-        self.timePoints = [float(i) / 99 * self.upperBound for i in range(100)]
+        self.timePoints = [self.lowerBound + float(i) / self.maxTimeIndex * (self.upperBound-self.lowerBound) for i in range(self.maxTimeIndex + 1)]
         self.precompute_information()
+        self.update_time_labels()
 
     def add_time(self, time):
         insort(self.timePoints, time)
+        self.maxTimeIndex += 1
         self.precompute_information(timeList=[time])
 
     def time_changed(self, sliderVal):

@@ -714,9 +714,9 @@
         <widget class="QPushButton" name="generateAnimationPushButton">
          <property name="geometry">
           <rect>
-           <x>250</x>
+           <x>298</x>
            <y>440</y>
-           <width>99</width>
+           <width>131</width>
            <height>21</height>
           </rect>
          </property>
@@ -742,7 +742,7 @@
           <rect>
            <x>140</x>
            <y>440</y>
-           <width>41</width>
+           <width>61</width>
            <height>21</height>
           </rect>
          </property>
@@ -753,7 +753,7 @@
         <widget class="QLabel" name="label_14">
          <property name="geometry">
           <rect>
-           <x>190</x>
+           <x>210</x>
            <y>440</y>
            <width>21</width>
            <height>21</height>
@@ -766,9 +766,9 @@
         <widget class="QLineEdit" name="animationEndLineEdit">
          <property name="geometry">
           <rect>
-           <x>200</x>
+           <x>230</x>
            <y>440</y>
-           <width>41</width>
+           <width>61</width>
            <height>21</height>
           </rect>
          </property>
@@ -779,7 +779,7 @@
         <widget class="QLabel" name="label_17">
          <property name="geometry">
           <rect>
-           <x>430</x>
+           <x>470</x>
            <y>440</y>
            <width>91</width>
            <height>21</height>
@@ -792,9 +792,9 @@
         <widget class="QLabel" name="currentSliderTimeLabel">
          <property name="geometry">
           <rect>
-           <x>530</x>
+           <x>570</x>
            <y>440</y>
-           <width>111</width>
+           <width>71</width>
            <height>21</height>
           </rect>
          </property>
