@@ -31,6 +31,11 @@ class PlotValuesCanvas(FigureCanvas):
         self.mpl_connect('button_press_event', self.on_click)
 
 
+        # Enforce using PDFLatex instead of xetex
+        pgf_with_pdflatex = {
+            "pgf.texsystem": "pdflatex"}
+        matplotlib.rcParams.update(pgf_with_pdflatex)
+
 
     def update_plot(self, lowerBound, upperBound, labels, xValues, yValues, *additional_values):
         self.figure.clf()
@@ -97,3 +102,16 @@ class PlotValuesCanvas(FigureCanvas):
 
         if action == 1:
             self.callback(xAbsolute)
+
+    def export(self, path):
+        # Hide verticalLine for export
+        if self.verticalLine is not None:
+            self.verticalLine.set_visible(False)
+            self.draw_idle()
+
+        self.figure.savefig(path)
+
+        # Show verticalLine
+        if self.verticalLine is not None:
+            self.verticalLine.set_visible(True)
+            self.draw_idle()

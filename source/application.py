@@ -75,6 +75,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.scipPathPushButton.clicked.connect(self.select_scip_binary)
         self.computeFlowPushButton.clicked.connect(self.compute_nash_flow)
         self.cleanUpCheckBox.clicked.connect(self.change_cleanup_state)
+        self.exportDiagramPushButton.clicked.connect(self.export_diagram)
 
         # Configure Slider
         self.timeSlider.setMinimum(0)
@@ -93,7 +94,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.actionLoad_NashFlow.triggered.connect(self.load_nashflow)
         self.actionSave_NashFlow.triggered.connect(self.save_nashflow)
 
-        #self.intervalsListWidget.currentItemChanged.connect(self.update_NTF_display)
+
         self.intervalsListWidget.itemClicked.connect(self.update_NTF_display)
 
         self.generateAnimationPushButton.clicked.connect(self.generate_animation)
@@ -680,3 +681,20 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.timeSlider.setValue(self.plotAnimationCanvas.timePoints.index(xVal))
         if updateNTF:
             self.slider_released()
+
+    def export_diagram(self):
+        fileType = 'pdf' if self.exportComboBox.currentIndex() == 0 else 'pgf'
+
+        dialog = QtGui.QFileDialog
+        fsave = dialog.getSaveFileName(self, "Select File", "", fileType + " files (*." + fileType + ")")
+
+        if os.name != 'posix':
+            fsave = fsave[0]
+        if len(fsave) == 0:
+            return
+        fsave = str(fsave)
+
+        if not fsave.endswith('.' + fileType):
+            fsave += '.' + fileType
+
+        self.plotDiagramCanvas.export(path=fsave)

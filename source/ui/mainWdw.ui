@@ -591,12 +591,45 @@
            <x>10</x>
            <y>20</y>
            <width>441</width>
-           <height>441</height>
+           <height>411</height>
           </rect>
          </property>
          <property name="frameShape">
           <enum>QFrame::Box</enum>
          </property>
+        </widget>
+        <widget class="QPushButton" name="exportDiagramPushButton">
+         <property name="geometry">
+          <rect>
+           <x>230</x>
+           <y>440</y>
+           <width>221</width>
+           <height>21</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Export</string>
+         </property>
+        </widget>
+        <widget class="QComboBox" name="exportComboBox">
+         <property name="geometry">
+          <rect>
+           <x>14</x>
+           <y>440</y>
+           <width>211</width>
+           <height>21</height>
+          </rect>
+         </property>
+         <item>
+          <property name="text">
+           <string>Export as .PDF</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Export as .PGF</string>
+          </property>
+         </item>
         </widget>
        </widget>
        <widget class="QGroupBox" name="groupBox_4">
