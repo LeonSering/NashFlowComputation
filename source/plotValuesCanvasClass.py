@@ -30,16 +30,19 @@ class PlotValuesCanvas(FigureCanvas):
         # Signals
         self.mpl_connect('button_press_event', self.on_click)
 
-    def update_plot(self, lowerBound, upperBound, xValues, yValues, *additional_values):
+
+
+    def update_plot(self, lowerBound, upperBound, labels, xValues, yValues, *additional_values):
         self.figure.clf()
 
         axes = self.figure.add_subplot(111)
+
         yMin, yMax = min(yValues), max(yValues)
-        axes.plot(xValues, yValues, linewidth=2, color='green')
+        axes.plot(xValues, yValues, linewidth=2, color='green', label=labels[0])
         colorCounter = 0
         for xVals, yVals in additional_values:
             yMin, yMax = min(yMin, min(yVals)), max(yMax, max(yVals))
-            axes.plot(xVals, yVals, linewidth=2, color=self.additionalColors[colorCounter])
+            axes.plot(xVals, yVals, linewidth=2, color=self.additionalColors[colorCounter], label=labels[colorCounter + 1])
             colorCounter += 1
 
         axes.set_xlim(lowerBound, upperBound)
@@ -52,6 +55,7 @@ class PlotValuesCanvas(FigureCanvas):
             self.verticalLine = None
 
         self.visibleBool = True
+        axes.legend(loc='upper left')
         self.draw_idle()
 
     def clear_plot(self):

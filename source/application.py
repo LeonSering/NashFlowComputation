@@ -194,6 +194,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         """Update attributes of focusNode"""
         if self.graphCreationCanvas.focusNode is None:
             return
+
         nodeName = str(self.nodeNameLineEdit.text())
         XPos = str(self.nodeXLineEdit.text())
         YPos = str(self.nodeYLineEdit.text())
@@ -596,25 +597,13 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
             xValues.append(upperBound)
             yValues.append(self.nashFlow.node_label(v, upperBound))
 
-        self.plotDiagramCanvas.update_plot(lowerBound, upperBound, xValues, yValues)
+        self.plotDiagramCanvas.update_plot(lowerBound, upperBound, ["Earliest arrival time"], xValues, yValues)
 
 
     def update_edge_graphs(self):
         if self.plotAnimationCanvas.focusEdge is None:
             return
         v, w = self.plotAnimationCanvas.focusEdge[0], self.plotAnimationCanvas.focusEdge[1]
-        '''
-        lowerBoundInput = str(self.plotLowerBoundLineEdit.text())
-        lowerBound = float(lowerBoundInput) if lowerBoundInput != "" else 0
-
-        upperBoundInput = str(self.plotUpperBoundLineEdit.text())
-        if upperBoundInput == "":
-            upperBoundInput = self.nashFlow.node_label(v, self.nashFlow.flowIntervals[-1][1]) \
-                if self.nashFlow.flowIntervals[-1][1] < float('inf') \
-                else self.nashFlow.node_label(v, self.nashFlow.flowIntervals[-1][0])
-
-        upperBound = float(upperBoundInput)
-        '''
 
         lowerBound = self.animationLowerBound
         upperBound = self.animationUpperBound
@@ -652,7 +641,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
             queueXValues.append(upperBound)
             queueYValues.append(val)
 
-        self.plotDiagramCanvas.update_plot(lowerBound, upperBound, inflowXValues, inflowYValues, (outflowXValues, outflowYValues), (queueXValues, queueYValues))
+        self.plotDiagramCanvas.update_plot(lowerBound, upperBound, ["Cumulative Inflow", "Cumulative Outflow", "Queue size"], inflowXValues, inflowYValues, (outflowXValues, outflowYValues), (queueXValues, queueYValues))
 
     def set_plot_range(self):
         if self.plotAnimationCanvas.focusEdge is not None:
