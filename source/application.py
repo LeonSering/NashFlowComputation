@@ -375,6 +375,8 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.save_config()
         self.re_init_graph_creation_app(NoNewGraph=True)
 
+        self.tabWidget.setCurrentIndex(0)
+
     def save_graph(self):
         """Save CurrentGraph instance to '.cg' file"""
 
@@ -416,6 +418,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.re_init_nashflow_app()
         self.add_intervals_to_list()
 
+        self.tabWidget.setCurrentIndex(1)
     def save_nashflow(self):
         """Save Nashflow instance to '.nf' file"""
 
@@ -646,7 +649,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
             lastInflowInterval = next(reversed(self.nashFlow.network[v][w]['inflow']))
             lastInflow = self.nashFlow.network[v][w]['inflow'][lastInflowInterval]
 
-            val = max(0, lastQueueSize + (lastInflow - self.network[v][w]['capacity']) * (upperBound - lastInflowInterval[0]))
+            val = max(0, lastQueueSize + (lastInflow - self.nashFlow.network[v][w]['capacity']) * (upperBound - lastInflowInterval[0]))
 
             queueXValues.append(upperBound)
             queueYValues.append(val)
