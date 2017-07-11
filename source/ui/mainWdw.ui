@@ -779,7 +779,7 @@
         <widget class="QLabel" name="label_17">
          <property name="geometry">
           <rect>
-           <x>470</x>
+           <x>480</x>
            <y>440</y>
            <width>91</width>
            <height>21</height>
@@ -792,9 +792,9 @@
         <widget class="QLabel" name="currentSliderTimeLabel">
          <property name="geometry">
           <rect>
-           <x>570</x>
+           <x>580</x>
            <y>440</y>
-           <width>71</width>
+           <width>61</width>
            <height>21</height>
           </rect>
          </property>
@@ -805,7 +805,7 @@
         <widget class="QLineEdit" name="setTimeLineEdit">
          <property name="geometry">
           <rect>
-           <x>470</x>
+           <x>480</x>
            <y>460</y>
            <width>61</width>
            <height>21</height>
@@ -818,7 +818,7 @@
         <widget class="QPushButton" name="setTimePushButton">
          <property name="geometry">
           <rect>
-           <x>540</x>
+           <x>550</x>
            <y>460</y>
            <width>91</width>
            <height>21</height>
@@ -826,6 +826,84 @@
          </property>
          <property name="text">
           <string>Set time</string>
+         </property>
+        </widget>
+        <widget class="QLabel" name="label_18">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>460</y>
+           <width>51</width>
+           <height>21</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Focus:</string>
+         </property>
+        </widget>
+        <widget class="QLabel" name="currentFocusLineEdit">
+         <property name="geometry">
+          <rect>
+           <x>60</x>
+           <y>460</y>
+           <width>71</width>
+           <height>21</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>N/A</string>
+         </property>
+        </widget>
+        <widget class="QLabel" name="currentCapacityLineEdit">
+         <property name="geometry">
+          <rect>
+           <x>210</x>
+           <y>460</y>
+           <width>71</width>
+           <height>21</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>N/A</string>
+         </property>
+        </widget>
+        <widget class="QLabel" name="label_19">
+         <property name="geometry">
+          <rect>
+           <x>140</x>
+           <y>460</y>
+           <width>71</width>
+           <height>21</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Capacity:</string>
+         </property>
+        </widget>
+        <widget class="QLabel" name="label_20">
+         <property name="geometry">
+          <rect>
+           <x>300</x>
+           <y>460</y>
+           <width>91</width>
+           <height>21</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Transit time:</string>
+         </property>
+        </widget>
+        <widget class="QLabel" name="currentTransitTimeLineEdit">
+         <property name="geometry">
+          <rect>
+           <x>390</x>
+           <y>460</y>
+           <width>71</width>
+           <height>21</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>N/A</string>
          </property>
         </widget>
        </widget>

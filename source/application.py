@@ -729,3 +729,18 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.save_config()
 
         self.plotDiagramCanvas.export(path=fsave)
+
+    def update_plotAnimationCanvas_focusSelection(self):
+        if self.plotAnimationCanvas.focusNode is not None:
+            self.currentFocusLineEdit.setText(str(self.plotAnimationCanvas.focusNode))
+            self.currentCapacityLineEdit.setText("N/A")
+            self.currentTransitTimeLineEdit.setText("N/A")
+        elif self.plotAnimationCanvas.focusEdge is not None:
+            v, w = self.plotAnimationCanvas.focusEdge
+            self.currentFocusLineEdit.setText(str((self.network.node[v]['label'], self.network.node[w]['label'])))
+            self.currentCapacityLineEdit.setText(str(self.network[v][w]['capacity']))
+            self.currentTransitTimeLineEdit.setText(str(self.network[v][w]['transitTime']))
+        else:
+            self.currentFocusLineEdit.setText("N/A")
+            self.currentCapacityLineEdit.setText("N/A")
+            self.currentTransitTimeLineEdit.setText("N/A")
