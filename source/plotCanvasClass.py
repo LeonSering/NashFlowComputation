@@ -512,15 +512,20 @@ class PlotCanvas(FigureCanvas):
         if color:
             # Update colors
             edgeColor = lambda v, w: 'black' if (v, w) != self.focusEdge else 'b'
+            edgeSize = lambda v, w: self.edgeWidthSize if (v, w) != self.focusEdge else self.edgeWidthSize + 1
+            boxSize = lambda v, w: 1 if (v, w) != self.focusEdge else 2
             collectionIndex = 0
             for edges, edgeCollection in self.edgeCollections:
                 if edges:
                     edgeColorList = [colorConverter.to_rgba(edgeColor(v, w), 1) for v, w in
                                      edges] if not removal else 'black'
                     edgeCollection.set_color(edgeColorList)
+                    edgeCollection.set_linewidth([edgeSize(v, w) for v, w in edges])
 
                     boxCollection = self.boxCollections[collectionIndex][1]
                     boxCollection.set_edgecolor(edgeColorList)
+
+                    boxCollection.set_linewidth([boxSize(v, w) for v, w in edges])
                     # edgeCollection.set_facecolors(edgeColorList)
                 collectionIndex += 1
 
@@ -554,9 +559,9 @@ class PlotCanvas(FigureCanvas):
 
         # Scale edge widths
         self.edgeWidthSize = smaller(self.edgeWidthSize)
-        edgeWithSize = max(1, int(round(self.edgeWidthSize)))
+        #edgeWithSize = max(1, int(round(self.edgeWidthSize)))
         for edges, edgeCollection in self.edgeCollections:
-            edgeCollection.set_linewidth(edgeWithSize)
+            edgeCollection.set_linewidth(self.edgeWidthSize)
 
         # Scale font size of node labels
         self.nodeLabelFontSize = smaller(self.nodeLabelFontSize)
@@ -573,6 +578,7 @@ class PlotCanvas(FigureCanvas):
         # Scale font size of Additional Node Labels, if existing
         for v, label in self.additionalNodeLabelCollection.iteritems():
             label.set_fontsize(nodeLabelSize)
+
 
         self.draw_idle()
 

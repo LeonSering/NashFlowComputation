@@ -315,7 +315,7 @@ class Utilities:
                     'edge_color must be a single color or list of exactly m colors where m is the number or edges')
         edge_collection = LineCollection(edge_pos,
                                          colors=edge_colors,
-                                         linewidths=4,
+                                         linewidths=width,
                                          antialiaseds=(1,),
                                          linestyle=style,
                                          transOffset=ax.transData,

@@ -186,12 +186,13 @@ class PlotAnimationCanvas(PlotCanvas):
 
         edgeCollection = LineCollection(edge_pos,
                                          colors=edge_colors,
-                                         linewidths=max(1, int(self.edgeWidthSize)),
+                                         linewidths=self.edgeWidthSize*0.7,
                                          antialiaseds=(1,),
                                          transOffset=self.axes.transData,
                                          alpha = 1
                                          )
 
+        edgeCollection.set_zorder(1)
         self.edgeColoring[edge] = edgeCollection
         self.axes.add_collection(edgeCollection)
 
