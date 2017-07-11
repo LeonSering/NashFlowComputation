@@ -243,6 +243,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
     def update_edge_display(self):
         """Update display of the properties of the currently focussed edge focusEdge, if existing"""
         edge = self.graphCreationCanvas.focusEdge
+
         if edge is not None:
             # TO DO: Check for valid input
             self.tailLineEdit.setText(self.network.node[edge[0]]['label'])

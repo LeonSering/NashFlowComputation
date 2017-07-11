@@ -48,15 +48,15 @@ class PlotCanvas(FigureCanvas):
 
         self.network = graph
         self.interface = interface
-        # self.displaysNTF = (not clickableBool and not creationBool)
-        # self.displaysNashFlow = (clickableBool and not creationBool)
+
 
         # Visualization Settings
         self.Xlim = (-100, 100)
         self.Ylim = (-100, 100)
-        self.nodeSize = 300
+        self.nodeSize = 24**2
         self.nodeLabelFontSize = 12  # float but passed as int
         self.edgeLabelFontSize = 10  # float but passed as int
+        self.edgeWidthSize = 4
 
         # Only one of them can be not None
         self.focusNode = None
@@ -303,7 +303,7 @@ class PlotCanvas(FigureCanvas):
         """
         self.figure.clf()  # Clear current figure window
         self.axes = self.figure.add_axes([0, 0, 1, 1])
-
+        self.axes.set_aspect("equal")
         self.axes.set_xlim(self.Xlim)
         self.axes.set_ylim(self.Ylim)
         self.axes.axis('off')  # Hide axes in the plot
@@ -318,7 +318,7 @@ class PlotCanvas(FigureCanvas):
         nodeColor = lambda v: 'r' if v != self.focusNode else 'b'
         nodeColorList = [nodeColor(v) for v in self.network.nodes()]
         self.nodeCollections.append((self.network.nodes(),
-                                     draw_networkx_nodes(self.network, pos=positions, ax=self.axes,
+                                     self.draw_nodes(self.network, pos=positions, ax=self.axes,
                                                          node_size=self.nodeSize, node_color=nodeColorList)))
 
         # Plot Node Labels
@@ -327,15 +327,15 @@ class PlotCanvas(FigureCanvas):
                                                         font_size=nodeLabelSize)
 
         # Plot Edges
-        self.edgeCollections, self.arrowCollections = [], []
+        self.edgeCollections, self.boxCollections = [], []
         edgeColor = lambda v, w: 'black' if (v, w) != self.focusEdge else 'b'
         edgeColorList = [edgeColor(v, w) for v, w in self.network.edges()]
         if edgeColorList:
-            edgeCollection, arrowCollection = self.draw_edges(self.network, pos=positions, ax=self.axes,
+            edgeCollection, boxCollection = self.draw_edges(self.network, pos=positions, ax=self.axes,
                                                                    arrow=True,
-                                                                   edge_color=edgeColorList)
+                                                                   edge_color=edgeColorList, width=self.edgeWidthSize)
             self.edgeCollections.append((self.network.edges(), edgeCollection))
-            self.arrowCollections.append((self.network.edges(), arrowCollection))
+            self.boxCollections.append((self.network.edges(), boxCollection))
 
         additionalNodeLabels = self.get_additional_node_labels()
         if additionalNodeLabels:
@@ -352,6 +352,7 @@ class PlotCanvas(FigureCanvas):
 
         self.edgeLabelCollection = draw_networkx_edge_labels(self.network, pos=positions, ax=self.axes,
                                                              edge_labels=self.edgeLabels, font_size=edgeLabelSize)
+
 
         self.draw_idle()
 
@@ -371,7 +372,7 @@ class PlotCanvas(FigureCanvas):
                     nodes = [node for node in nodes if node != v]
                     if nodes:
                         positions = {v: self.network.node[v]['position'] for v in self.network.nodes()}
-                        newNodeCollection = draw_networkx_nodes(self.network,
+                        newNodeCollection = self.draw_nodes(self.network,
                                                                 pos=positions,
                                                                 ax=self.axes, node_size=self.nodeSize,
                                                                 nodelist=nodes, node_color='r')
@@ -388,7 +389,7 @@ class PlotCanvas(FigureCanvas):
                 deletedLabel.remove()
 
             else:
-                self.nodeCollections.append(([v], draw_networkx_nodes(self.network,
+                self.nodeCollections.append(([v], self.draw_nodes(self.network,
                                                                       pos={v: self.network.node[v]['position']},
                                                                       ax=self.axes, node_size=self.nodeSize,
                                                                       nodelist=[v], node_color='b')))
@@ -396,7 +397,7 @@ class PlotCanvas(FigureCanvas):
             # A node has been added (can we do better than plotting all nodes again)
             if self.focusNode is not None and all([self.focusNode not in entry for entry in self.nodeCollections]):
                 v = self.focusNode
-                self.nodeCollections.append(([v], draw_networkx_nodes(self.network,
+                self.nodeCollections.append(([v], self.draw_nodes(self.network,
                                                                       pos={v: self.network.node[v]['position']},
                                                                       ax=self.axes, node_size=self.nodeSize,
                                                                       nodelist=[v])))
@@ -431,17 +432,17 @@ class PlotCanvas(FigureCanvas):
             for edges, edgeCollection in self.edgeCollections:
                 missingEdges = [edge for edge in edges if edge not in self.network.edges()]
                 if missingEdges:
-                    arrowCollection = self.arrowCollections[collectionIndex][1]
+                    boxCollection = self.boxCollections[collectionIndex][1]
                     edgeCollection.remove()
-                    arrowCollection.remove()
+                    boxCollection.remove()
                     edges = [edge for edge in edges if edge not in missingEdges]
                     if edges:
                         positions = {v: self.network.node[v]['position'] for v in self.network.nodes()}
-                        newEdgeCollection, newArrowCollection = self.draw_edges(self.network, pos=positions,
+                        newEdgeCollection, newBoxCollection = self.draw_edges(self.network, pos=positions,
                                                                                      ax=self.axes, arrow=True,
-                                                                                     edgelist=edges)
+                                                                                     edgelist=edges, width=self.edgeWidthSize)
                         self.edgeCollections[collectionIndex] = (edges, newEdgeCollection)
-                        self.arrowCollections[collectionIndex] = (edges, newArrowCollection)
+                        self.boxCollections[collectionIndex] = (edges, newBoxCollection)
 
                     else:
                         toDeleteIndices.append(collectionIndex)
@@ -455,21 +456,22 @@ class PlotCanvas(FigureCanvas):
 
             for index in reversed(toDeleteIndices):
                 del self.edgeCollections[index]
-                del self.arrowCollections[index]
+                del self.boxCollections[index]
 
 
         elif added:
             # A node has been added (can we do better than plotting all nodes again)
             if self.focusEdge is not None:
                 v, w = self.focusEdge
-                edgeCollection, arrowCollection = self.draw_edges(self.network,
+                edgeCollection, boxCollection = self.draw_edges(self.network,
                                                                        pos={v: self.network.node[v]['position'],
                                                                             w: self.network.node[w]['position']},
                                                                        ax=self.axes, arrow=True,
-                                                                       edgelist=[self.focusEdge])
+                                                                       edgelist=[self.focusEdge],
+                                                                        width=self.edgeWidthSize)
 
                 self.edgeCollections.append(([self.focusEdge], edgeCollection))
-                self.arrowCollections.append(([self.focusEdge], arrowCollection))
+                self.boxCollections.append(([self.focusEdge], boxCollection))
                 edgeLabelSize = int(round(self.edgeLabelFontSize))
                 lbl = {self.focusEdge: (self.network[v][w]['capacity'], self.network[v][w]['transitTime'])}
                 self.edgeLabelCollection.update(draw_networkx_edge_labels(self.network,
@@ -482,37 +484,29 @@ class PlotCanvas(FigureCanvas):
             collectionIndex = 0
             for edges, edgeCollection in self.edgeCollections:
                 pos = nx.get_node_attributes(self.network, 'position')
-                edge_pos = np.asarray([(pos[e[0]], pos[e[1]]) for e in edges])
+
+                p = 0.25
+                edge_pos = []
+                for edge in edges:
+                    src, dst = np.array(pos[edge[0]]), np.array(pos[edge[1]])
+                    s = dst - src
+                    src = src + p * s
+                    edge_pos.append((src, dst))
+
+                edge_pos = np.asarray(edge_pos)
+                box_pos = np.asarray([(pos[e[0]], pos[e[1]]) for e in edges])
                 # Move edges
                 edgeCollection.set_segments(edge_pos)
 
-                a_pos = []
-                p = 1.0 - 0.25  # make head segment 25 percent of edge length
-                for src, dst in edge_pos:
-                    x1, y1 = src
-                    x2, y2 = dst
-                    dx = x2 - x1  # x offset
-                    dy = y2 - y1  # y offset
-                    d = np.sqrt(float(dx ** 2 + dy ** 2))  # length of edge
-                    if d == 0:  # source and target at same position
-                        continue
-                    if dx == 0:  # vertical edge
-                        xa = x2
-                        ya = dy * p + y1
-                    if dy == 0:  # horizontal edge
-                        ya = y2
-                        xa = dx * p + x1
-                    else:
-                        theta = np.arctan2(dy, dx)
-                        xa = p * d * np.cos(theta) + x1
-                        ya = p * d * np.sin(theta) + y1
 
-                    a_pos.append(((xa, ya), (x2, y2)))
-
-                arrowCollection = self.arrowCollections[collectionIndex][1]
-                # Move arrows
-                arrowCollection.set_segments(a_pos)
-
+                boxCollection = self.boxCollections[collectionIndex][1]
+                # Move boxes
+                boxCollection.remove()
+                boxCollection = Utilities.get_boxes(edge_pos=box_pos)
+                boxCollection.set_zorder(1)  # edges go behind nodes
+                #boxCollection.set_label(label)
+                self.axes.add_collection(boxCollection)
+                self.boxCollections[collectionIndex] = (self.boxCollections[collectionIndex][0], boxCollection)
                 collectionIndex += 1
 
         if color:
@@ -525,8 +519,8 @@ class PlotCanvas(FigureCanvas):
                                      edges] if not removal else 'black'
                     edgeCollection.set_color(edgeColorList)
 
-                    arrowCollection = self.arrowCollections[collectionIndex][1]
-                    arrowCollection.set_color(edgeColorList)
+                    boxCollection = self.boxCollections[collectionIndex][1]
+                    boxCollection.set_edgecolor(edgeColorList)
                     # edgeCollection.set_facecolors(edgeColorList)
                 collectionIndex += 1
 
@@ -558,11 +552,11 @@ class PlotCanvas(FigureCanvas):
         self.axes.set_xlim(self.Xlim)
         self.axes.set_ylim(self.Ylim)
 
-        # Scale node size
-        self.nodeSize = smaller(self.nodeSize)
-        for nodes, nodeCollection in self.nodeCollections:
-            #nodeCollection.set_sizes([self.nodeSize for node in nodes])
-            nodeCollection.set_sizes([self.nodeSize]*len(nodes))
+        # Scale edge widths
+        self.edgeWidthSize = smaller(self.edgeWidthSize)
+        edgeWithSize = max(1, int(round(self.edgeWidthSize)))
+        for edges, edgeCollection in self.edgeCollections:
+            edgeCollection.set_linewidth(edgeWithSize)
 
         # Scale font size of node labels
         self.nodeLabelFontSize = smaller(self.nodeLabelFontSize)
@@ -592,6 +586,35 @@ class PlotCanvas(FigureCanvas):
         self.axes.set_xlim(self.Xlim)
         self.axes.set_ylim(self.Ylim)
 
+
+    def draw_nodes(self, G,
+                    pos,
+                    nodelist=None,
+                    node_size=300,
+                    node_color='r',
+                    node_shape='o',
+                    alpha=1.0,
+                    cmap=None,
+                    vmin=None,
+                    vmax=None,
+                    ax=None,
+                    linewidths=None,
+                    label=None,
+                    **kwds):
+        return Utilities.draw_nodes(G,
+                    pos,
+                    nodelist,
+                    node_size,
+                    node_color,
+                    node_shape,
+                    alpha,
+                    cmap,
+                    vmin,
+                    vmax,
+                    ax,
+                    linewidths,
+                    label)
+
     def draw_edges(self, G, pos,
                    edgelist=None,
                    width=1.0,
@@ -606,7 +629,7 @@ class PlotCanvas(FigureCanvas):
                    label=None,
                    **kwds):
 
-        return Utilities.draw_edges(G, pos,
+        return Utilities.draw_edges_with_boxes(G, pos,
                    edgelist,
                    width,
                    edge_color,

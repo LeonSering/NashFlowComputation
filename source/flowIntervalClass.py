@@ -6,7 +6,7 @@
 # ===========================================================================
 import os
 from itertools import combinations
-
+from collections import deque
 from normalizedThinFlowClass import NormalizedThinFlow
 from utilitiesClass import Utilities
 
@@ -70,6 +70,51 @@ class FlowInterval:
         self.NTFEdgeFlowDict.update(flow)
 
         self.assert_NTF()
+
+    def advanced_NTF_search(self):
+        graph, removedVertices = self.preprocessing()
+
+        pass
+
+
+    def preprocessing(self):
+        '''Iteratively remove all nodes that have no outgoing edges (except sink t)'''
+        graph = self.shortestPathNetwork.copy()
+
+        queue = deque([w for w in graph.nodes()
+                 if w != 't' and graph.out_degree(w) == 0])
+
+        removedVertices = deque([])
+
+        while queue:
+            w = queue.pop()
+            for edge in graph.in_edges():
+                v = edge[0]
+                if graph.out_degree(v) == 1 and edge != 't':
+                    queue.append(v)
+            graph.remove_node(w)
+            removedVertices.append(w)
+
+        return graph, removedVertices
+
+    def postprocessing(self, labels, missingVertices):
+        '''Update node labels for all missing vertices'''
+
+        while missingVertices:
+            w = missingVertices.pop()
+            for edge in self.shortestPathNetwork.in_edges(w):
+                v = edge[0]
+                m = float('inf')
+                if edge in self.resettingEdges:
+                    m = 0
+                    break
+                else:
+                    m = min(m, labels[v])
+            labels[w] = m
+
+        return labels
+
+
 
     def backtrack_NTF_search_naive(self, remainingNodes, E_0):
         # Guarantees that f.a. nodes w there is at least one edge e=vw in E_0
