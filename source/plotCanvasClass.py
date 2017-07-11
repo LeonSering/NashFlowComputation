@@ -42,7 +42,7 @@ class PlotCanvas(FigureCanvas):
         creationBool:  (bool) if True then canvas can be used to create new nodes/edges (i.e. drag&drop, selection, etc)
     """
 
-    def __init__(self, graph, interface):
+    def __init__(self, graph, interface, stretchFactor = 1.57):
         self.figure = matplotlib.figure.Figure()
         super(PlotCanvas, self).__init__(self.figure)  # Call parents constructor
 
@@ -51,7 +51,7 @@ class PlotCanvas(FigureCanvas):
 
 
         # Visualization Settings
-        self.Xlim = (-100, 100)
+        self.Xlim = (stretchFactor*(-100), stretchFactor*(100))
         self.Ylim = (-100, 100)
         self.nodeSize = 24**2
         self.nodeLabelFontSize = 12  # float but passed as int
@@ -303,7 +303,7 @@ class PlotCanvas(FigureCanvas):
         """
         self.figure.clf()  # Clear current figure window
         self.axes = self.figure.add_axes([0, 0, 1, 1])
-        self.axes.set_aspect("equal")
+        #self.axes.set_aspect("equal")
         self.axes.set_xlim(self.Xlim)
         self.axes.set_ylim(self.Ylim)
         self.axes.axis('off')  # Hide axes in the plot

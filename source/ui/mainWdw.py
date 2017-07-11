@@ -46,7 +46,7 @@ class Ui_MainWindow(object):
         self.tab = QtGui.QWidget()
         self.tab.setObjectName(_fromUtf8("tab"))
         self.plotFrame = QtGui.QFrame(self.tab)
-        self.plotFrame.setGeometry(QtCore.QRect(10, 10, 631, 411))
+        self.plotFrame.setGeometry(QtCore.QRect(10, 10, 630, 400))
         self.plotFrame.setFrameShape(QtGui.QFrame.Box)
         self.plotFrame.setFrameShadow(QtGui.QFrame.Plain)
         self.plotFrame.setObjectName(_fromUtf8("plotFrame"))
@@ -131,7 +131,7 @@ class Ui_MainWindow(object):
         self.deleteNodeButton.setFlat(False)
         self.deleteNodeButton.setObjectName(_fromUtf8("deleteNodeButton"))
         self.groupBox_3 = QtGui.QGroupBox(self.tab)
-        self.groupBox_3.setGeometry(QtCore.QRect(10, 430, 921, 201))
+        self.groupBox_3.setGeometry(QtCore.QRect(10, 570, 921, 201))
         self.groupBox_3.setStyleSheet(_fromUtf8("QGroupBox { \n"
 "     border: 2px solid rgb(0, 0, 127); \n"
 "     border-radius: 1px; \n"
@@ -180,7 +180,7 @@ class Ui_MainWindow(object):
         self.cleanUpCheckBox.setGeometry(QtCore.QRect(770, 140, 99, 22))
         self.cleanUpCheckBox.setObjectName(_fromUtf8("cleanUpCheckBox"))
         self.computeFlowPushButton = QtGui.QPushButton(self.tab)
-        self.computeFlowPushButton.setGeometry(QtCore.QRect(800, 690, 131, 71))
+        self.computeFlowPushButton.setGeometry(QtCore.QRect(800, 770, 131, 71))
         self.computeFlowPushButton.setAutoDefault(False)
         self.computeFlowPushButton.setDefault(False)
         self.computeFlowPushButton.setFlat(False)
@@ -307,7 +307,7 @@ class Ui_MainWindow(object):
         self.menubar.addAction(self.menuFile.menuAction())
 
         self.retranslateUi(MainWindow)
-        self.tabWidget.setCurrentIndex(1)
+        self.tabWidget.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):

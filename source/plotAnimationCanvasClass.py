@@ -23,7 +23,7 @@ from matplotlib.colors import colorConverter
 
 
 class PlotAnimationCanvas(PlotCanvas):
-    def __init__(self, nashflow, interface, upperBound):
+    def __init__(self, nashflow, interface, upperBound, stretchFactor):
         self.nashFlow = nashflow
         self.upperBound = upperBound
         self.network = self.nashFlow.network
@@ -44,7 +44,7 @@ class PlotAnimationCanvas(PlotCanvas):
         self.edgeColoring = {edge:None for edge in self.network.edges()}
         self.precompute_information()
 
-        PlotCanvas.__init__(self, graph=self.network, interface=interface)  # Call parents constructor
+        PlotCanvas.__init__(self, graph=self.network, interface=interface, stretchFactor=stretchFactor)  # Call parents constructor
 
         positions = get_node_attributes(self.network, 'position')
         offset = (0, 8)

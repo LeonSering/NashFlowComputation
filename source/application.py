@@ -40,6 +40,12 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         QtGui.QMainWindow.__init__(self)
         self.setupUi(self)
 
+
+        # Scaling factors of frames
+        self.plotCanvasStretchFactor = float(self.plotFrame.width())/self.plotFrame.height()
+        self.plotAnimationCanvasStretchFactor = float(self.plotAnimationFrame.width())/self.plotAnimationFrame.height()
+        self.plotNTFCanvasStretchFactor = float(self.plotNTFFrame.width())/self.plotNTFFrame.height()
+
         # Init graph
         self.network = self.init_graph()
         self.init_graph_creation_app()
@@ -316,7 +322,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
 
         # Reinitialization of graphCreationCanvas
         self.graphCreationCanvas.setParent(None)  # Drop graphCreationCanvas widget
-        self.graphCreationCanvas = PlotCanvas(self.network, self)
+        self.graphCreationCanvas = PlotCanvas(self.network, self, self.plotCanvasStretchFactor)
         self.plotFrameLayout.addWidget(self.graphCreationCanvas)  # Add graphCreationCanvas-widget to application
 
         # Update UI
@@ -346,7 +352,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
 
         self.timeSlider.setValue(0)
 
-        self.plotAnimationCanvas = PlotAnimationCanvas(nashflow=self.nashFlow, interface=self, upperBound=self.animationUpperBound)
+        self.plotAnimationCanvas = PlotAnimationCanvas(nashflow=self.nashFlow, interface=self, upperBound=self.animationUpperBound, stretchFactor=self.plotAnimationCanvasStretchFactor)
         self.plotAnimationFrameLayout.addWidget(self.plotAnimationCanvas)
 
 
@@ -550,7 +556,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
             item = QtGui.QListWidgetItem(intervalString)
             self.intervalsListWidget.addItem(item)  # Add item to listWidget
 
-            plot = PlotNTFCanvas(interval[2].shortestPathNetwork, self, intervalID=index)
+            plot = PlotNTFCanvas(interval[2].shortestPathNetwork, self, intervalID=index, stretchFactor=self.plotNTFCanvasStretchFactor)
             self.NTFPlotList.append(plot)  # Add NTF Plot to List
 
     def update_NTF_display(self):

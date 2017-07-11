@@ -18,14 +18,14 @@ matplotlib.use("Qt4Agg")
 
 
 class PlotNTFCanvas(PlotCanvas):
-    def __init__(self, graph, interface, intervalID):
+    def __init__(self, graph, interface, intervalID, stretchFactor):
         self.figure = matplotlib.figure.Figure()
 
         flowLabels = interface.nashFlow.flowIntervals[intervalID][2].NTFEdgeFlowDict
         self.NTFNodeLabelDict = interface.nashFlow.flowIntervals[intervalID][2].NTFNodeLabelDict
         self.NTFEdgeFlowDict = {edge: flowLabels[edge] for edge in graph.edges()}
 
-        PlotCanvas.__init__(self, graph, interface)  # Call parents constructor
+        PlotCanvas.__init__(self, graph, interface, stretchFactor=stretchFactor)  # Call parents constructor
 
     def get_additional_node_labels(self):
         return {node: "%.2f" % self.NTFNodeLabelDict[node] for node in self.NTFNodeLabelDict}
