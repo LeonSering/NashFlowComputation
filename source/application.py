@@ -511,7 +511,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
             self.scipFile = self.configFile.get('Settings', 'scippath')
             self.scipPathLineEdit.setText(self.scipFile)
 
-            self.cleanUpEnabled = (self.configFile.get('Settings', 'cleanup') == '1')
+            self.cleanUpEnabled = (self.configFile.get('Settings', 'cleanup') == 'True')
             self.cleanUpCheckBox.setChecked(self.cleanUpEnabled)
 
             self.numberOfIntervals = self.configFile.get('Settings', 'intervals')
