@@ -25,7 +25,7 @@ except AttributeError:
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName(_fromUtf8("MainWindow"))
-        MainWindow.resize(1159, 1023)
+        MainWindow.resize(1159, 1053)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -197,19 +197,19 @@ class Ui_MainWindow(object):
         self.groupBox_5.setFlat(False)
         self.groupBox_5.setObjectName(_fromUtf8("groupBox_5"))
         self.plotDiagramFrame = QtGui.QFrame(self.groupBox_5)
-        self.plotDiagramFrame.setGeometry(QtCore.QRect(10, 20, 441, 411))
+        self.plotDiagramFrame.setGeometry(QtCore.QRect(10, 20, 441, 401))
         self.plotDiagramFrame.setFrameShape(QtGui.QFrame.Box)
         self.plotDiagramFrame.setObjectName(_fromUtf8("plotDiagramFrame"))
         self.exportDiagramPushButton = QtGui.QPushButton(self.groupBox_5)
-        self.exportDiagramPushButton.setGeometry(QtCore.QRect(230, 440, 221, 21))
+        self.exportDiagramPushButton.setGeometry(QtCore.QRect(230, 430, 221, 21))
         self.exportDiagramPushButton.setObjectName(_fromUtf8("exportDiagramPushButton"))
         self.exportComboBox = QtGui.QComboBox(self.groupBox_5)
-        self.exportComboBox.setGeometry(QtCore.QRect(14, 440, 211, 21))
+        self.exportComboBox.setGeometry(QtCore.QRect(14, 430, 211, 21))
         self.exportComboBox.setObjectName(_fromUtf8("exportComboBox"))
         self.exportComboBox.addItem(_fromUtf8(""))
         self.exportComboBox.addItem(_fromUtf8(""))
         self.groupBox_4 = QtGui.QGroupBox(self.tab_2)
-        self.groupBox_4.setGeometry(QtCore.QRect(0, 490, 651, 431))
+        self.groupBox_4.setGeometry(QtCore.QRect(0, 510, 651, 431))
         self.groupBox_4.setStyleSheet(_fromUtf8("QGroupBox { \n"
 "     border: 2px solid rgb(0, 0, 127); \n"
 "     border-radius: 1px; \n"
@@ -220,7 +220,7 @@ class Ui_MainWindow(object):
         self.plotNTFFrame.setFrameShape(QtGui.QFrame.Box)
         self.plotNTFFrame.setObjectName(_fromUtf8("plotNTFFrame"))
         self.groupBox_7 = QtGui.QGroupBox(self.tab_2)
-        self.groupBox_7.setGeometry(QtCore.QRect(0, 10, 651, 471))
+        self.groupBox_7.setGeometry(QtCore.QRect(0, 10, 651, 491))
         self.groupBox_7.setAutoFillBackground(False)
         self.groupBox_7.setStyleSheet(_fromUtf8("QGroupBox { \n"
 "     border: 2px solid rgb(0, 0, 127); \n"
@@ -228,7 +228,7 @@ class Ui_MainWindow(object):
 " } "))
         self.groupBox_7.setObjectName(_fromUtf8("groupBox_7"))
         self.plotAnimationFrame = QtGui.QFrame(self.groupBox_7)
-        self.plotAnimationFrame.setGeometry(QtCore.QRect(10, 20, 631, 391))
+        self.plotAnimationFrame.setGeometry(QtCore.QRect(10, 20, 630, 400))
         self.plotAnimationFrame.setFrameShape(QtGui.QFrame.Box)
         self.plotAnimationFrame.setObjectName(_fromUtf8("plotAnimationFrame"))
         self.timeSlider = QtGui.QSlider(self.groupBox_7)
@@ -258,6 +258,13 @@ class Ui_MainWindow(object):
         self.currentSliderTimeLabel = QtGui.QLabel(self.groupBox_7)
         self.currentSliderTimeLabel.setGeometry(QtCore.QRect(570, 440, 71, 21))
         self.currentSliderTimeLabel.setObjectName(_fromUtf8("currentSliderTimeLabel"))
+        self.setTimeLineEdit = QtGui.QLineEdit(self.groupBox_7)
+        self.setTimeLineEdit.setGeometry(QtCore.QRect(470, 460, 61, 21))
+        self.setTimeLineEdit.setText(_fromUtf8(""))
+        self.setTimeLineEdit.setObjectName(_fromUtf8("setTimeLineEdit"))
+        self.setTimePushButton = QtGui.QPushButton(self.groupBox_7)
+        self.setTimePushButton.setGeometry(QtCore.QRect(540, 460, 91, 21))
+        self.setTimePushButton.setObjectName(_fromUtf8("setTimePushButton"))
         self.groupBox_8 = QtGui.QGroupBox(self.tab_2)
         self.groupBox_8.setGeometry(QtCore.QRect(670, 490, 211, 221))
         self.groupBox_8.setStyleSheet(_fromUtf8("QGroupBox { \n"
@@ -307,7 +314,7 @@ class Ui_MainWindow(object):
         self.menubar.addAction(self.menuFile.menuAction())
 
         self.retranslateUi(MainWindow)
-        self.tabWidget.setCurrentIndex(0)
+        self.tabWidget.setCurrentIndex(1)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
@@ -350,6 +357,7 @@ class Ui_MainWindow(object):
         self.label_14.setText(_translate("MainWindow", "-", None))
         self.label_17.setText(_translate("MainWindow", "Current time:", None))
         self.currentSliderTimeLabel.setText(_translate("MainWindow", "0", None))
+        self.setTimePushButton.setText(_translate("MainWindow", "Set time", None))
         self.groupBox_8.setTitle(_translate("MainWindow", "NTF list", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), _translate("MainWindow", "Compute Nash flow", None))
         self.menuFile.setTitle(_translate("MainWindow", "File", None))

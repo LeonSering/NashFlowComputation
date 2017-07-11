@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1159</width>
-    <height>1023</height>
+    <height>1053</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -36,7 +36,7 @@
        </sizepolicy>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="tab">
        <attribute name="title">
@@ -591,7 +591,7 @@
            <x>10</x>
            <y>20</y>
            <width>441</width>
-           <height>411</height>
+           <height>401</height>
           </rect>
          </property>
          <property name="frameShape">
@@ -602,7 +602,7 @@
          <property name="geometry">
           <rect>
            <x>230</x>
-           <y>440</y>
+           <y>430</y>
            <width>221</width>
            <height>21</height>
           </rect>
@@ -615,7 +615,7 @@
          <property name="geometry">
           <rect>
            <x>14</x>
-           <y>440</y>
+           <y>430</y>
            <width>211</width>
            <height>21</height>
           </rect>
@@ -636,7 +636,7 @@
         <property name="geometry">
          <rect>
           <x>0</x>
-          <y>490</y>
+          <y>510</y>
           <width>651</width>
           <height>431</height>
          </rect>
@@ -670,7 +670,7 @@
           <x>0</x>
           <y>10</y>
           <width>651</width>
-          <height>471</height>
+          <height>491</height>
          </rect>
         </property>
         <property name="autoFillBackground">
@@ -690,8 +690,8 @@
           <rect>
            <x>10</x>
            <y>20</y>
-           <width>631</width>
-           <height>391</height>
+           <width>630</width>
+           <height>400</height>
           </rect>
          </property>
          <property name="frameShape">
@@ -800,6 +800,32 @@
          </property>
          <property name="text">
           <string>0</string>
+         </property>
+        </widget>
+        <widget class="QLineEdit" name="setTimeLineEdit">
+         <property name="geometry">
+          <rect>
+           <x>470</x>
+           <y>460</y>
+           <width>61</width>
+           <height>21</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+        <widget class="QPushButton" name="setTimePushButton">
+         <property name="geometry">
+          <rect>
+           <x>540</x>
+           <y>460</y>
+           <width>91</width>
+           <height>21</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Set time</string>
          </property>
         </widget>
        </widget>

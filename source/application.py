@@ -84,6 +84,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.computeFlowPushButton.clicked.connect(self.compute_nash_flow)
         self.cleanUpCheckBox.clicked.connect(self.change_cleanup_state)
         self.exportDiagramPushButton.clicked.connect(self.export_diagram)
+        self.setTimePushButton.clicked.connect(self.set_new_time_manually)
 
         # Configure Slider
         self.timeSlider.setMinimum(0)
@@ -123,6 +124,8 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         # Animation generation shortcuts
         self.animationStartLineEdit.returnPressed.connect(self.generate_animation)
         self.animationEndLineEdit.returnPressed.connect(self.generate_animation)
+        self.setTimeLineEdit.returnPressed.connect(self.set_new_time_manually)
+
 
 
 
@@ -681,6 +684,13 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
             self.delete_node()
         elif self.graphCreationCanvas.focusEdge is not None:
             self.delete_edge()
+
+    def set_new_time_manually(self):
+        if self.setTimeLineEdit.text() == "":
+            return
+        else:
+            val = float(self.setTimeLineEdit.text())
+            self.callback_plotValuesCanvas(xVal=val, updateNTF=True)
 
     def callback_plotValuesCanvas(self, xVal, updateNTF=True):
         xVal = float("%.2f" % xVal)
