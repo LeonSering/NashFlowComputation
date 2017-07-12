@@ -598,7 +598,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         for index, interval in enumerate(self.nashFlow.flowIntervals):
             lowerBound = interval[0]
             upperBound = interval[1]
-            if lowerBound <= time <= upperBound:
+            if lowerBound <= time < upperBound:
                 self.intervalsListWidget.setCurrentRow(index)
                 if self.plotNTFCanvas is not None:
                     self.plotNTFCanvas.setParent(None)
