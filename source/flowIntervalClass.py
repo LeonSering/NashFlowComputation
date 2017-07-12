@@ -35,6 +35,7 @@ class FlowInterval:
         self.NTFNodeLabelDict = {node: 0 for node in self.network}
         self.NTFEdgeFlowDict = {edge: 0 for edge in self.network.edges()}
 
+
         self.rootPath = os.path.join(self.outputDirectory, str(self.id) + '-FlowInterval-' + Utilities.get_time())
         Utilities.create_dir(self.rootPath)
 
@@ -71,10 +72,142 @@ class FlowInterval:
 
         self.assert_NTF()
 
-    def advanced_NTF_search(self):
-        graph, removedVertices = self.preprocessing()
+    def get_NTF_advanced(self):
+        self.counter = 0
+        #graph, removedVertices = self.preprocessing()
+        graph = self.shortestPathNetwork
+        # All resetting edges have to be part of E_0
+        #E_0 = [e for e in self.resettingEdges if e in graph.edges()]    # Init
+        E_0 = []
+        isolationDict = dict()
+        violatedNodes = []
+        remainingEdges = [e for e in graph.edges() if e not in E_0]
+        for v in graph.nodes():
+            foundOut, foundIn = False, False
+            for edge in graph.out_edges(v):
+                if edge in E_0:
+                    foundOut = True
+                    break
+            for edge in graph.in_edges(v):
+                if edge in E_0:
+                    foundIn = True
+                    break
 
-        pass
+            if v == 's':
+                foundIn = True
+            elif v == 't':
+                foundOut = True
+
+            isolationDict[v] = (foundIn, foundOut)
+            if foundIn != foundOut:
+                violatedNodes.append(v)
+
+
+        #self.backtrack_NTF_search_advanced(E_0, isolationDict, violatedNodes, remainingEdges, graph, E_0)
+        self.backtrack_NTF_search_advanced(E_0, isolationDict, violatedNodes, remainingEdges, graph, self.resettingEdges)
+
+        labels, flow = self.NTF.get_labels_and_flow()
+        #labels = self.postprocessing(labels, removedVertices)
+        self.NTFNodeLabelDict.update(labels)
+        self.NTFEdgeFlowDict.update(flow)
+
+        self.assert_NTF()
+
+    def violatedTuple(self, t):
+        return t[0] != t[1]
+
+    def backtrack_NTF_search_advanced(self, E_0, isolationDict, violatedNodes, remainingEdges, graph, resettingEdges):
+        # Ensures that each node lies on some path s-t-path in E_0 or is isolated
+        if not violatedNodes:
+            NTF = NormalizedThinFlow(shortestPathNetwork=graph, id=self.counter,
+                                     resettingEdges=resettingEdges, flowEdges=E_0, inflowRate=self.inflowRate,
+                                     minCapacity=self.minCapacity, outputDirectory=self.rootPath,
+                                     templateFile=self.templateFile, scipFile=self.scipFile)
+            self.numberOfSolvedIPs += 1
+            if NTF.is_valid():
+                self.NTF = NTF
+                return True
+            else:
+                # Drop instance (necessary?)
+                del NTF
+                self.counter += 1
+
+                if remainingEdges:
+                    k = len(remainingEdges)
+                    while k > 0:
+                        for selectedRemainers in combinations(remainingEdges, k):
+                            selectedRemainers = list(selectedRemainers)
+                            isolationDictCopy = dict(isolationDict)
+                            for edge in selectedRemainers:
+                                v, w = edge
+                                isolationDictCopy[v] = (isolationDictCopy[v][0], True)
+                                isolationDictCopy[w] = (True, isolationDictCopy[w][1])
+
+                            recursiveCall = self.backtrack_NTF_search_advanced(E_0 + selectedRemainers, isolationDictCopy,
+                                                                          [v for v in graph.nodes() if
+                                                                           self.violatedTuple(isolationDictCopy[v])],
+                                                                          [e for e in remainingEdges if e not in selectedRemainers], graph, resettingEdges)
+
+                            if recursiveCall:
+                                return True
+                        k -= 1
+
+                return False
+
+        w = violatedNodes[0]  # Node handled in this recursive call
+        if isolationDict[w][0]:
+            # No outgoing edges but incoming edges
+            isolationDict[w] = (True, True)
+            remainingOutgoing = [e for e in graph.out_edges(w) if e in remainingEdges]
+            k = len(remainingOutgoing)
+            while k > 0:
+                for selectedRemainers in combinations(remainingOutgoing, k):
+                    selectedRemainers = list(selectedRemainers)
+                    isolationDictCopy = dict(isolationDict)
+
+
+
+                    for edge in selectedRemainers:
+                        v = edge[1] # Edge from w to v
+                        isolationDictCopy[v] = (True, isolationDictCopy[v][1])
+
+
+
+                    recursiveCall = self.backtrack_NTF_search_advanced(E_0 + selectedRemainers, isolationDictCopy,
+                                                                       [v for v in graph.nodes() if
+                                                                        self.violatedTuple(isolationDictCopy[v])],
+                                                                       [e for e in remainingEdges if
+                                                                        e not in selectedRemainers], graph,
+                                                                       resettingEdges)
+
+                    if recursiveCall:
+                        return True
+                k -= 1
+
+        elif isolationDict[w][1]:
+            # No incoming edges but outgoing edges
+            isolationDict[w] = (True, True)
+            remainingIncoming = [e for e in graph.in_edges(w) if e in remainingEdges]
+            k = len(remainingIncoming)
+            while k > 0:
+                for selectedRemainers in combinations(remainingIncoming, k):
+                    selectedRemainers = list(selectedRemainers)
+                    isolationDictCopy = dict(isolationDict)
+                    for edge in selectedRemainers:
+                        v = edge[0] # Edge from v to w
+                        isolationDictCopy[v] = (isolationDictCopy[v][0], True)
+
+                    recursiveCall = self.backtrack_NTF_search_advanced(E_0 + selectedRemainers, isolationDictCopy,
+                                                                       [v for v in graph.nodes() if
+                                                                        self.violatedTuple(isolationDictCopy[v])],
+                                                                       [e for e in remainingEdges if
+                                                                        e not in selectedRemainers], graph,
+                                                                       resettingEdges)
+                    if recursiveCall:
+                        return True
+                k -= 1
+
+        return False
 
 
     def preprocessing(self):
@@ -88,9 +221,9 @@ class FlowInterval:
 
         while queue:
             w = queue.pop()
-            for edge in graph.in_edges():
+            for edge in graph.in_edges(w):
                 v = edge[0]
-                if graph.out_degree(v) == 1 and edge != 't':
+                if graph.out_degree(v) == 1 and v != 't':
                     queue.append(v)
             graph.remove_node(w)
             removedVertices.append(w)
@@ -102,9 +235,9 @@ class FlowInterval:
 
         while missingVertices:
             w = missingVertices.pop()
+            m = float('inf')
             for edge in self.shortestPathNetwork.in_edges(w):
                 v = edge[0]
-                m = float('inf')
                 if edge in self.resettingEdges:
                     m = 0
                     break

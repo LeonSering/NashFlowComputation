@@ -28,7 +28,6 @@ class NormalizedThinFlow:
         self.templateFile = templateFile
         self.scipFile = scipFile
         self.isValid = False
-
         self.run_order()
 
     def is_valid(self):

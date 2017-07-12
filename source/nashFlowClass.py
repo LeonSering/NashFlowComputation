@@ -10,6 +10,7 @@ from shutil import rmtree
 
 from flowIntervalClass import FlowInterval
 from utilitiesClass import Utilities
+import time
 
 TOL = 1e-8
 
@@ -26,6 +27,7 @@ class NashFlow:
         self.scipFile = scipFile
         self.cleanUpBool = cleanUpBool
         self.numberOfSolvedIPs = 0
+        self.computationalTime = 0
         self.infinityReached = False  # True if last interval has alpha = +inf
 
         self.minCapacity = Utilities.compute_min_capacity(self.network)
@@ -52,6 +54,8 @@ class NashFlow:
         if self.cleanUpBool:
             rmtree(self.rootPath)
 
+        print "TOTAL Solved IPs: ", str(self.numberOfSolvedIPs), " TOTAL Time: ", "%.2f" % self.computationalTime
+
     def compute_flowInterval(self):
         # NOTE TO MYSELF: computing shortest paths and resetting edges is only necessary for first flowInterval -> later: implement in flowIntervallClass
 
@@ -75,7 +79,13 @@ class NashFlow:
             interval.shortestPathNetwork = Utilities.get_shortest_path_network(self.network, labels={
                 v: self.node_label(v, lowerBoundTime) for v in self.network})  # Compute shortest path network
 
+        start = time.time()
+        #interval.get_NTF_advanced()
         interval.get_NTF()
+
+        end = time.time()
+        self.computationalTime += (end-start)
+        print "Solved IPs: ", str(interval.numberOfSolvedIPs), " Time: ", "%.2f" % (end-start)
         self.lowerBoundsToIntervalDict[lowerBoundTime] = interval
 
         interval.compute_alpha({node: self.node_label(node, lowerBoundTime) for node in self.network})
