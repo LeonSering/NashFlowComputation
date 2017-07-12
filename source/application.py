@@ -566,6 +566,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
             intervalString = 'Interval ' + str(interval[2].id) + ': [' + str("%.2f" % interval[0]) + ',' + str(
                 "%.2f" % interval[1]) + '['
             item = QtGui.QListWidgetItem(intervalString)
+            item.setBackgroundColor(QtGui.QColor(self.plotAnimationCanvas.NTFColors[index % len(self.plotAnimationCanvas.NTFColors)]))
             self.intervalsListWidget.addItem(item)  # Add item to listWidget
 
             plot = PlotNTFCanvas(interval[2].shortestPathNetwork, self, intervalID=index, stretchFactor=self.plotNTFCanvasStretchFactor,

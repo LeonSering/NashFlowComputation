@@ -672,6 +672,13 @@
            <height>351</height>
           </rect>
          </property>
+         <property name="styleSheet">
+          <string notr="true">QListWidget:item:selected:active { 
+	
+	color: rgb(0, 0, 0);
+            background-color: rgb(255, 255, 255);
+            }</string>
+         </property>
          <property name="frameShape">
           <enum>QFrame::Box</enum>
          </property>

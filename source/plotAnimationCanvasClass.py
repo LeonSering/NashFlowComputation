@@ -31,7 +31,7 @@ class PlotAnimationCanvas(PlotCanvas):
         self.maxTimeIndex = 99
         self.timePoints = [float(i) / self.maxTimeIndex * self.upperBound for i in range(self.maxTimeIndex + 1)]
         self.nodeLabelByTimeDict = {node: dict() for node in self.network.nodes()}
-        self.NTFColors = ['r', 'b', 'g', 'orange']
+        self.NTFColors = ['seagreen', 'darkorange', 'aquamarine', 'deepskyblue', 'mediumpurple']
 
 
         self.flowOnEntireEdge = {edge:{i:dict() for i in range(len(self.nashFlow.flowIntervals))} for edge in self.network.edges()}

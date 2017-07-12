@@ -221,6 +221,11 @@ class Ui_MainWindow(object):
         self.plotNTFFrame.setObjectName(_fromUtf8("plotNTFFrame"))
         self.intervalsListWidget = QtGui.QListWidget(self.groupBox_4)
         self.intervalsListWidget.setGeometry(QtCore.QRect(650, 20, 191, 351))
+        self.intervalsListWidget.setStyleSheet(_fromUtf8("QListWidget:item:selected:active { \n"
+"    \n"
+"    color: rgb(0, 0, 0);\n"
+"            background-color: rgb(255, 255, 255);\n"
+"            }"))
         self.intervalsListWidget.setFrameShape(QtGui.QFrame.Box)
         self.intervalsListWidget.setFrameShadow(QtGui.QFrame.Plain)
         self.intervalsListWidget.setObjectName(_fromUtf8("intervalsListWidget"))
