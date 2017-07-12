@@ -67,10 +67,19 @@ class NormalizedThinFlow:
         self.isValid = (pattern in self.resultLog)
 
     def start_process(self):
+        #cmd = [self.scipFile, '-f', self.templateFile, '-l', self.logFile]
+        #devNull = open(os.devnull, 'w')
+        #rc = subprocess.call(cmd, stdout=devNull)
+        #devNull.close()
+
+        # Better approach
         cmd = [self.scipFile, '-f', self.templateFile, '-l', self.logFile]
         devNull = open(os.devnull, 'w')
-        rc = subprocess.call(cmd, stdout=devNull)
-        devNull.close()
+        proc = subprocess.Popen(cmd, stdout=devNull, stderr=devNull)
+        proc.communicate()
+
+
+
 
     def write_zimpl_files(self):
         # Write files

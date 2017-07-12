@@ -26,6 +26,7 @@ class PlotNTFCanvas(PlotCanvas):
         self.NTFEdgeFlowDict = {edge: flowLabels[edge] for edge in graph.edges()}
 
         PlotCanvas.__init__(self, graph, interface, stretchFactor=stretchFactor)  # Call parents constructor
+        self.network = self.network.copy() # Copy network to avoid modifying it in other Canvas when deleting/adding zero flow edges
         self.originalNetwork = self.network.copy()
         if not showNoFlowEdges:
             self.change_edge_show_status(showNoFlowEdges)

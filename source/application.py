@@ -71,6 +71,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
 
         self.load_config()  # Try to load configuration file
 
+
         self.tabWidget.setCurrentIndex(0)  # Show Graph Creation Tab
 
         # Signal configuration
@@ -86,6 +87,8 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.exportDiagramPushButton.clicked.connect(self.export_diagram)
         self.setTimePushButton.clicked.connect(self.set_new_time_manually)
         self.showEdgesWithoutFlowCheckBox.clicked.connect(self.change_no_flow_show_state)
+        self.nodeSelectionListWidget.itemClicked.connect(self.update_focus_node)
+        self.edgeSelectionListWidget.itemClicked.connect(self.update_focus_edge)
 
 
         # Configure Slider
@@ -150,6 +153,11 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.plotFrame.setLayout(self.plotFrameLayout)
         self.graphCreationCanvas = PlotCanvas(self.network, self)  # Initialize PlotCanvas
         self.plotFrameLayout.addWidget(self.graphCreationCanvas)
+
+
+        self.re_init_node_list()
+        self.re_init_edge_list()
+
 
     def init_nashflow_app(self):
         # Configure plotNTFFrame to display plots of NTF
@@ -224,8 +232,14 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
             # TO DO: Check for valid input
             vertex = self.graphCreationCanvas.focusNode
 
+            if nodeName != self.network.node[vertex]['label']:
+                self.network.node[vertex]['label'] = nodeName
+                item = self.nodeToListItem[vertex]
+                self.nodeSelectionListWidget.takeItem(self.nodeSelectionListWidget.row(item))     # Delete item
+                self.add_node_to_list(vertex)
+                self.nodeSelectionListWidget.sortItems()
 
-            self.network.node[vertex]['label'] = nodeName
+
             movedBool = (self.network.node[vertex]['position'] != (int(XPos), int(YPos)))
             self.network.node[vertex]['position'] = (int(XPos), int(YPos))
 
@@ -244,6 +258,18 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
             return
 
         if vertex in self.network:
+            item = self.nodeToListItem[vertex]
+            index = self.nodeSelectionListWidget.row(item)
+            self.nodeSelectionListWidget.takeItem(index)
+
+
+            for edge in self.network.edges():
+                if vertex in edge:
+                    item = self.edgeToListItem[edge]
+                    index = self.edgeSelectionListWidget.row(item)
+                    self.edgeSelectionListWidget.takeItem(index)
+
+
             self.graphCreationCanvas.update_nodes(removal=True, color=True)
             numberOfEdges = self.network.number_of_edges()
             self.network.remove_node(vertex)
@@ -304,6 +330,9 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
             self.network.add_edge(tail, head, transitTime=transitText, capacity=capacityText)
             self.graphCreationCanvas.focusEdge = (tail, head)
             self.graphCreationCanvas.update_edges(added=True, color=True)
+            self.graphCreationCanvas.update_nodes(color=True)
+            self.add_edge_to_list((tail, head))
+            self.edgeSelectionListWidget.sortItems()
 
         # Update UI
         self.update_edge_display()
@@ -315,6 +344,10 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
             return
 
         if self.network.has_edge(edge[0], edge[1]):
+            item = self.edgeToListItem[edge]
+            index = self.edgeSelectionListWidget.row(item)
+            self.edgeSelectionListWidget.takeItem(index)
+
             self.network.remove_edge(edge[0], edge[1])  # Deletion before update, as opposed to delete_node()
             self.graphCreationCanvas.update_edges(removal=True)
 
@@ -341,6 +374,11 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.update_node_display()
         self.update_edge_display()
         self.inflowLineEdit.setText(str(self.network.graph['inflowRate']))
+
+        self.re_init_node_list()
+        self.re_init_edge_list()
+
+
 
     def re_init_nashflow_app(self):
         # Configure plotNTFFrame to display plots of NTF
@@ -567,6 +605,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
                 "%.2f" % interval[1]) + '['
             item = QtGui.QListWidgetItem(intervalString)
             item.setBackgroundColor(QtGui.QColor(self.plotAnimationCanvas.NTFColors[index % len(self.plotAnimationCanvas.NTFColors)]))
+
             self.intervalsListWidget.addItem(item)  # Add item to listWidget
 
             plot = PlotNTFCanvas(interval[2].shortestPathNetwork, self, intervalID=index, stretchFactor=self.plotNTFCanvasStretchFactor,
@@ -760,3 +799,58 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
     def change_no_flow_show_state(self):
         for NTF in self.NTFPlotList:
             NTF.change_edge_show_status(show=self.showEdgesWithoutFlowCheckBox.isChecked())
+
+    def update_focus_node(self):
+        self.graphCreationCanvas.focusEdge = None
+
+
+        index = self.nodeSelectionListWidget.currentRow()
+        item = self.nodeSelectionListWidget.item(index)
+        node = self.nodeToListItem.keys()[self.nodeToListItem.values().index(item)]
+        self.graphCreationCanvas.focusNode = node
+        self.graphCreationCanvas.update_nodes(color=True)
+        self.graphCreationCanvas.update_edges(color=True)
+        self.update_node_display()
+        self.update_edge_display()
+
+    def update_focus_edge(self):
+        self.graphCreationCanvas.focusNode = None
+
+
+        index = self.edgeSelectionListWidget.currentRow()
+        item = self.edgeSelectionListWidget.item(index)
+        edge = self.edgeToListItem.keys()[self.edgeToListItem.values().index(item)]
+        self.graphCreationCanvas.focusEdge = edge
+        self.graphCreationCanvas.update_nodes(color=True)
+        self.graphCreationCanvas.update_edges(color=True)
+        self.update_node_display()
+        self.update_edge_display()
+
+    def re_init_node_list(self):
+        self.nodeSelectionListWidget.clear()
+        self.nodeToListItem = dict()
+        for node in self.network.nodes():
+            self.add_node_to_list(node)
+
+        self.nodeSelectionListWidget.sortItems()
+
+    def re_init_edge_list(self):
+        self.edgeSelectionListWidget.clear()
+        self.edgeToListItem = dict()
+        for edge in self.network.edges():
+            self.add_edge_to_list(edge)
+
+        self.edgeSelectionListWidget.sortItems()
+
+    def add_node_to_list(self, node):
+        nodeString = 'Node ' + str(node) + ': ' + self.network.node[node]['label']
+        item = QtGui.QListWidgetItem(nodeString)
+        self.nodeToListItem[node] = item
+        self.nodeSelectionListWidget.addItem(item)  # Add item to listWidget
+
+    def add_edge_to_list(self, edge):
+        v, w = edge
+        edgeString = 'Edge: ' + str((self.network.node[v]['label'], self.network.node[w]['label']))
+        item = QtGui.QListWidgetItem(edgeString)
+        self.edgeToListItem[edge] = item
+        self.edgeSelectionListWidget.addItem(item)  # Add item to listWidget

@@ -46,7 +46,7 @@ class PlotCanvas(FigureCanvas):
         self.figure = matplotlib.figure.Figure()
         super(PlotCanvas, self).__init__(self.figure)  # Call parents constructor
 
-        self.network = graph.copy()
+        self.network = graph
         self.interface = interface
 
 
@@ -132,6 +132,9 @@ class PlotCanvas(FigureCanvas):
                 self.selectedNode = clickedNode
                 self.update_nodes(added=newNodeCreated, color=True)
 
+                if newNodeCreated:
+                    self.interface.add_node_to_list(self.focusNode)
+
         elif action == 2:
             # Wheel was clicked, move visible part of canvas
             self.mouseWheelPressed = True
@@ -172,6 +175,7 @@ class PlotCanvas(FigureCanvas):
                 if newNodeCreated:
                     self.focusNode = clickedNode
                     self.update_nodes(added=True, color=True)
+                    self.interface.add_node_to_list(clickedNode)
                     self.focusNode = None
 
                 if self.selectedNode is not None and self.selectedNode != clickedNode:
@@ -184,6 +188,7 @@ class PlotCanvas(FigureCanvas):
 
                         self.interface.update_edge_display()
                         self.update_edges(added=True, color=True)
+                        self.interface.add_edge_to_list(self.focusEdge)
 
             self.selectedNode = None
             self.update_nodes(color=True)
