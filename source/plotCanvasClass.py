@@ -46,7 +46,7 @@ class PlotCanvas(FigureCanvas):
         self.figure = matplotlib.figure.Figure()
         super(PlotCanvas, self).__init__(self.figure)  # Call parents constructor
 
-        self.network = graph
+        self.network = graph.copy()
         self.interface = interface
 
 

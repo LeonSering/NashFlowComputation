@@ -85,6 +85,8 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.cleanUpCheckBox.clicked.connect(self.change_cleanup_state)
         self.exportDiagramPushButton.clicked.connect(self.export_diagram)
         self.setTimePushButton.clicked.connect(self.set_new_time_manually)
+        self.showEdgesWithoutFlowCheckBox.clicked.connect(self.change_no_flow_show_state)
+
 
         # Configure Slider
         self.timeSlider.setMinimum(0)
@@ -566,7 +568,8 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
             item = QtGui.QListWidgetItem(intervalString)
             self.intervalsListWidget.addItem(item)  # Add item to listWidget
 
-            plot = PlotNTFCanvas(interval[2].shortestPathNetwork, self, intervalID=index, stretchFactor=self.plotNTFCanvasStretchFactor)
+            plot = PlotNTFCanvas(interval[2].shortestPathNetwork, self, intervalID=index, stretchFactor=self.plotNTFCanvasStretchFactor,
+                                 showNoFlowEdges=self.showEdgesWithoutFlowCheckBox.isChecked())
             self.NTFPlotList.append(plot)  # Add NTF Plot to List
 
     def update_NTF_display(self):
@@ -751,3 +754,8 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
             self.currentFocusLineEdit.setText("N/A")
             self.currentCapacityLineEdit.setText("N/A")
             self.currentTransitTimeLineEdit.setText("N/A")
+
+
+    def change_no_flow_show_state(self):
+        for NTF in self.NTFPlotList:
+            NTF.change_edge_show_status(show=self.showEdgesWithoutFlowCheckBox.isChecked())

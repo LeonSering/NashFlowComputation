@@ -349,8 +349,8 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>570</y>
-          <width>921</width>
+          <y>420</y>
+          <width>911</width>
           <height>201</height>
          </rect>
         </property>
@@ -540,10 +540,10 @@
        <widget class="QPushButton" name="computeFlowPushButton">
         <property name="geometry">
          <rect>
-          <x>800</x>
-          <y>770</y>
-          <width>131</width>
-          <height>71</height>
+          <x>650</x>
+          <y>320</y>
+          <width>271</width>
+          <height>91</height>
          </rect>
         </property>
         <property name="text">
@@ -570,7 +570,7 @@
           <x>670</x>
           <y>10</y>
           <width>461</width>
-          <height>471</height>
+          <height>491</height>
          </rect>
         </property>
         <property name="styleSheet">
@@ -602,7 +602,7 @@
          <property name="geometry">
           <rect>
            <x>230</x>
-           <y>430</y>
+           <y>460</y>
            <width>221</width>
            <height>21</height>
           </rect>
@@ -615,7 +615,7 @@
          <property name="geometry">
           <rect>
            <x>14</x>
-           <y>430</y>
+           <y>460</y>
            <width>211</width>
            <height>21</height>
           </rect>
@@ -637,7 +637,7 @@
          <rect>
           <x>0</x>
           <y>510</y>
-          <width>651</width>
+          <width>851</width>
           <height>431</height>
          </rect>
         </property>
@@ -661,6 +661,38 @@
          </property>
          <property name="frameShape">
           <enum>QFrame::Box</enum>
+         </property>
+        </widget>
+        <widget class="QListWidget" name="intervalsListWidget">
+         <property name="geometry">
+          <rect>
+           <x>650</x>
+           <y>20</y>
+           <width>191</width>
+           <height>351</height>
+          </rect>
+         </property>
+         <property name="frameShape">
+          <enum>QFrame::Box</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Plain</enum>
+         </property>
+        </widget>
+        <widget class="QCheckBox" name="showEdgesWithoutFlowCheckBox">
+         <property name="geometry">
+          <rect>
+           <x>648</x>
+           <y>390</y>
+           <width>191</width>
+           <height>22</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Show edges w/out flow</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
          </property>
         </widget>
        </widget>
@@ -904,41 +936,6 @@
          </property>
          <property name="text">
           <string>N/A</string>
-         </property>
-        </widget>
-       </widget>
-       <widget class="QGroupBox" name="groupBox_8">
-        <property name="geometry">
-         <rect>
-          <x>670</x>
-          <y>490</y>
-          <width>211</width>
-          <height>221</height>
-         </rect>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">QGroupBox { 
-     border: 2px solid rgb(0, 0, 127); 
-     border-radius: 1px; 
- } </string>
-        </property>
-        <property name="title">
-         <string>NTF list</string>
-        </property>
-        <widget class="QListWidget" name="intervalsListWidget">
-         <property name="geometry">
-          <rect>
-           <x>10</x>
-           <y>20</y>
-           <width>191</width>
-           <height>191</height>
-          </rect>
-         </property>
-         <property name="frameShape">
-          <enum>QFrame::Box</enum>
-         </property>
-         <property name="frameShadow">
-          <enum>QFrame::Plain</enum>
          </property>
         </widget>
        </widget>

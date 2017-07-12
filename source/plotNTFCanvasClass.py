@@ -7,9 +7,9 @@
 # ===========================================================================
 
 import matplotlib.figure
-
+from utilitiesClass import Utilities
 from plotCanvasClass import PlotCanvas
-
+import networkx as nx
 matplotlib.use("Qt4Agg")
 
 
@@ -18,7 +18,7 @@ matplotlib.use("Qt4Agg")
 
 
 class PlotNTFCanvas(PlotCanvas):
-    def __init__(self, graph, interface, intervalID, stretchFactor):
+    def __init__(self, graph, interface, intervalID, stretchFactor, showNoFlowEdges=True):
         self.figure = matplotlib.figure.Figure()
 
         flowLabels = interface.nashFlow.flowIntervals[intervalID][2].NTFEdgeFlowDict
@@ -26,12 +26,15 @@ class PlotNTFCanvas(PlotCanvas):
         self.NTFEdgeFlowDict = {edge: flowLabels[edge] for edge in graph.edges()}
 
         PlotCanvas.__init__(self, graph, interface, stretchFactor=stretchFactor)  # Call parents constructor
+        self.originalNetwork = self.network.copy()
+        if not showNoFlowEdges:
+            self.change_edge_show_status(showNoFlowEdges)
 
     def get_additional_node_labels(self):
-        return {node: "%.2f" % self.NTFNodeLabelDict[node] for node in self.NTFNodeLabelDict}
+        return {node: "%.2f" % self.NTFNodeLabelDict[node] for node in self.network.nodes()}
 
     def get_edge_labels(self):
-        return {edge: "%.2f" % self.NTFEdgeFlowDict[edge] for edge in self.NTFEdgeFlowDict}
+        return {edge: "%.2f" % self.NTFEdgeFlowDict[edge] for edge in self.network.edges()}
 
     def on_click(self, event):
         """
@@ -79,3 +82,15 @@ class PlotNTFCanvas(PlotCanvas):
             self.mouseWheelPosition = (xAbsolute, yAbsolute)
             self.move()
             self.draw_idle()
+
+    def change_edge_show_status(self, show=True):
+        if show:
+            self.network = self.originalNetwork.copy()
+        else:
+            for edge in self.network.edges():
+                if Utilities.is_eq_tol(self.NTFEdgeFlowDict[edge], 0):
+                    self.network.remove_edge(edge[0], edge[1])
+            self.network.remove_nodes_from(nx.isolates(self.network))
+
+        self.init_plot()
+

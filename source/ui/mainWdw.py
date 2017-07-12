@@ -131,7 +131,7 @@ class Ui_MainWindow(object):
         self.deleteNodeButton.setFlat(False)
         self.deleteNodeButton.setObjectName(_fromUtf8("deleteNodeButton"))
         self.groupBox_3 = QtGui.QGroupBox(self.tab)
-        self.groupBox_3.setGeometry(QtCore.QRect(10, 570, 921, 201))
+        self.groupBox_3.setGeometry(QtCore.QRect(10, 420, 911, 201))
         self.groupBox_3.setStyleSheet(_fromUtf8("QGroupBox { \n"
 "     border: 2px solid rgb(0, 0, 127); \n"
 "     border-radius: 1px; \n"
@@ -180,7 +180,7 @@ class Ui_MainWindow(object):
         self.cleanUpCheckBox.setGeometry(QtCore.QRect(770, 140, 99, 22))
         self.cleanUpCheckBox.setObjectName(_fromUtf8("cleanUpCheckBox"))
         self.computeFlowPushButton = QtGui.QPushButton(self.tab)
-        self.computeFlowPushButton.setGeometry(QtCore.QRect(800, 770, 131, 71))
+        self.computeFlowPushButton.setGeometry(QtCore.QRect(650, 320, 271, 91))
         self.computeFlowPushButton.setAutoDefault(False)
         self.computeFlowPushButton.setDefault(False)
         self.computeFlowPushButton.setFlat(False)
@@ -189,7 +189,7 @@ class Ui_MainWindow(object):
         self.tab_2 = QtGui.QWidget()
         self.tab_2.setObjectName(_fromUtf8("tab_2"))
         self.groupBox_5 = QtGui.QGroupBox(self.tab_2)
-        self.groupBox_5.setGeometry(QtCore.QRect(670, 10, 461, 471))
+        self.groupBox_5.setGeometry(QtCore.QRect(670, 10, 461, 491))
         self.groupBox_5.setStyleSheet(_fromUtf8("QGroupBox { \n"
 "     border: 2px solid rgb(0, 0, 127); \n"
 "     border-radius: 1px; \n"
@@ -201,15 +201,15 @@ class Ui_MainWindow(object):
         self.plotDiagramFrame.setFrameShape(QtGui.QFrame.Box)
         self.plotDiagramFrame.setObjectName(_fromUtf8("plotDiagramFrame"))
         self.exportDiagramPushButton = QtGui.QPushButton(self.groupBox_5)
-        self.exportDiagramPushButton.setGeometry(QtCore.QRect(230, 430, 221, 21))
+        self.exportDiagramPushButton.setGeometry(QtCore.QRect(230, 460, 221, 21))
         self.exportDiagramPushButton.setObjectName(_fromUtf8("exportDiagramPushButton"))
         self.exportComboBox = QtGui.QComboBox(self.groupBox_5)
-        self.exportComboBox.setGeometry(QtCore.QRect(14, 430, 211, 21))
+        self.exportComboBox.setGeometry(QtCore.QRect(14, 460, 211, 21))
         self.exportComboBox.setObjectName(_fromUtf8("exportComboBox"))
         self.exportComboBox.addItem(_fromUtf8(""))
         self.exportComboBox.addItem(_fromUtf8(""))
         self.groupBox_4 = QtGui.QGroupBox(self.tab_2)
-        self.groupBox_4.setGeometry(QtCore.QRect(0, 510, 651, 431))
+        self.groupBox_4.setGeometry(QtCore.QRect(0, 510, 851, 431))
         self.groupBox_4.setStyleSheet(_fromUtf8("QGroupBox { \n"
 "     border: 2px solid rgb(0, 0, 127); \n"
 "     border-radius: 1px; \n"
@@ -219,6 +219,15 @@ class Ui_MainWindow(object):
         self.plotNTFFrame.setGeometry(QtCore.QRect(10, 20, 631, 401))
         self.plotNTFFrame.setFrameShape(QtGui.QFrame.Box)
         self.plotNTFFrame.setObjectName(_fromUtf8("plotNTFFrame"))
+        self.intervalsListWidget = QtGui.QListWidget(self.groupBox_4)
+        self.intervalsListWidget.setGeometry(QtCore.QRect(650, 20, 191, 351))
+        self.intervalsListWidget.setFrameShape(QtGui.QFrame.Box)
+        self.intervalsListWidget.setFrameShadow(QtGui.QFrame.Plain)
+        self.intervalsListWidget.setObjectName(_fromUtf8("intervalsListWidget"))
+        self.showEdgesWithoutFlowCheckBox = QtGui.QCheckBox(self.groupBox_4)
+        self.showEdgesWithoutFlowCheckBox.setGeometry(QtCore.QRect(648, 390, 191, 22))
+        self.showEdgesWithoutFlowCheckBox.setChecked(True)
+        self.showEdgesWithoutFlowCheckBox.setObjectName(_fromUtf8("showEdgesWithoutFlowCheckBox"))
         self.groupBox_7 = QtGui.QGroupBox(self.tab_2)
         self.groupBox_7.setGeometry(QtCore.QRect(0, 10, 651, 491))
         self.groupBox_7.setAutoFillBackground(False)
@@ -283,18 +292,6 @@ class Ui_MainWindow(object):
         self.currentTransitTimeLineEdit = QtGui.QLabel(self.groupBox_7)
         self.currentTransitTimeLineEdit.setGeometry(QtCore.QRect(390, 460, 71, 21))
         self.currentTransitTimeLineEdit.setObjectName(_fromUtf8("currentTransitTimeLineEdit"))
-        self.groupBox_8 = QtGui.QGroupBox(self.tab_2)
-        self.groupBox_8.setGeometry(QtCore.QRect(670, 490, 211, 221))
-        self.groupBox_8.setStyleSheet(_fromUtf8("QGroupBox { \n"
-"     border: 2px solid rgb(0, 0, 127); \n"
-"     border-radius: 1px; \n"
-" } "))
-        self.groupBox_8.setObjectName(_fromUtf8("groupBox_8"))
-        self.intervalsListWidget = QtGui.QListWidget(self.groupBox_8)
-        self.intervalsListWidget.setGeometry(QtCore.QRect(10, 20, 191, 191))
-        self.intervalsListWidget.setFrameShape(QtGui.QFrame.Box)
-        self.intervalsListWidget.setFrameShadow(QtGui.QFrame.Plain)
-        self.intervalsListWidget.setObjectName(_fromUtf8("intervalsListWidget"))
         self.tabWidget.addTab(self.tab_2, _fromUtf8(""))
         self.verticalLayout.addWidget(self.tabWidget)
         MainWindow.setCentralWidget(self.centralwidget)
@@ -369,6 +366,7 @@ class Ui_MainWindow(object):
         self.exportComboBox.setItemText(0, _translate("MainWindow", "Export as .PDF", None))
         self.exportComboBox.setItemText(1, _translate("MainWindow", "Export as .PGF", None))
         self.groupBox_4.setTitle(_translate("MainWindow", "Normalized Thin Flows", None))
+        self.showEdgesWithoutFlowCheckBox.setText(_translate("MainWindow", "Show edges w/out flow", None))
         self.groupBox_7.setTitle(_translate("MainWindow", "Nash Flow over time", None))
         self.generateAnimationPushButton.setText(_translate("MainWindow", "Generate", None))
         self.label_13.setText(_translate("MainWindow", "Animation range:", None))
@@ -382,7 +380,6 @@ class Ui_MainWindow(object):
         self.label_19.setText(_translate("MainWindow", "Capacity:", None))
         self.label_20.setText(_translate("MainWindow", "Transit time:", None))
         self.currentTransitTimeLineEdit.setText(_translate("MainWindow", "N/A", None))
-        self.groupBox_8.setTitle(_translate("MainWindow", "NTF list", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), _translate("MainWindow", "Compute Nash flow", None))
         self.menuFile.setTitle(_translate("MainWindow", "File", None))
         self.actionLoad_Graph.setText(_translate("MainWindow", "Load Graph", None))
