@@ -207,6 +207,9 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
             self.nodeXLineEdit.setText("")
             self.nodeYLineEdit.setText("")
 
+        self.setFocus()
+
+
     def update_node(self):
         """Update attributes of focusNode"""
         if self.graphCreationCanvas.focusNode is None:
@@ -227,6 +230,8 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
             self.graphCreationCanvas.update_nodes(moved=movedBool)  # Update UI
             if movedBool:
                 self.graphCreationCanvas.update_edges(moved=movedBool)
+
+
 
 
 
@@ -266,6 +271,8 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
             self.headLineEdit.setText("")
             self.transitTimeLineEdit.setText("")
             self.capacityLineEdit.setText("")
+
+        self.setFocus()
 
     def update_add_edge(self):
         """Add an edge or update attributes of focusNode, if existing"""
