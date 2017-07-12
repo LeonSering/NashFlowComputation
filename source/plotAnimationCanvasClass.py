@@ -284,7 +284,7 @@ class PlotAnimationCanvas(PlotCanvas):
                 self.focusNode = clickedNode
                 self.focusEdge = None
                 self.mouseLeftPressTime = None
-                self.update_nodes(added=True, color=True)
+                self.update_nodes(added=False, color=True)
                 self.update_edges(color=True)
                 self.interface.update_plotAnimationCanvas_focusSelection()
                 self.interface.update_node_label_graph()
