@@ -9,7 +9,10 @@ from itertools import combinations
 from collections import deque
 from normalizedThinFlowClass import NormalizedThinFlow
 from utilitiesClass import Utilities
-
+import threading
+import time
+import signal
+import subprocess
 TOL = 1e-8
 
 
@@ -17,7 +20,7 @@ class FlowInterval:
     """description of class"""
 
     def __init__(self, network, resettingEdges, lowerBoundTime, inflowRate, minCapacity, counter, outputDirectory,
-                 templateFile, scipFile):
+                 templateFile, scipFile, timeout):
 
         self.network = network
         self.resettingEdges = resettingEdges
@@ -29,6 +32,12 @@ class FlowInterval:
         self.outputDirectory = outputDirectory
         self.templateFile = templateFile
         self.scipFile = scipFile
+        self.timeout = timeout
+
+
+
+        self.foundNTF = False
+        self.aborted = False
         self.alpha = None
         self.shortestPathNetwork = None  # to be set from NashFlowClass
         self.numberOfSolvedIPs = 0
@@ -38,6 +47,26 @@ class FlowInterval:
 
         self.rootPath = os.path.join(self.outputDirectory, str(self.id) + '-FlowInterval-' + Utilities.get_time())
         Utilities.create_dir(self.rootPath)
+
+        if self.timeout > 0:
+            self.timeoutThread = threading.Thread(target=self.timeout_control)
+            self.timeoutThread.start()
+
+    def timeout_control(self):
+        startTime = time.time()
+        while not self.foundNTF and time.time() - startTime <= self.timeout:
+            time.sleep(1)
+
+        if not self.foundNTF:
+            print "KILLING"
+            self.aborted = True
+            out = subprocess.check_output(['ps', '-A'])
+            for line in out.splitlines():
+                if "scip" in line:
+                    pid = int(line.split(None, 1)[0])
+                    os.kill(pid, signal.SIGKILL)
+
+
 
     def compute_alpha(self, labelLowerBoundTimeDict):
         func = lambda v, w: (
@@ -118,18 +147,24 @@ class FlowInterval:
 
     def backtrack_NTF_search_advanced(self, E_0, isolationDict, violatedNodes, remainingEdges, graph, resettingEdges):
         # Ensures that each node lies on some path s-t-path in E_0 or is isolated
+
+        # Check whether already aborted
+        if self.aborted:
+            return True
+
         if not violatedNodes:
-            NTF = NormalizedThinFlow(shortestPathNetwork=graph, id=self.counter,
+            self.NTF = NormalizedThinFlow(shortestPathNetwork=graph, id=self.counter,
                                      resettingEdges=resettingEdges, flowEdges=E_0, inflowRate=self.inflowRate,
                                      minCapacity=self.minCapacity, outputDirectory=self.rootPath,
                                      templateFile=self.templateFile, scipFile=self.scipFile)
+            self.NTF.run_order()
             self.numberOfSolvedIPs += 1
-            if NTF.is_valid():
-                self.NTF = NTF
+            if self.NTF.is_valid():
+                self.foundNTF = True
                 return True
             else:
                 # Drop instance (necessary?)
-                del NTF
+                del self.NTF
                 self.counter += 1
 
                 if remainingEdges:
@@ -252,18 +287,24 @@ class FlowInterval:
     def backtrack_NTF_search_naive(self, remainingNodes, E_0):
         # Guarantees that f.a. nodes w there is at least one edge e=vw in E_0
 
+        # Check whether already aborted
+        if self.aborted:
+            return True
+
         if not remainingNodes:
-            NTF = NormalizedThinFlow(shortestPathNetwork=self.shortestPathNetwork, id=self.counter,
+
+            self.NTF = NormalizedThinFlow(shortestPathNetwork=self.shortestPathNetwork, id=self.counter,
                                      resettingEdges=self.resettingEdges, flowEdges=E_0, inflowRate=self.inflowRate,
                                      minCapacity=self.minCapacity, outputDirectory=self.rootPath,
                                      templateFile=self.templateFile, scipFile=self.scipFile)
+            self.NTF.run_order()
             self.numberOfSolvedIPs += 1
-            if NTF.is_valid():
-                self.NTF = NTF
+            if self.NTF.is_valid():
+                self.foundNTF = True
                 return True
             else:
                 # Drop instance (necessary?)
-                del NTF
+                del self.NTF
                 self.counter += 1
                 return False
 
@@ -284,25 +325,32 @@ class FlowInterval:
         return False
 
     def naive_NTF_search(self):
+
+
+
         found = False
         k = self.shortestPathNetwork.number_of_edges()
         edges = self.shortestPathNetwork.edges()
         while k > 0 and not found:
             for E_0 in combinations(edges, k):
+                # Check whether already aborted
+                if self.aborted:
+                    return True
+
                 self.numberOfSolvedIPs += 1
                 E_0 = list(E_0)
-                NTF = NormalizedThinFlow(shortestPathNetwork=self.shortestPathNetwork, id=self.counter,
+                self.NTF = NormalizedThinFlow(shortestPathNetwork=self.shortestPathNetwork, id=self.counter,
                                          resettingEdges=self.resettingEdges, flowEdges=E_0, inflowRate=self.inflowRate,
                                          minCapacity=self.minCapacity, outputDirectory=self.rootPath,
                                          templateFile=self.templateFile, scipFile=self.scipFile)
-
-                if NTF.is_valid():
+                self.NTF.run_order()
+                if self.NTF.is_valid():
                     found = True
-                    self.NTF = NTF
+                    self.foundNTF = True
                     break
                 else:
                     # Drop instance (necessary?)
-                    del NTF
+                    del self.NTF
 
                 self.counter += 1
             k -= 1

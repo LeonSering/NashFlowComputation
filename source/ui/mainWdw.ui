@@ -536,7 +536,7 @@
           <string>Clean up</string>
          </property>
         </widget>
-        <widget class="QLabel" name="label_15">
+        <widget class="QLabel" name="timeoutLabel">
          <property name="enabled">
           <bool>false</bool>
          </property>
@@ -565,7 +565,7 @@
           </rect>
          </property>
          <property name="text">
-          <string>0</string>
+          <string>300</string>
          </property>
         </widget>
         <widget class="QCheckBox" name="activateTimeoutCheckBox">

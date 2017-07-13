@@ -28,7 +28,7 @@ class NormalizedThinFlow:
         self.templateFile = templateFile
         self.scipFile = scipFile
         self.isValid = False
-        self.run_order()
+
 
     def is_valid(self):
         return self.isValid
@@ -75,8 +75,8 @@ class NormalizedThinFlow:
         # Better approach
         cmd = [self.scipFile, '-f', self.templateFile, '-l', self.logFile]
         devNull = open(os.devnull, 'w')
-        proc = subprocess.Popen(cmd, stdout=devNull, stderr=devNull)
-        proc.communicate()
+        self.proc = subprocess.Popen(cmd, stdout=devNull, stderr=devNull)
+        self.proc.communicate()
 
 
 

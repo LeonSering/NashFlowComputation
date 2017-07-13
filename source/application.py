@@ -55,6 +55,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.outputDirectory = ''
         self.templateFile = ''
         self.scipFile = ''
+        self.timeoutActivated = False
 
         self.defaultLoadSaveDir = ''
 
@@ -89,6 +90,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.showEdgesWithoutFlowCheckBox.clicked.connect(self.change_no_flow_show_state)
         self.nodeSelectionListWidget.itemClicked.connect(self.update_focus_node)
         self.edgeSelectionListWidget.itemClicked.connect(self.update_focus_edge)
+        self.activateTimeoutCheckBox.clicked.connect(self.change_timeout_state)
 
 
         # Configure Slider
@@ -544,9 +546,10 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.configFile.set('Settings', 'outputdir', '')
         self.configFile.set('Settings', 'templatefile', '')
         self.configFile.set('Settings', 'scippath', '')
-        self.configFile.set('Settings', 'cleanup', '1')
+        self.configFile.set('Settings', 'cleanup', 'True')
         self.configFile.set('Settings', 'intervals', '-1')
         self.configFile.set('Settings', 'defaultloadsavedir', '')
+        self.configFile.set('Settings', 'timeoutactivated', 'True')
 
         try:
             self.configFile.read('config.cfg')
@@ -566,6 +569,10 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
 
             self.defaultLoadSaveDir = self.configFile.get('Settings', 'defaultloadsavedir')
 
+            self.timeoutActivated = (self.configFile.get('Settings', 'timeoutactivated') == 'True')
+            self.activateTimeoutCheckBox.setChecked(self.timeoutActivated)
+            self.change_timeout_state()
+
         except Exception as err:
             return
 
@@ -576,6 +583,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.configFile.set('Settings', 'cleanup', self.cleanUpEnabled)
         self.configFile.set('Settings', 'intervals', self.numberOfIntervals)
         self.configFile.set('Settings', 'defaultloadsavedir', self.defaultLoadSaveDir)
+        self.configFile.set('Settings', 'timeoutactivated', self.timeoutActivated)
 
         with open('config.cfg', 'wb') as configfile:
             self.configFile.write(configfile)
@@ -588,9 +596,9 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
 
         self.save_config()  # Save config-settings to file
         self.tabWidget.setCurrentIndex(1)  # Switch to next tab
-
+        timeout = -1 if not self.timeoutActivated else float(self.timeoutLineEdit.text())
         self.nashFlow = NashFlow(self.network, float(inflowRate), float(self.numberOfIntervals), self.outputDirectory,
-                                 self.templateFile, self.scipFile, self.cleanUpEnabled)
+                                 self.templateFile, self.scipFile, self.cleanUpEnabled, timeout)
         self.nashFlow.run()
 
         self.re_init_nashflow_app()
@@ -854,3 +862,8 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         item = QtGui.QListWidgetItem(edgeString)
         self.edgeToListItem[edge] = item
         self.edgeSelectionListWidget.addItem(item)  # Add item to listWidget
+
+    def change_timeout_state(self):
+        self.timeoutActivated = self.activateTimeoutCheckBox.isChecked()
+        self.timeoutLabel.setEnabled(self.timeoutActivated)
+        self.timeoutLineEdit.setEnabled(self.timeoutActivated)
