@@ -58,11 +58,11 @@ class FlowInterval:
             time.sleep(1)
 
         if not self.foundNTF:
-            print "KILLING"
             self.aborted = True
             out = subprocess.check_output(['ps', '-A'])
             for line in out.splitlines():
                 if "scip" in line:
+                    print "KILLING SCIP PROCESS"
                     pid = int(line.split(None, 1)[0])
                     os.kill(pid, signal.SIGKILL)
 

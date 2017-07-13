@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1159</width>
-    <height>1053</height>
+    <height>1041</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -19,7 +19,13 @@
   <property name="minimumSize">
    <size>
     <width>1159</width>
-    <height>1023</height>
+    <height>1041</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>1159</width>
+    <height>1041</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -366,8 +372,8 @@
         <widget class="QLabel" name="label_8">
          <property name="geometry">
           <rect>
-           <x>970</x>
-           <y>20</y>
+           <x>950</x>
+           <y>40</y>
            <width>91</width>
            <height>17</height>
           </rect>
@@ -379,8 +385,8 @@
         <widget class="QLineEdit" name="inflowLineEdit">
          <property name="geometry">
           <rect>
-           <x>970</x>
-           <y>40</y>
+           <x>950</x>
+           <y>60</y>
            <width>131</width>
            <height>21</height>
           </rect>
@@ -415,8 +421,8 @@
         <widget class="QLabel" name="label_10">
          <property name="geometry">
           <rect>
-           <x>970</x>
-           <y>70</y>
+           <x>950</x>
+           <y>90</y>
            <width>141</width>
            <height>17</height>
           </rect>
@@ -428,8 +434,8 @@
         <widget class="QLineEdit" name="intervalsLineEdit">
          <property name="geometry">
           <rect>
-           <x>970</x>
-           <y>90</y>
+           <x>950</x>
+           <y>110</y>
            <width>131</width>
            <height>21</height>
           </rect>
@@ -526,14 +532,14 @@
         <widget class="QCheckBox" name="cleanUpCheckBox">
          <property name="geometry">
           <rect>
-           <x>970</x>
-           <y>140</y>
-           <width>99</width>
+           <x>770</x>
+           <y>40</y>
+           <width>151</width>
            <height>22</height>
           </rect>
          </property>
          <property name="text">
-          <string>Clean up</string>
+          <string>Activate Clean-up</string>
          </property>
         </widget>
         <widget class="QLabel" name="timeoutLabel">
@@ -543,7 +549,7 @@
          <property name="geometry">
           <rect>
            <x>770</x>
-           <y>120</y>
+           <y>100</y>
            <width>101</width>
            <height>17</height>
           </rect>
@@ -559,7 +565,7 @@
          <property name="geometry">
           <rect>
            <x>770</x>
-           <y>140</y>
+           <y>120</y>
            <width>131</width>
            <height>21</height>
           </rect>
@@ -572,7 +578,7 @@
          <property name="geometry">
           <rect>
            <x>770</x>
-           <y>90</y>
+           <y>70</y>
            <width>151</width>
            <height>22</height>
           </rect>
@@ -586,9 +592,9 @@
         <property name="geometry">
          <rect>
           <x>730</x>
-          <y>790</y>
-          <width>271</width>
-          <height>131</height>
+          <y>760</y>
+          <width>401</width>
+          <height>171</height>
          </rect>
         </property>
         <property name="text">
