@@ -50,6 +50,9 @@ class PlotAnimationCanvas(PlotCanvas):
         offset = (0, 8)
         add_tuple_offset = lambda a: (a[0] + offset[0], a[1] + offset[1])
         self.movedPositions = {node: add_tuple_offset(positions[node]) for node in positions}
+        self.edgeWidthSize = 6
+        self.tubeWidthSize = 4
+        self.zoom(factor=None)
 
     def precompute_information(self, timeList=None):
         if not timeList:
@@ -186,7 +189,7 @@ class PlotAnimationCanvas(PlotCanvas):
 
         edgeCollection = LineCollection(edge_pos,
                                          colors=edge_colors,
-                                         linewidths=self.edgeWidthSize*0.7,
+                                         linewidths=self.tubeWidthSize,
                                          antialiaseds=(1,),
                                          transOffset=self.axes.transData,
                                          alpha = 1
@@ -337,7 +340,7 @@ class PlotAnimationCanvas(PlotCanvas):
                    label=None,
                    **kwds):
 
-        return Utilities.draw_animation_edges(G, pos,
+        edges, boxes, tubes = Utilities.draw_animation_edges(G, pos,
                    edgelist,
                    width,
                    edge_color,
@@ -350,6 +353,8 @@ class PlotAnimationCanvas(PlotCanvas):
                    arrows,
                    label)
 
+        self.tube_collection = tubes
+        return edges, boxes
 
     def get_inflow_interval(self, edge, time):
         v,w = edge
@@ -367,3 +372,54 @@ class PlotAnimationCanvas(PlotCanvas):
                 return (lowerBound, upperBound)
 
         return -1
+
+    def zoom(self, factor=None):
+        if factor is not None:
+            smaller = lambda val: factor * val  # Returns smaller value if factor < 1, i.e. if zooming out
+            bigger = lambda val: (1. / factor) * val  # Returns bigger value if factor < 1, i.e. if zooming out
+        else:
+            smaller = lambda val: val
+            bigger = lambda val: val
+
+        # Scale axis
+        self.Xlim = tuple(bigger(entry) for entry in self.Xlim)
+        self.Ylim = tuple(bigger(entry) for entry in self.Ylim)
+        self.axes.set_xlim(self.Xlim)
+        self.axes.set_ylim(self.Ylim)
+
+        # Scale edge widths
+        self.edgeWidthSize = smaller(self.edgeWidthSize)
+        #edgeWithSize = max(1, int(round(self.edgeWidthSize)))
+        for edges, edgeCollection in self.edgeCollections:
+            edgeCollection.set_linewidth(self.edgeWidthSize)
+
+        # Scale tubes
+        self.tubeWidthSize = smaller(self.tubeWidthSize)
+        self.tube_collection.set_linewidth(self.tubeWidthSize)
+
+        # Scale colored edges if existing
+        for edge in self.network.edges():
+            colorEdgeCollection = self.edgeColoring[edge]
+            if colorEdgeCollection is not None:
+                colorEdgeCollection.set_linewidth(self.tubeWidthSize)
+
+
+        # Scale font size of node labels
+        self.nodeLabelFontSize = smaller(self.nodeLabelFontSize)
+        nodeLabelSize = int(round(self.nodeLabelFontSize))
+        for v, label in self.nodeLabelCollection.iteritems():
+            label.set_fontsize(nodeLabelSize)
+
+        # Scale font size of Additional Node Labels, if existing
+        for v, label in self.additionalNodeLabelCollection.iteritems():
+            label.set_fontsize(nodeLabelSize)
+
+        # Scale font size of edge labels
+        self.edgeLabelFontSize = smaller(self.edgeLabelFontSize)
+        edgeLabelSize = int(round(self.edgeLabelFontSize))
+        for edge, label in self.edgeLabelCollection.iteritems():
+            label.set_fontsize(edgeLabelSize)
+
+
+
+        self.draw_idle()

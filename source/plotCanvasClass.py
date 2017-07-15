@@ -45,7 +45,7 @@ class PlotCanvas(FigureCanvas):
     def __init__(self, graph, interface, stretchFactor = 1.57):
         self.figure = matplotlib.figure.Figure()
         super(PlotCanvas, self).__init__(self.figure)  # Call parents constructor
-
+        self.figure.patch.set_facecolor('lightgrey')
         self.network = graph
         self.interface = interface
 
@@ -311,6 +311,7 @@ class PlotCanvas(FigureCanvas):
         #self.axes.set_aspect("equal")
         self.axes.set_xlim(self.Xlim)
         self.axes.set_ylim(self.Ylim)
+
         self.axes.axis('off')  # Hide axes in the plot
 
         nodeLabelSize = int(round(self.nodeLabelFontSize))

@@ -433,9 +433,22 @@ class Utilities:
             else:
                 raise ValueError(
                     'edge_color must be a single color or list of exactly m colors where m is the number or edges')
+        '''
+        modEdgeColors = list(edge_colors)
+        modEdgeColors = tuple(modEdgeColors + [colorConverter.to_rgba('w', alpha)
+                                     for c in edge_color])
+        #print modEdgeColors
+        edge_collection = LineCollection(np.asarray(list(edge_pos)*2),
+                                         colors=modEdgeColors,
+                                         linewidths=[6]*len(list(edge_colors))+[4]*len(list(edge_colors)),
+                                         antialiaseds=(1,),
+                                         linestyle=style,
+                                         transOffset=ax.transData,
+                                         )
+        '''
         edge_collection = LineCollection(edge_pos,
                                          colors=edge_colors,
-                                         linewidths=4,
+                                         linewidths=6,
                                          antialiaseds=(1,),
                                          linestyle=style,
                                          transOffset=ax.transData,
@@ -444,6 +457,19 @@ class Utilities:
         edge_collection.set_zorder(1)  # edges go behind nodes
         edge_collection.set_label(label)
         ax.add_collection(edge_collection)
+
+        tube_collection = LineCollection(edge_pos,
+                                         colors=tuple([colorConverter.to_rgba('lightgrey', alpha)
+                                     for c in edge_color]),
+                                         linewidths=4,
+                                         antialiaseds=(1,),
+                                         linestyle=style,
+                                         transOffset=ax.transData,
+                                         )
+
+        tube_collection.set_zorder(1)  # edges go behind nodes
+        tube_collection.set_label(label)
+        ax.add_collection(tube_collection)
 
         # Note: there was a bug in mpl regarding the handling of alpha values for
         # each line in a LineCollection.  It was fixed in matplotlib in r7184 and
@@ -471,7 +497,7 @@ class Utilities:
             arrow_collection.set_label(label)
             ax.add_collection(arrow_collection)
 
-        return edge_collection, arrow_collection
+        return edge_collection, arrow_collection, tube_collection
 
     @staticmethod
     def get_boxes(edge_colors= None, edge_pos=None, width=1.0):

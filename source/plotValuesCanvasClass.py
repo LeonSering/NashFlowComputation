@@ -20,7 +20,7 @@ class PlotValuesCanvas(FigureCanvas):
         self.figure = figure.Figure()
         super(PlotValuesCanvas, self).__init__(self.figure)  # Call parents constructor
 
-
+        self.figure.patch.set_facecolor("lightgrey")
         self.plots = []
         self.hLines = []
         self.hLinesLabels = []
