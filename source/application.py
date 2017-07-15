@@ -648,7 +648,6 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
 
     def update_NTF_display(self):
         rowID = self.intervalsListWidget.currentRow()
-        self.intervalsListWidget.setCurrentRow(-1)
         lastViewPoint = None
         if rowID < 0:
             return
@@ -704,7 +703,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
                 self.plotNTFFrameLayout.addWidget(self.plotNTFCanvas)
 
         rowID = self.intervalsListWidget.currentRow()
-        self.intervalsListWidget.setCurrentRow(-1)
+
         normalFont, boldFont = QtGui.QFont(), QtGui.QFont()
         normalFont.setBold(False)
         boldFont.setBold(True)
