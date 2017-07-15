@@ -29,7 +29,7 @@ class PlotAnimationCanvas(PlotCanvas):
         self.network = self.nashFlow.network
         self.currentTimeIndex = 0
         self.maxTimeIndex = 99
-        self.timePoints = [float(i) / self.maxTimeIndex * self.upperBound for i in range(self.maxTimeIndex + 1)]
+        self.timePoints = [(float(i) / self.maxTimeIndex) * self.upperBound for i in range(self.maxTimeIndex + 1)]
         self.nodeLabelByTimeDict = {node: dict() for node in self.network.nodes()}
         self.NTFColors = ['seagreen', 'darkorange', 'aquamarine', 'deepskyblue', 'mediumpurple']
 

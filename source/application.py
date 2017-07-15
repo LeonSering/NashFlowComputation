@@ -19,6 +19,7 @@ from plotNTFCanvasClass import PlotNTFCanvas
 from plotValuesCanvasClass import PlotValuesCanvas
 from ui import mainWdw
 from utilitiesClass import Utilities
+import random
 
 filterwarnings('ignore')  # For the moment: ignore warnings as pyplot.hold is deprecated
 
@@ -146,6 +147,18 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
             [('s', {'position': (-90, 0), 'label': 's'}), ('t', {'position': (90, 0), 'label': 't'})])
         network.graph['lastID'] = network.number_of_nodes() - 2  # Keep track of next nodes ID
         network.graph['inflowRate'] = 1
+        '''
+        D = nx.gnc_graph(50)
+        network.add_nodes_from([(str(v), {'position': (random.randint(-300, 300), random.randint(-300, 300)), 'label': str(v)}) for v in D.nodes()])
+        #network.add_edges_from([(edge, {'transitTime':1, 'capacity':1}) for edge in D.edges()])
+        network.add_edges_from([(str(edge[0]), str(edge[1])) for edge in D.edges()], transitTime=1, capacity=1)
+
+        network.add_edges_from([('s', str(node)) for node in D.nodes() if node % 2], transitTime=1, capacity=1)
+
+        for i in range(15):
+            node = str(random.randint(0, D.number_of_nodes()))
+            network.add_edge(node, 't', transitTime=1, capacity=1)
+        '''
 
         return network
 
@@ -366,6 +379,14 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
 
         if not NoNewGraph:
             self.network = self.init_graph()  # Reinstantiation of the CurrentGraph
+        '''
+        labels = nx.single_source_dijkstra_path_length(G=self.network, source='s',
+                                                       weight='transitTime')
+        for node in self.network.nodes():
+            if node not in labels:
+                print "Removed node: ", str(node)
+                self.network.remove_node(node)
+        '''
 
         # Reinitialization of graphCreationCanvas
         self.graphCreationCanvas.setParent(None)  # Drop graphCreationCanvas widget
@@ -408,6 +429,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.plotAnimationFrameLayout.addWidget(self.plotAnimationCanvas)
 
 
+
         # Configure plotDiagramFrame
         if self.plotDiagramCanvas is not None:
             self.plotDiagramCanvas.setParent(None)
@@ -432,6 +454,8 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
             self.network = pickle.load(f)
         self.defaultLoadSaveDir = os.path.dirname(fopen)
         self.save_config()
+
+
         self.re_init_graph_creation_app(NoNewGraph=True)
 
         self.tabWidget.setCurrentIndex(0)
@@ -606,6 +630,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.add_intervals_to_list()
 
         self.intervalsListWidget.setCurrentRow(0)
+        self.slider_released()  # Update NTFs to display first NTF
 
     def add_intervals_to_list(self):
         for index, interval in enumerate(self.nashFlow.flowIntervals):

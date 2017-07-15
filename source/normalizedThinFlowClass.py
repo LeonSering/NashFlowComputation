@@ -85,7 +85,7 @@ class NormalizedThinFlow:
         # Write files
         with open(os.path.join(self.rootPath, 'nodes.txt'), 'w') as nodeWriter:
             for node in self.network:
-                nodeWriter.write(node + '\n')
+                nodeWriter.write(str(node) + '\n')
 
         with open(os.path.join(self.rootPath, 'edges.txt'), 'w') as edgeWriter:
             for edge in self.network.edges():
@@ -93,7 +93,7 @@ class NormalizedThinFlow:
                 capacity = str(self.network[v][w]['capacity'])
                 isInE_0 = str(1) if edge in self.flowEdges else str(0)
                 isInE_Star = str(1) if edge in self.resettingEdges else str(0)
-                outputString = v + ":" + w + ":" + capacity + ":" + isInE_0 + ":" + isInE_Star + '\n'
+                outputString = str(v) + ":" + str(w) + ":" + capacity + ":" + isInE_0 + ":" + isInE_Star + '\n'
                 edgeWriter.write(outputString)
 
         with open(os.path.join(self.rootPath, 'other.txt'), 'w') as otherWriter:

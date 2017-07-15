@@ -81,8 +81,8 @@ class NashFlow:
                 v: self.node_label(v, lowerBoundTime) for v in self.network})  # Compute shortest path network
 
         start = time.time()
-        #interval.get_NTF_advanced()
-        interval.get_NTF()
+        interval.get_NTF_advanced()
+        #interval.get_NTF()
 
         end = time.time()
         self.computationalTime += (end-start)
