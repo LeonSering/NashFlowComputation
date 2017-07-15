@@ -638,6 +638,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
                 "%.2f" % interval[1]) + '['
             item = QtGui.QListWidgetItem(intervalString)
             item.setBackgroundColor(QtGui.QColor(self.plotAnimationCanvas.NTFColors[index % len(self.plotAnimationCanvas.NTFColors)]))
+            #item.setTextColor(QtGui.QColor(self.plotAnimationCanvas.NTFColors[index % len(self.plotAnimationCanvas.NTFColors)]))
 
             self.intervalsListWidget.addItem(item)  # Add item to listWidget
 
@@ -647,9 +648,23 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
 
     def update_NTF_display(self):
         rowID = self.intervalsListWidget.currentRow()
+        self.intervalsListWidget.setCurrentRow(-1)
         lastViewPoint = None
         if rowID < 0:
             return
+
+        normalFont, boldFont = QtGui.QFont(), QtGui.QFont()
+        normalFont.setBold(False)
+        boldFont.setBold(True)
+        for row in range(self.intervalsListWidget.count()):
+            item = self.intervalsListWidget.item(row)
+            if row != rowID:
+                item.setFont(normalFont)
+            else:
+                item.setFont(boldFont)
+
+
+
 
         if self.plotNTFCanvas is not None:
             lastViewPoint = self.plotNTFCanvas.get_viewpoint()
@@ -688,6 +703,18 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
                 self.plotNTFCanvas.set_viewpoint(viewPoint=lastViewPoint)
                 self.plotNTFFrameLayout.addWidget(self.plotNTFCanvas)
 
+        rowID = self.intervalsListWidget.currentRow()
+        self.intervalsListWidget.setCurrentRow(-1)
+        normalFont, boldFont = QtGui.QFont(), QtGui.QFont()
+        normalFont.setBold(False)
+        boldFont.setBold(True)
+        for row in range(self.intervalsListWidget.count()):
+            item = self.intervalsListWidget.item(row)
+            if row != rowID:
+                item.setFont(normalFont)
+            else:
+                item.setFont(boldFont)
+                #item.setSelected(False)
 
     def update_node_label_graph(self):
         if self.plotAnimationCanvas.focusNode is None:
