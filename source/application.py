@@ -647,13 +647,17 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
 
     def update_NTF_display(self):
         rowID = self.intervalsListWidget.currentRow()
+        lastViewPoint = None
         if rowID < 0:
             return
 
         if self.plotNTFCanvas is not None:
+            lastViewPoint = self.plotNTFCanvas.get_viewpoint()
             self.plotNTFCanvas.setParent(None)
 
         self.plotNTFCanvas = self.NTFPlotList[rowID]
+        self.plotNTFCanvas.set_viewpoint(viewPoint=lastViewPoint)
+
         self.plotNTFFrameLayout.addWidget(self.plotNTFCanvas)
 
         self.callback_plotValuesCanvas(self.nashFlow.flowIntervals[rowID][0], False)
@@ -668,8 +672,8 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
 
 
     def slider_released(self):
-
         time = self.plotAnimationCanvas.get_time_from_tick(self.timeSlider.value())
+        lastViewPoint = None
         # Adjust NTF if necessary
         for index, interval in enumerate(self.nashFlow.flowIntervals):
             lowerBound = interval[0]
@@ -677,9 +681,11 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
             if lowerBound <= time < upperBound:
                 self.intervalsListWidget.setCurrentRow(index)
                 if self.plotNTFCanvas is not None:
+                    lastViewPoint = self.plotNTFCanvas.get_viewpoint()
                     self.plotNTFCanvas.setParent(None)
 
                 self.plotNTFCanvas = self.NTFPlotList[index]
+                self.plotNTFCanvas.set_viewpoint(viewPoint=lastViewPoint)
                 self.plotNTFFrameLayout.addWidget(self.plotNTFCanvas)
 
 

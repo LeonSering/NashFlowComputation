@@ -551,10 +551,13 @@ class PlotCanvas(FigureCanvas):
 
         self.draw_idle()
 
-    def zoom(self, factor):
-
-        smaller = lambda val: factor * val  # Returns smaller value if factor < 1, i.e. if zooming out
-        bigger = lambda val: (1. / factor) * val  # Returns bigger value if factor < 1, i.e. if zooming out
+    def zoom(self, factor=None):
+        if factor is not None:
+            smaller = lambda val: factor * val  # Returns smaller value if factor < 1, i.e. if zooming out
+            bigger = lambda val: (1. / factor) * val  # Returns bigger value if factor < 1, i.e. if zooming out
+        else:
+            smaller = lambda val: val
+            bigger = lambda val: val
 
         # Scale axis
         self.Xlim = tuple(bigger(entry) for entry in self.Xlim)
@@ -574,15 +577,16 @@ class PlotCanvas(FigureCanvas):
         for v, label in self.nodeLabelCollection.iteritems():
             label.set_fontsize(nodeLabelSize)
 
+        # Scale font size of Additional Node Labels, if existing
+        for v, label in self.additionalNodeLabelCollection.iteritems():
+            label.set_fontsize(nodeLabelSize)
+
         # Scale font size of edge labels
         self.edgeLabelFontSize = smaller(self.edgeLabelFontSize)
         edgeLabelSize = int(round(self.edgeLabelFontSize))
         for edge, label in self.edgeLabelCollection.iteritems():
             label.set_fontsize(edgeLabelSize)
 
-        # Scale font size of Additional Node Labels, if existing
-        for v, label in self.additionalNodeLabelCollection.iteritems():
-            label.set_fontsize(nodeLabelSize)
 
 
         self.draw_idle()

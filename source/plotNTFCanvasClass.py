@@ -53,8 +53,6 @@ class PlotNTFCanvas(PlotCanvas):
 
         if action == 2:
             # Wheel was clicked, move visible part of canvas
-            self.currentXlim = self.Xlim
-            self.currentYlim = self.Ylim
             self.mouseWheelPressed = True
             self.mouseWheelPressedPosition = (xAbsolute, yAbsolute)
 
@@ -94,4 +92,15 @@ class PlotNTFCanvas(PlotCanvas):
             self.network.remove_nodes_from(nx.isolates(self.network))
 
         self.init_plot()
+
+    def get_viewpoint(self):
+        return (self.Xlim, self.Ylim, self.edgeWidthSize, self.nodeLabelFontSize, self.edgeLabelFontSize)
+
+    def set_viewpoint(self, viewPoint=None):
+        if viewPoint is None:
+            return
+
+        self.Xlim, self.Ylim, self.edgeWidthSize, self.nodeLabelFontSize, self.edgeLabelFontSize = viewPoint
+
+        self.zoom(factor=None)
 
