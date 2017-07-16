@@ -44,14 +44,18 @@ class NashFlow:
         self.lowerBoundsToIntervalDict = OrderedDict()
         self.animationIntervals = {edge:[] for edge in self.network.edges()}
 
-    def run(self):
+    def run(self, next=False):
         computedUpperBound = 0
         k = 1 if self.numberOfIntervals != -1 else -float('inf')
 
-        while computedUpperBound < float('inf') and k <= self.numberOfIntervals:
+        if next:
+            Utilities.create_dir(self.rootPath)
             self.compute_flowInterval()
-            computedUpperBound = self.flowIntervals[-1][1]
-            k += 1
+        else:
+            while computedUpperBound < float('inf') and k <= self.numberOfIntervals:
+                self.compute_flowInterval()
+                computedUpperBound = self.flowIntervals[-1][1]
+                k += 1
 
         # Clean up
         if self.cleanUpBool:

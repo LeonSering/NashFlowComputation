@@ -99,7 +99,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.playPushButton.clicked.connect(self.play_animation)
         self.pausePushButton.clicked.connect(self.pause_animation)
         self.stopPushButton.clicked.connect(self.stop_animation)
-
+        self.computeIntervalPushButton.clicked.connect(self.compute_next_interval)
 
         # Configure Slider
         self.timeSlider.setMinimum(0)
@@ -413,6 +413,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
 
 
     def re_init_nashflow_app(self):
+        self.computeIntervalPushButton.setEnabled(True)
         # Configure plotNTFFrame to display plots of NTF
         if self.plotNTFCanvas is not None:
             self.plotNTFCanvas.setParent(None)
@@ -457,6 +458,8 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         avgTime, totalTime = self.nashFlow.get_stat_time()
         self.statAvgTimeLabel.setText(str(avgTime))
         self.statTotalTimeLabel.setText(str(totalTime))
+
+
 
 
     def load_graph(self):
@@ -669,6 +672,18 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
 
         self.intervalsListWidget.setCurrentRow(0)
         self.slider_released()  # Update NTFs to display first NTF
+
+        if self.nashFlow.infinityReached:
+            self.computeIntervalPushButton.setEnabled(False)
+
+    def compute_next_interval(self):
+        self.nashFlow.run(next=True)
+        self.re_init_nashflow_app()
+
+        self.add_intervals_to_list()
+
+        if self.nashFlow.infinityReached:
+            self.computeIntervalPushButton.setEnabled(False)
 
     def add_intervals_to_list(self):
         for index, interval in enumerate(self.nashFlow.flowIntervals):
