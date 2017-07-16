@@ -40,6 +40,8 @@ class PlotAnimationCanvas(PlotCanvas):
         self.flowOnQueue = {edge: {i: dict() for i in range(len(self.nashFlow.flowIntervals))} for edge in
                                  self.network.edges()}
 
+        self.maximalQueueSize = 0
+
         self.boxColoring = {edge:None for edge in self.network.edges()}
         self.edgeColoring = {edge:None for edge in self.network.edges()}
         self.precompute_information()
@@ -100,6 +102,15 @@ class PlotAnimationCanvas(PlotCanvas):
                     flowOnQueue = max(0, self.flowOnEntireEdge[edge][fk][time] - self.flowOnEdgeNotQueue[edge][fk][time])
 
                     self.flowOnQueue[edge][fk][time] = flowOnQueue
+
+        for time in timeList:
+            for edge in self.network.edges():
+                v, w = edge
+                m = 0
+                for fk in range(len(self.nashFlow.flowIntervals)):
+                    m += self.flowOnQueue[edge][fk][time]
+
+                self.maximalQueueSize = max(self.maximalQueueSize, m)
 
 
     def reset_bounds(self, lowerBound, upperBound):
@@ -207,11 +218,12 @@ class PlotAnimationCanvas(PlotCanvas):
 
         totalFlowOnQueue = sum(self.flowOnQueue[edge][fk][self.timePoints[self.currentTimeIndex]] for fk in range(len(self.nashFlow.flowIntervals)))
 
-        if Utilities.is_eq_tol(totalFlowOnQueue, 0):
+        if Utilities.is_eq_tol(totalFlowOnQueue, 0) or Utilities.is_eq_tol(self.maximalQueueSize, 0):
             return
 
         flowRatio = [max(0, float(self.flowOnQueue[edge][fk][self.timePoints[self.currentTimeIndex]])/totalFlowOnQueue)
                       for fk in range(len(self.nashFlow.flowIntervals))]
+        totalRatio = totalFlowOnQueue/float(self.maximalQueueSize)
 
         delta = np.array([0, radius])
         src = np.array(src)
@@ -234,7 +246,16 @@ class PlotAnimationCanvas(PlotCanvas):
                             alpha=1)
             boxes.append(rec)
 
-            lastProportion -= flowRatio[fk]
+            lastProportion -= (totalRatio * flowRatio[fk])
+        d = np.sqrt(np.sum(((dst - src) * p * (1-totalRatio)) ** 2))
+        lastRec = Rectangle(src - delta,
+                            width=d,
+                            height=radius * 2,
+                            transform=t,
+                            facecolor='lightgrey',
+                            linewidth=0,
+                            alpha=1)
+        boxes.append(lastRec)
 
         boxCollection = PatchCollection(boxes,
                                         match_original=True,
