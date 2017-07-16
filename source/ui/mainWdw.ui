@@ -673,7 +673,7 @@
          <property name="geometry">
           <rect>
            <x>230</x>
-           <y>460</y>
+           <y>430</y>
            <width>221</width>
            <height>21</height>
           </rect>
@@ -686,7 +686,7 @@
          <property name="geometry">
           <rect>
            <x>14</x>
-           <y>460</y>
+           <y>430</y>
            <width>211</width>
            <height>21</height>
           </rect>
@@ -701,6 +701,58 @@
            <string>Export as .PGF</string>
           </property>
          </item>
+        </widget>
+        <widget class="QLabel" name="currentSliderTimeLabel">
+         <property name="geometry">
+          <rect>
+           <x>120</x>
+           <y>460</y>
+           <width>61</width>
+           <height>21</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>0</string>
+         </property>
+        </widget>
+        <widget class="QLabel" name="label_17">
+         <property name="geometry">
+          <rect>
+           <x>20</x>
+           <y>460</y>
+           <width>91</width>
+           <height>21</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Current time:</string>
+         </property>
+        </widget>
+        <widget class="QPushButton" name="setTimePushButton">
+         <property name="geometry">
+          <rect>
+           <x>240</x>
+           <y>460</y>
+           <width>91</width>
+           <height>21</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Set time</string>
+         </property>
+        </widget>
+        <widget class="QLineEdit" name="setTimeLineEdit">
+         <property name="geometry">
+          <rect>
+           <x>170</x>
+           <y>460</y>
+           <width>61</width>
+           <height>21</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
         </widget>
        </widget>
        <widget class="QGroupBox" name="groupBox_4">
@@ -882,58 +934,6 @@
           <string/>
          </property>
         </widget>
-        <widget class="QLabel" name="label_17">
-         <property name="geometry">
-          <rect>
-           <x>480</x>
-           <y>440</y>
-           <width>91</width>
-           <height>21</height>
-          </rect>
-         </property>
-         <property name="text">
-          <string>Current time:</string>
-         </property>
-        </widget>
-        <widget class="QLabel" name="currentSliderTimeLabel">
-         <property name="geometry">
-          <rect>
-           <x>580</x>
-           <y>440</y>
-           <width>61</width>
-           <height>21</height>
-          </rect>
-         </property>
-         <property name="text">
-          <string>0</string>
-         </property>
-        </widget>
-        <widget class="QLineEdit" name="setTimeLineEdit">
-         <property name="geometry">
-          <rect>
-           <x>480</x>
-           <y>460</y>
-           <width>61</width>
-           <height>21</height>
-          </rect>
-         </property>
-         <property name="text">
-          <string/>
-         </property>
-        </widget>
-        <widget class="QPushButton" name="setTimePushButton">
-         <property name="geometry">
-          <rect>
-           <x>550</x>
-           <y>460</y>
-           <width>91</width>
-           <height>21</height>
-          </rect>
-         </property>
-         <property name="text">
-          <string>Set time</string>
-         </property>
-        </widget>
         <widget class="QLabel" name="label_18">
          <property name="geometry">
           <rect>
@@ -1012,7 +1012,64 @@
           <string>N/A</string>
          </property>
         </widget>
+        <widget class="QPushButton" name="playPushButton">
+         <property name="geometry">
+          <rect>
+           <x>470</x>
+           <y>440</y>
+           <width>51</width>
+           <height>41</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="icon">
+          <iconset resource="resources/icons.qrc">
+           <normaloff>:/playpausestop/play.png</normaloff>:/playpausestop/play.png</iconset>
+         </property>
+        </widget>
+        <widget class="QPushButton" name="pausePushButton">
+         <property name="geometry">
+          <rect>
+           <x>530</x>
+           <y>440</y>
+           <width>51</width>
+           <height>41</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="icon">
+          <iconset resource="resources/icons.qrc">
+           <normaloff>:/playpausestop/pause.png</normaloff>:/playpausestop/pause.png</iconset>
+         </property>
+        </widget>
+        <widget class="QPushButton" name="stopPushButton">
+         <property name="geometry">
+          <rect>
+           <x>590</x>
+           <y>440</y>
+           <width>51</width>
+           <height>41</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="icon">
+          <iconset resource="resources/icons.qrc">
+           <normaloff>:/playpausestop/stop.png</normaloff>:/playpausestop/stop.png</iconset>
+         </property>
+        </widget>
        </widget>
+       <zorder>groupBox_5</zorder>
+       <zorder>groupBox_4</zorder>
+       <zorder>groupBox_7</zorder>
+       <zorder>setTimePushButton</zorder>
+       <zorder>plotNTFFrame</zorder>
+       <zorder>setTimeLineEdit</zorder>
       </widget>
      </widget>
     </item>
@@ -1082,6 +1139,8 @@
    </property>
   </action>
  </widget>
- <resources/>
+ <resources>
+  <include location="resources/icons.qrc"/>
+ </resources>
  <connections/>
 </ui>

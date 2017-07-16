@@ -20,6 +20,8 @@ from plotValuesCanvasClass import PlotValuesCanvas
 from ui import mainWdw
 from utilitiesClass import Utilities
 import random
+import threading
+import time
 
 filterwarnings('ignore')  # For the moment: ignore warnings as pyplot.hold is deprecated
 
@@ -67,6 +69,8 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.animationLowerBound = 0
         self.animationUpperBound = 1
 
+        self.animationRunning = False
+
         self.configFile = ConfigParser.RawConfigParser()
 
         self.init_nashflow_app()
@@ -92,6 +96,9 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.nodeSelectionListWidget.itemClicked.connect(self.update_focus_node)
         self.edgeSelectionListWidget.itemClicked.connect(self.update_focus_edge)
         self.activateTimeoutCheckBox.clicked.connect(self.change_timeout_state)
+        self.playPushButton.clicked.connect(self.play_animation)
+        self.pausePushButton.clicked.connect(self.pause_animation)
+        self.stopPushButton.clicked.connect(self.stop_animation)
 
 
         # Configure Slider
@@ -924,3 +931,23 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.timeoutActivated = self.activateTimeoutCheckBox.isChecked()
         self.timeoutLabel.setEnabled(self.timeoutActivated)
         self.timeoutLineEdit.setEnabled(self.timeoutActivated)
+
+    def play_animation(self):
+        def animate(FPS=10):
+            while self.animationRunning and self.timeSlider.value() < self.timeSlider.maximum():
+                time.sleep(1/float(FPS))
+                self.timeSlider.setValue(self.timeSlider.value() + 1)
+            self.animationRunning = False
+
+        self.animationRunning = True
+        t = threading.Thread(target=animate)
+        t.start()
+
+
+    def pause_animation(self):
+        self.animationRunning = False
+
+    def stop_animation(self):
+        self.animationRunning = False
+        time.sleep(0.5)
+        self.timeSlider.setValue(0)
