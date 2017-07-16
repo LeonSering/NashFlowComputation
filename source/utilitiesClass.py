@@ -97,8 +97,12 @@ class Utilities:
         return {key: (dict1[key], dict2[key]) for key in dict1 if key in dict2}
 
     @staticmethod
-    def add_3_and_round_up(x):
-        x += 3
+    def add_and_round_up(x, n):
+        x += n
+        return x if x % 10 == 0 else x + 10 - x % 10
+
+    @staticmethod
+    def round_up(x):
         return x if x % 10 == 0 else x + 10 - x % 10
 
     @staticmethod

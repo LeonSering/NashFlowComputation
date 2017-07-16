@@ -202,9 +202,9 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
 
         upperBoundInput = str(self.animationEndLineEdit.text())
         if upperBoundInput == "":
-            upperBoundInput = self.nashFlow.flowIntervals[-1][1] \
+            upperBoundInput = self.nashFlow.node_label('t', self.nashFlow.flowIntervals[-1][1]) \
                 if self.nashFlow.flowIntervals[-1][1] < float('inf') \
-                else Utilities.add_3_and_round_up(self.nashFlow.flowIntervals[-1][0])
+                else Utilities.round_up(self.nashFlow.node_label('t', self.nashFlow.flowIntervals[-1][0]))
 
         upperBound = float(upperBoundInput)
 
@@ -416,9 +416,9 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         if self.plotAnimationCanvas is not None:
             self.plotAnimationCanvas.setParent(None)
 
-        self.animationUpperBound = self.nashFlow.flowIntervals[-1][1] \
+        self.animationUpperBound = self.nashFlow.node_label('t', self.nashFlow.flowIntervals[-1][1]) \
                 if self.nashFlow.flowIntervals[-1][1] < float('inf') \
-                else Utilities.add_3_and_round_up(self.nashFlow.flowIntervals[-1][0])
+                else Utilities.round_up(self.nashFlow.node_label('t', self.nashFlow.flowIntervals[-1][0]))
 
         self.animationStartLineEdit.setText("%.2f" % self.animationLowerBound)
         self.animationEndLineEdit.setText("%.2f" % self.animationUpperBound)
