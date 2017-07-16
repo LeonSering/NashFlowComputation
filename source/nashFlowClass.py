@@ -33,6 +33,8 @@ class NashFlow:
 
         self.minCapacity = Utilities.compute_min_capacity(self.network)
         self.counter = 0
+        self.preprocessedNodes = 0
+        self.preprocessedEdges = 0
 
         # Create directory for Nash-Flow
         self.rootPath = os.path.join(self.outputDirectory, 'NashFlow-' + Utilities.get_time())
@@ -86,6 +88,9 @@ class NashFlow:
 
         end = time.time()
         self.computationalTime += (end-start)
+        interval.computationalTime = end-start
+        self.preprocessedNodes += interval.preprocessedNodes
+        self.preprocessedEdges += interval.preprocessedEdges
         print "Solved IPs: ", str(interval.numberOfSolvedIPs), " Time: ", "%.2f" % (end-start)
         self.lowerBoundsToIntervalDict[lowerBoundTime] = interval
 
@@ -247,3 +252,25 @@ class NashFlow:
             if Utilities.is_geq_tol(time, lowerBoundTime):
                 lastTime = lowerBoundTime
         return lastTime
+
+    def get_stat_preprocessing(self):
+        if len(self.flowIntervals) == 0:
+            return "N/A", "N/A"
+
+        totalNodes, totalEdges = self.preprocessedNodes, self.preprocessedEdges
+        avgNodes, avgEdges = float(totalNodes)/len(self.flowIntervals), float(totalEdges)/len(self.flowIntervals)
+        return "%.2f" % avgNodes, "%.2f" % avgEdges
+
+    def get_stat_solved_IPs(self):
+        total = self.numberOfSolvedIPs
+        if len(self.flowIntervals) == 0:
+            return "N/A", "N/A"
+        avg = float(total)/len(self.flowIntervals)
+        return "%.2f" % avg, total
+
+    def get_stat_time(self):
+        total = self.computationalTime
+        if len(self.flowIntervals) == 0:
+            return "N/A", "N/A"
+        avg = float(total)/len(self.flowIntervals)
+        return "%.2f" % avg, "%.2f" % total

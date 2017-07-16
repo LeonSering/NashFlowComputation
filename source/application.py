@@ -446,6 +446,18 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.plotDiagramCanvas = PlotValuesCanvas(callback=self.callback_plotValuesCanvas)
         self.plotDiagramLayout.addWidget(self.plotDiagramCanvas)
 
+        self.statNumberOfNodesLabel.setText(str(self.nashFlow.network.number_of_nodes()))
+        self.statNumberOfEdgesLabel.setText(str(self.nashFlow.network.number_of_edges()))
+        avgNodes, avgEdges = self.nashFlow.get_stat_preprocessing()
+        self.statAvgDeletedNodesLabel.setText(str(avgNodes))
+        self.statAvgDeletedEdgesLabel.setText(str(avgEdges))
+        avgIPs, totalIPs = self.nashFlow.get_stat_solved_IPs()
+        self.statAvgSolvedIPsLabel.setText(str(avgIPs))
+        self.statTotalSolvedIPsLabel.setText(str(totalIPs))
+        avgTime, totalTime = self.nashFlow.get_stat_time()
+        self.statAvgTimeLabel.setText(str(avgTime))
+        self.statTotalTimeLabel.setText(str(totalTime))
+
 
     def load_graph(self):
         """Load CurrentGraph instance from '.cg' file"""

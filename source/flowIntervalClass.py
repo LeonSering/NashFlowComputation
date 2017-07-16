@@ -41,6 +41,9 @@ class FlowInterval:
         self.alpha = None
         self.shortestPathNetwork = None  # to be set from NashFlowClass
         self.numberOfSolvedIPs = 0
+        self.computationalTime = -1
+        self.preprocessedNodes = 0
+        self.preprocessedEdges = 0
         self.NTFNodeLabelDict = {node: 0 for node in self.network}
         self.NTFEdgeFlowDict = {edge: 0 for edge in self.network.edges()}
 
@@ -283,6 +286,9 @@ class FlowInterval:
                     queue.append(v)
             graph.remove_node(w)
             removedVertices.append(w)
+
+        self.preprocessedNodes = len(removedVertices)
+        self.preprocessedEdges = self.shortestPathNetwork.number_of_edges() - graph.number_of_edges()
 
         return graph, removedVertices
 
