@@ -203,6 +203,11 @@ class Ui_MainWindow(object):
         self.edgeSelectionListWidget = QtGui.QListWidget(self.tab)
         self.edgeSelectionListWidget.setGeometry(QtCore.QRect(1000, 330, 131, 211))
         self.edgeSelectionListWidget.setObjectName(_fromUtf8("edgeSelectionListWidget"))
+        self.logPlainTextEdit = QtGui.QPlainTextEdit(self.tab)
+        self.logPlainTextEdit.setGeometry(QtCore.QRect(10, 760, 701, 171))
+        self.logPlainTextEdit.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
+        self.logPlainTextEdit.setTextInteractionFlags(QtCore.Qt.NoTextInteraction)
+        self.logPlainTextEdit.setObjectName(_fromUtf8("logPlainTextEdit"))
         self.tabWidget.addTab(self.tab, _fromUtf8(""))
         self.tab_2 = QtGui.QWidget()
         self.tab_2.setObjectName(_fromUtf8("tab_2"))
@@ -375,7 +380,7 @@ class Ui_MainWindow(object):
         self.menubar.addAction(self.menuFile.menuAction())
 
         self.retranslateUi(MainWindow)
-        self.tabWidget.setCurrentIndex(1)
+        self.tabWidget.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):

@@ -222,6 +222,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
 
         self.timeSlider.setValue(0)
         self.plotAnimationCanvas.reset_bounds(self.animationLowerBound, self.animationUpperBound)
+        self.output("Generating animation")
 
 
 
@@ -386,6 +387,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
 
         if not NoNewGraph:
             self.network = self.init_graph()  # Reinstantiation of the CurrentGraph
+            self.output("Clearing graph")
         '''
         labels = nx.single_source_dijkstra_path_length(G=self.network, source='s',
                                                        weight='transitTime')
@@ -434,6 +436,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
 
         self.plotAnimationCanvas = PlotAnimationCanvas(nashflow=self.nashFlow, interface=self, upperBound=self.animationUpperBound, stretchFactor=self.plotAnimationCanvasStretchFactor)
         self.plotAnimationFrameLayout.addWidget(self.plotAnimationCanvas)
+        self.output("Generating animation")
 
 
 
@@ -462,7 +465,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.defaultLoadSaveDir = os.path.dirname(fopen)
         self.save_config()
 
-
+        self.output("Loading graph: " + str(fopen))
         self.re_init_graph_creation_app(NoNewGraph=True)
 
         self.tabWidget.setCurrentIndex(0)
@@ -485,6 +488,8 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
             fsave += ".cg"
         self.defaultLoadSaveDir = os.path.dirname(fsave)
         self.save_config()
+
+        self.output("Saving graph: " + str(fsave))
         # Save network instance to file
         with open(fsave, 'wb') as f:
             pickle.dump(self.network, f)
@@ -505,6 +510,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
             self.nashFlow = pickle.load(f)
         self.defaultLoadSaveDir = os.path.dirname(fopen)
         self.save_config()
+        self.output("Loading nash flow: " + str(fopen))
         self.re_init_nashflow_app()
         self.add_intervals_to_list()
 
@@ -525,6 +531,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
             fsave += ".nf"
         self.defaultLoadSaveDir = os.path.dirname(fsave)
         self.save_config()
+        self.output("Saving nash flow: " + str(fsave))
         # Save network instance to file
         with open(fsave, 'wb') as f:
             pickle.dump(self.nashFlow, f)
@@ -540,6 +547,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         if len(fselect) == 0:
             return
         fselect = str(fselect)
+        self.output("Selecting output directory: " + str(fselect))
         self.outputDirectoryLineEdit.setText(fselect)
         self.outputDirectory = fselect
 
@@ -554,6 +562,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         if len(fselect) == 0:
             return
         fselect = str(fselect)
+        self.output("Selecting template file: " + str(fselect))
         self.templateFileLineEdit.setText(fselect)
         self.templateFile = fselect
 
@@ -569,6 +578,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         if len(fselect) == 0:
             return
         fselect = str(fselect)
+        self.output("Selecting scip binary: " + str(fselect))
         self.scipPathLineEdit.setText(fselect)
         self.scipFile = fselect
 
@@ -604,7 +614,10 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
             self.activateTimeoutCheckBox.setChecked(self.timeoutActivated)
             self.change_timeout_state()
 
+            self.output("Loading config: Success")
+
         except Exception as err:
+            self.output("Loading config: Failure")
             return
 
     def save_config(self):
@@ -619,6 +632,8 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         with open('config.cfg', 'wb') as configfile:
             self.configFile.write(configfile)
 
+        self.output("Saving config: config.cfg")
+
     def compute_nash_flow(self):
 
         # Get remaining settings
@@ -628,9 +643,13 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.save_config()  # Save config-settings to file
         self.tabWidget.setCurrentIndex(1)  # Switch to next tab
         timeout = -1 if not self.timeoutActivated else float(self.timeoutLineEdit.text())
+        numberString = str(self.numberOfIntervals) if float(self.numberOfIntervals) != -1 else "all"
+        self.output("Starting computation of " + numberString + " flow intervals")
         self.nashFlow = NashFlow(self.network, float(inflowRate), float(self.numberOfIntervals), self.outputDirectory,
                                  self.templateFile, self.scipFile, self.cleanUpEnabled, timeout)
         self.nashFlow.run()
+
+        self.output("Computation complete in " + "%.2f" % self.nashFlow.computationalTime + " seconds")
 
         self.re_init_nashflow_app()
 
@@ -849,6 +868,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
 
         self.defaultLoadSaveDir = os.path.dirname(fsave)
         self.save_config()
+        self.output("Exporting diagram: " + str(fsave))
 
         self.plotDiagramCanvas.export(path=fsave)
 
@@ -871,6 +891,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
     def change_no_flow_show_state(self):
         for NTF in self.NTFPlotList:
             NTF.change_edge_show_status(show=self.showEdgesWithoutFlowCheckBox.isChecked())
+
 
     def update_focus_node(self):
         self.graphCreationCanvas.focusEdge = None
@@ -939,15 +960,25 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
                 self.timeSlider.setValue(self.timeSlider.value() + 1)
             self.animationRunning = False
 
+        self.output("Starting animation")
+
         self.animationRunning = True
         t = threading.Thread(target=animate)
         t.start()
 
 
     def pause_animation(self):
+        self.output("Pausing animation")
         self.animationRunning = False
 
     def stop_animation(self):
         self.animationRunning = False
+        self.output("Stopping animation")
         time.sleep(0.5)
+
         self.timeSlider.setValue(0)
+
+    def output(self, txt):
+        time = Utilities.get_time_for_log()
+        logText = time + " - " + txt
+        self.logPlainTextEdit.appendPlainText(logText)

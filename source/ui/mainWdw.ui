@@ -42,7 +42,7 @@
        </sizepolicy>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="tab">
        <attribute name="title">
@@ -628,6 +628,22 @@
           <width>131</width>
           <height>211</height>
          </rect>
+        </property>
+       </widget>
+       <widget class="QPlainTextEdit" name="logPlainTextEdit">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>760</y>
+          <width>701</width>
+          <height>171</height>
+         </rect>
+        </property>
+        <property name="verticalScrollBarPolicy">
+         <enum>Qt::ScrollBarAsNeeded</enum>
+        </property>
+        <property name="textInteractionFlags">
+         <set>Qt::NoTextInteraction</set>
         </property>
        </widget>
       </widget>

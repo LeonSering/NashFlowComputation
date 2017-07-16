@@ -34,6 +34,10 @@ class Utilities:
         return time.strftime("%d_%m_%Y-%H_%M_%S", time.localtime())
 
     @staticmethod
+    def get_time_for_log():
+        return time.strftime("%H:%M:%S", time.localtime())
+
+    @staticmethod
     def is_eq_tol(a, b, tol=TOL):
         return abs(a - b) <= tol
 
