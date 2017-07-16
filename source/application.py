@@ -19,7 +19,6 @@ from plotNTFCanvasClass import PlotNTFCanvas
 from plotValuesCanvasClass import PlotValuesCanvas
 from ui import mainWdw
 from utilitiesClass import Utilities
-import random
 import threading
 import time
 
@@ -433,11 +432,13 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.animationStartLineEdit.setText("%.2f" % self.animationLowerBound)
         self.animationEndLineEdit.setText("%.2f" % self.animationUpperBound)
 
-        self.timeSlider.setValue(0)
+
 
         self.plotAnimationCanvas = PlotAnimationCanvas(nashflow=self.nashFlow, interface=self, upperBound=self.animationUpperBound, stretchFactor=self.plotAnimationCanvasStretchFactor)
         self.plotAnimationFrameLayout.addWidget(self.plotAnimationCanvas)
+        self.timeSlider.setMaximum(99)
         self.output("Generating animation")
+        self.timeSlider.setValue(0)
 
 
 
@@ -649,7 +650,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
 
         self.output("Saving config: config.cfg")
 
-    def compute_nash_flow(self):
+    def compute_nash_flow(self, next=False):
 
         # Get remaining settings
         self.numberOfIntervals = self.intervalsLineEdit.text()
@@ -658,11 +659,15 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.save_config()  # Save config-settings to file
         self.tabWidget.setCurrentIndex(1)  # Switch to next tab
         timeout = -1 if not self.timeoutActivated else float(self.timeoutLineEdit.text())
-        numberString = str(self.numberOfIntervals) if float(self.numberOfIntervals) != -1 else "all"
-        self.output("Starting computation of " + numberString + " flow intervals")
-        self.nashFlow = NashFlow(self.network, float(inflowRate), float(self.numberOfIntervals), self.outputDirectory,
-                                 self.templateFile, self.scipFile, self.cleanUpEnabled, timeout)
-        self.nashFlow.run()
+
+        if not next:
+            numberString = str(self.numberOfIntervals) if float(self.numberOfIntervals) != -1 else "all"
+            self.output("Starting computation of " + numberString + " flow intervals")
+            self.nashFlow = NashFlow(self.network, float(inflowRate), float(self.numberOfIntervals), self.outputDirectory,
+                                     self.templateFile, self.scipFile, self.cleanUpEnabled, timeout)
+        else:
+            self.output("Starting computation of next flow interval")
+        self.nashFlow.run(next=next)
 
         self.output("Computation complete in " + "%.2f" % self.nashFlow.computationalTime + " seconds")
 
@@ -677,13 +682,11 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
             self.computeIntervalPushButton.setEnabled(False)
 
     def compute_next_interval(self):
-        self.nashFlow.run(next=True)
-        self.re_init_nashflow_app()
-
-        self.add_intervals_to_list()
-
-        if self.nashFlow.infinityReached:
-            self.computeIntervalPushButton.setEnabled(False)
+        if self.nashFlow is None:
+            self.numberOfIntervals = 1
+            self.compute_nash_flow()
+        else:
+            self.compute_nash_flow(next=True)
 
     def add_intervals_to_list(self):
         for index, interval in enumerate(self.nashFlow.flowIntervals):
@@ -746,14 +749,17 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
             lowerBound = interval[0]
             upperBound = interval[1]
             if lowerBound <= time < upperBound:
-                self.intervalsListWidget.setCurrentRow(index)
-                if self.plotNTFCanvas is not None:
-                    lastViewPoint = self.plotNTFCanvas.get_viewpoint()
-                    self.plotNTFCanvas.setParent(None)
+                if self.intervalsListWidget.currentRow != index:
+                    self.intervalsListWidget.setCurrentRow(index)
+                    if self.plotNTFCanvas is not None:
+                        lastViewPoint = self.plotNTFCanvas.get_viewpoint()
+                        self.plotNTFCanvas.setParent(None)
 
-                self.plotNTFCanvas = self.NTFPlotList[index]
-                self.plotNTFCanvas.set_viewpoint(viewPoint=lastViewPoint)
-                self.plotNTFFrameLayout.addWidget(self.plotNTFCanvas)
+                    self.plotNTFCanvas = self.NTFPlotList[index]
+                    self.plotNTFCanvas.set_viewpoint(viewPoint=lastViewPoint)
+                    self.plotNTFFrameLayout.addWidget(self.plotNTFCanvas)
+                break
+
 
         rowID = self.intervalsListWidget.currentRow()
 
@@ -981,7 +987,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.timeoutLineEdit.setEnabled(self.timeoutActivated)
 
     def play_animation(self):
-        def animate(FPS=10):
+        def animate(FPS=4):
             while self.animationRunning and self.timeSlider.value() < self.timeSlider.maximum():
                 time.sleep(1/float(FPS))
                 self.timeSlider.setValue(self.timeSlider.value() + 1)
