@@ -42,7 +42,7 @@
        </sizepolicy>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="tab">
        <attribute name="title">
@@ -613,7 +613,7 @@
        <widget class="QListWidget" name="nodeSelectionListWidget">
         <property name="geometry">
          <rect>
-          <x>860</x>
+          <x>1000</x>
           <y>330</y>
           <width>131</width>
           <height>211</height>
@@ -623,7 +623,7 @@
        <widget class="QListWidget" name="edgeSelectionListWidget">
         <property name="geometry">
          <rect>
-          <x>1000</x>
+          <x>860</x>
           <y>330</y>
           <width>131</width>
           <height>211</height>
@@ -770,14 +770,6 @@
           <string/>
          </property>
         </widget>
-        <zorder>plotDiagramFrame</zorder>
-        <zorder>exportDiagramPushButton</zorder>
-        <zorder>exportComboBox</zorder>
-        <zorder>currentSliderTimeLabel</zorder>
-        <zorder>label_17</zorder>
-        <zorder>setTimePushButton</zorder>
-        <zorder>setTimeLineEdit</zorder>
-        <zorder>groupBox_6</zorder>
        </widget>
        <widget class="QGroupBox" name="groupBox_4">
         <property name="geometry">
@@ -1049,7 +1041,7 @@
           <string/>
          </property>
          <property name="icon">
-          <iconset resource="resources/icons.qrc">
+          <iconset>
            <normaloff>:/playpausestop/play.png</normaloff>:/playpausestop/play.png</iconset>
          </property>
         </widget>
@@ -1066,7 +1058,7 @@
           <string/>
          </property>
          <property name="icon">
-          <iconset resource="resources/icons.qrc">
+          <iconset>
            <normaloff>:/playpausestop/pause.png</normaloff>:/playpausestop/pause.png</iconset>
          </property>
         </widget>
@@ -1083,7 +1075,7 @@
           <string/>
          </property>
          <property name="icon">
-          <iconset resource="resources/icons.qrc">
+          <iconset>
            <normaloff>:/playpausestop/stop.png</normaloff>:/playpausestop/stop.png</iconset>
          </property>
         </widget>
@@ -1413,14 +1405,6 @@
          <bool>false</bool>
         </property>
        </widget>
-       <zorder>groupBox_5</zorder>
-       <zorder>groupBox_4</zorder>
-       <zorder>groupBox_7</zorder>
-       <zorder>setTimePushButton</zorder>
-       <zorder>plotNTFFrame</zorder>
-       <zorder>setTimeLineEdit</zorder>
-       <zorder>groupBox_6</zorder>
-       <zorder>computeIntervalPushButton</zorder>
       </widget>
      </widget>
     </item>
@@ -1491,7 +1475,7 @@
   </action>
  </widget>
  <resources>
-  <include location="resources/icons.qrc"/>
+  <include location="icons.qrc"/>
  </resources>
  <connections/>
 </ui>
