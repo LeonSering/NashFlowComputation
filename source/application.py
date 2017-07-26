@@ -5,12 +5,14 @@
 # Description:  Interface class; controlling signals/slots & communication between widgets et cetera
 # ===========================================================================
 
+from PyQt4 import QtGui, QtCore
 import ConfigParser
 import os
 import pickle
-from warnings import filterwarnings
-
+import threading
+import time
 import networkx as nx
+from warnings import filterwarnings
 
 from nashFlowClass import NashFlow
 from plotAnimationCanvasClass import PlotAnimationCanvas
@@ -19,64 +21,48 @@ from plotNTFCanvasClass import PlotNTFCanvas
 from plotValuesCanvasClass import PlotValuesCanvas
 from ui import mainWdw
 from utilitiesClass import Utilities
-import threading
-import time
-
-filterwarnings('ignore')  # For the moment: ignore warnings as pyplot.hold is deprecated
-
-if os.name == 'posix':
-    from PyQt4 import QtGui, QtCore
-else:
-    from PySide import QtGui
-
-TOL = 1e-8
-
 
 # =======================================================================================================================
+filterwarnings('ignore')  # For the moment: ignore warnings as pyplot.hold is deprecated
 
 
 class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
     """Controls GUI"""
 
     def __init__(self):
+        """Initialization of Class and GUI"""
         QtGui.QMainWindow.__init__(self)
         self.setupUi(self)
 
-
-        # Scaling factors of frames
-        self.plotCanvasStretchFactor = float(self.plotFrame.width())/self.plotFrame.height()
-        self.plotAnimationCanvasStretchFactor = float(self.plotAnimationFrame.width())/self.plotAnimationFrame.height()
-        self.plotNTFCanvasStretchFactor = float(self.plotNTFFrame.width())/self.plotNTFFrame.height()
+        # Scaling factors of frames, to avoid distortion
+        self.plotCanvasStretchFactor = float(self.plotFrame.width()) / self.plotFrame.height()
+        self.plotAnimationCanvasStretchFactor = float(
+            self.plotAnimationFrame.width()) / self.plotAnimationFrame.height()
+        self.plotNTFCanvasStretchFactor = float(self.plotNTFFrame.width()) / self.plotNTFFrame.height()
 
         # Init graph
         self.network = self.init_graph()
         self.init_graph_creation_app()
-        self.inflowLineEdit.setText('1')
+        self.inflowLineEdit.setText('1')  # Default value
 
-
+        # Config defaults
         self.outputDirectory = ''
-        self.templateFile = 0
+        self.templateFile = 0  # 0,1,2 for three algorithms from thesis
         self.scipFile = ''
         self.timeoutActivated = False
-
         self.defaultLoadSaveDir = ''
-
         self.numberOfIntervals = -1
-
         self.cleanUpEnabled = True
 
         self.animationLowerBound = 0
         self.animationUpperBound = 1
-
         self.animationRunning = False
 
-        self.configFile = ConfigParser.RawConfigParser()
+        self.configFile = ConfigParser.RawConfigParser()  # This is the parser, not to confuse with the actual config.txt File, which cannot be specified
 
+        # Initializations
         self.init_nashflow_app()
-
         self.load_config()  # Try to load configuration file
-
-
         self.tabWidget.setCurrentIndex(0)  # Show Graph Creation Tab
 
         # Signal configuration
@@ -98,88 +84,66 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.pausePushButton.clicked.connect(self.pause_animation)
         self.stopPushButton.clicked.connect(self.stop_animation)
         self.computeIntervalPushButton.clicked.connect(self.compute_next_interval)
-
-        # Configure Slider
-        self.timeSlider.setMinimum(0)
-        self.timeSlider.setMaximum(99)
-        self.timeSlider.setValue(0)
-        self.timeSlider.setTickPosition(2) # Set ticks below horizontal slider
-        self.timeSlider.setTickInterval(1)
-
-        self.timeSlider.valueChanged.connect(self.slider_value_change)
-        self.timeSlider.sliderReleased.connect(self.slider_released)
-
         self.actionNew_graph.triggered.connect(self.re_init_graph_creation_app)
         self.actionLoad_graph.triggered.connect(self.load_graph)
         self.actionSave_graph.triggered.connect(self.save_graph)
         self.actionExit.triggered.connect(QtGui.QApplication.quit)
         self.actionLoad_NashFlow.triggered.connect(self.load_nashflow)
         self.actionSave_NashFlow.triggered.connect(self.save_nashflow)
-
-
-        self.intervalsListWidget.itemClicked.connect(self.update_NTF_display)
-
+        self.intervalsListWidget.itemClicked.connect(self.update_ntf_display)
         self.generateAnimationPushButton.clicked.connect(self.generate_animation)
+
+        # Configure Slider
+        self.timeSlider.setMinimum(0)
+        self.timeSlider.setMaximum(99)
+        self.timeSlider.setValue(0)
+        self.timeSlider.setTickPosition(2)  # Set ticks below horizontal slider
+        self.timeSlider.setTickInterval(1)
+
+        # Slider signals
+        self.timeSlider.valueChanged.connect(self.slider_value_change)
+        self.timeSlider.sliderReleased.connect(self.slider_released)
 
         # Keyboard shortcuts
         QtGui.QShortcut(QtGui.QKeySequence(QtCore.Qt.Key_Delete), self).activated.connect(
             self.pressed_delete)  # Pressed Delete
-        # Edge shortcuts
         self.tailLineEdit.returnPressed.connect(self.update_add_edge)
         self.headLineEdit.returnPressed.connect(self.update_add_edge)
         self.capacityLineEdit.returnPressed.connect(self.update_add_edge)
         self.transitTimeLineEdit.returnPressed.connect(self.update_add_edge)
-        # Node shortcuts
         self.nodeNameLineEdit.returnPressed.connect(self.update_node)
         self.nodeXLineEdit.returnPressed.connect(self.update_node)
         self.nodeYLineEdit.returnPressed.connect(self.update_node)
-
-        # Animation generation shortcuts
         self.animationStartLineEdit.returnPressed.connect(self.generate_animation)
         self.animationEndLineEdit.returnPressed.connect(self.generate_animation)
         self.setTimeLineEdit.returnPressed.connect(self.set_new_time_manually)
 
-
-
-
-
     @staticmethod
     def init_graph():
-
-        # Graph Creation
+        """
+        Creates the initial network
+        :return: network :initial network
+        """
         network = nx.DiGraph()
         network.add_nodes_from(
             [('s', {'position': (-90, 0), 'label': 's'}), ('t', {'position': (90, 0), 'label': 't'})])
         network.graph['lastID'] = network.number_of_nodes() - 2  # Keep track of next nodes ID
-        network.graph['inflowRate'] = 1
-        '''
-        D = nx.gnc_graph(50)
-        network.add_nodes_from([(str(v), {'position': (random.randint(-300, 300), random.randint(-300, 300)), 'label': str(v)}) for v in D.nodes()])
-        #network.add_edges_from([(edge, {'transitTime':1, 'capacity':1}) for edge in D.edges()])
-        network.add_edges_from([(str(edge[0]), str(edge[1])) for edge in D.edges()], transitTime=1, capacity=1)
-
-        network.add_edges_from([('s', str(node)) for node in D.nodes() if node % 2], transitTime=1, capacity=1)
-
-        for i in range(15):
-            node = str(random.randint(0, D.number_of_nodes()))
-            network.add_edge(node, 't', transitTime=1, capacity=1)
-        '''
-
+        network.graph['inflowRate'] = 1  # Default inflowrate for new networks
         return network
 
     def init_graph_creation_app(self):
+        """Initialization of Tab 0"""
         # Configure plotFrame to display plots of graphs
         self.plotFrameLayout = QtGui.QVBoxLayout()
         self.plotFrame.setLayout(self.plotFrameLayout)
         self.graphCreationCanvas = PlotCanvas(self.network, self)  # Initialize PlotCanvas
         self.plotFrameLayout.addWidget(self.graphCreationCanvas)
 
-
         self.re_init_node_list()
         self.re_init_edge_list()
 
-
     def init_nashflow_app(self):
+        """Initialization of Tab 1"""
         # Configure plotNTFFrame to display plots of NTF
         self.plotNTFFrameLayout = QtGui.QVBoxLayout()
         self.plotNTFFrame.setLayout(self.plotNTFFrameLayout)
@@ -194,52 +158,43 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         # Configure plotDiagramFrame to display edge in- and outflow, queue-size and node labels
         self.plotDiagramLayout = QtGui.QVBoxLayout()
         self.plotDiagramFrame.setLayout(self.plotDiagramLayout)
-        self.plotDiagramCanvas = PlotValuesCanvas(callback=self.callback_plotValuesCanvas)
+        self.plotDiagramCanvas = PlotValuesCanvas(callback=self.callback_plotvaluescanvas)
         self.plotDiagramLayout.addWidget(self.plotDiagramCanvas)
 
-
-
-
-
     def generate_animation(self):
+        """Generates new animation"""
         lowerBoundInput = str(self.animationStartLineEdit.text())
-        lowerBound = float(lowerBoundInput) if lowerBoundInput != "" else 0
-
         upperBoundInput = str(self.animationEndLineEdit.text())
         if upperBoundInput == "":
             upperBoundInput = self.nashFlow.node_label('t', self.nashFlow.flowIntervals[-1][1]) \
                 if self.nashFlow.flowIntervals[-1][1] < float('inf') \
                 else Utilities.round_up(self.nashFlow.node_label('t', self.nashFlow.flowIntervals[-1][0]))
 
+        lowerBound = float(lowerBoundInput) if lowerBoundInput != "" else 0
         upperBound = float(upperBoundInput)
-
 
         self.animationLowerBound = lowerBound
         self.animationUpperBound = upperBound
-        self.set_plot_range()
 
-        self.timeSlider.setValue(0)
+        self.update_diagrams()  # Update the value diagrams according to the new range
+
+        self.timeSlider.setValue(0)  # Reset slider
         self.plotAnimationCanvas.reset_bounds(self.animationLowerBound, self.animationUpperBound)
         self.output("Generating animation")
-
-
 
     def update_node_display(self):
         """Update display of the properties of the currently focussed node self.graphCreationCanvas.focusNode, if existing"""
         if self.graphCreationCanvas.focusNode is not None:
-            # TO DO: Check for valid input
             vertex = self.graphCreationCanvas.focusNode
             self.nodeNameLineEdit.setText(self.network.node[vertex]['label'])
             self.nodeXLineEdit.setText(str(self.network.node[vertex]['position'][0]))
             self.nodeYLineEdit.setText(str(self.network.node[vertex]['position'][1]))
-
         else:
             self.nodeNameLineEdit.setText("")
             self.nodeXLineEdit.setText("")
             self.nodeYLineEdit.setText("")
 
-        self.setFocus()
-
+        self.setFocus()  # Focus has to leave LineEdits
 
     def update_node(self):
         """Update attributes of focusNode"""
@@ -250,16 +205,13 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         XPos = str(self.nodeXLineEdit.text())
         YPos = str(self.nodeYLineEdit.text())
         if len(nodeName) > 0 and len(XPos) > 0 and len(YPos) > 0:
-            # TO DO: Check for valid input
             vertex = self.graphCreationCanvas.focusNode
-
             if nodeName != self.network.node[vertex]['label']:
                 self.network.node[vertex]['label'] = nodeName
                 item = self.nodeToListItem[vertex]
-                self.nodeSelectionListWidget.takeItem(self.nodeSelectionListWidget.row(item))     # Delete item
+                self.nodeSelectionListWidget.takeItem(self.nodeSelectionListWidget.row(item))  # Delete item
                 self.add_node_to_list(vertex)
-                self.nodeSelectionListWidget.sortItems()
-
+                self.nodeSelectionListWidget.sortItems()  # Re-sort
 
             movedBool = (self.network.node[vertex]['position'] != (int(XPos), int(YPos)))
             self.network.node[vertex]['position'] = (int(XPos), int(YPos))
@@ -267,10 +219,6 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
             self.graphCreationCanvas.update_nodes(moved=movedBool)  # Update UI
             if movedBool:
                 self.graphCreationCanvas.update_edges(moved=movedBool)
-
-
-
-
 
     def delete_node(self):
         """Delete focusNode from network"""
@@ -283,32 +231,28 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
             index = self.nodeSelectionListWidget.row(item)
             self.nodeSelectionListWidget.takeItem(index)
 
-
             for edge in self.network.edges():
                 if vertex in edge:
                     item = self.edgeToListItem[edge]
                     index = self.edgeSelectionListWidget.row(item)
                     self.edgeSelectionListWidget.takeItem(index)
 
-
             self.graphCreationCanvas.update_nodes(removal=True, color=True)
             numberOfEdges = self.network.number_of_edges()
             self.network.remove_node(vertex)
+
             removedEdgeBool = (numberOfEdges > self.network.number_of_edges())
             self.graphCreationCanvas.focusNode = None
 
             if removedEdgeBool:
                 self.graphCreationCanvas.update_edges(removal=True)
 
-            # Update UI
-            self.update_node_display()
+            self.update_node_display()  # Update UI
 
     def update_edge_display(self):
         """Update display of the properties of the currently focussed edge focusEdge, if existing"""
         edge = self.graphCreationCanvas.focusEdge
-
         if edge is not None:
-            # TO DO: Check for valid input
             self.tailLineEdit.setText(self.network.node[edge[0]]['label'])
             self.headLineEdit.setText(self.network.node[edge[1]]['label'])
             self.transitTimeLineEdit.setText(
@@ -321,7 +265,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
             self.transitTimeLineEdit.setText("")
             self.capacityLineEdit.setText("")
 
-        self.setFocus()
+        self.setFocus()  # Focus has to leave LineEdits
 
     def update_add_edge(self):
         """Add an edge or update attributes of focusNode, if existing"""
@@ -355,8 +299,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
             self.add_edge_to_list((tail, head))
             self.edgeSelectionListWidget.sortItems()
 
-        # Update UI
-        self.update_edge_display()
+        self.update_edge_display()  # Update UI
 
     def delete_edge(self):
         """Delete focusEdge from network"""
@@ -374,26 +317,16 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
 
             self.graphCreationCanvas.focusEdge = None
 
-            # Update UI
-            self.update_edge_display()
+            self.update_edge_display()  # Update UI
 
     def re_init_graph_creation_app(self, NoNewGraph=False):
         """
         Clears the graph creation tab for new graph creation
         :param NoNewGraph: (bool) - specify whether a new graph should be initiated or the old one kept
         """
-
         if not NoNewGraph:
             self.network = self.init_graph()  # Reinstantiation of the CurrentGraph
             self.output("Clearing graph")
-        '''
-        labels = nx.single_source_dijkstra_path_length(G=self.network, source='s',
-                                                       weight='transitTime')
-        for node in self.network.nodes():
-            if node not in labels:
-                print "Removed node: ", str(node)
-                self.network.remove_node(node)
-        '''
 
         # Reinitialization of graphCreationCanvas
         self.graphCreationCanvas.setParent(None)  # Drop graphCreationCanvas widget
@@ -408,10 +341,10 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.re_init_node_list()
         self.re_init_edge_list()
 
-
-
     def re_init_nashflow_app(self):
+        """Clears the nashflow tab for new nashflow computation"""
         self.computeIntervalPushButton.setEnabled(True)
+
         # Configure plotNTFFrame to display plots of NTF
         if self.plotNTFCanvas is not None:
             self.plotNTFCanvas.setParent(None)
@@ -425,28 +358,27 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
             self.plotAnimationCanvas.setParent(None)
 
         self.animationUpperBound = self.nashFlow.node_label('t', self.nashFlow.flowIntervals[-1][1]) \
-                if self.nashFlow.flowIntervals[-1][1] < float('inf') \
-                else Utilities.round_up(self.nashFlow.node_label('t', self.nashFlow.flowIntervals[-1][0]))
+            if self.nashFlow.flowIntervals[-1][1] < float('inf') \
+            else Utilities.round_up(self.nashFlow.node_label('t', self.nashFlow.flowIntervals[-1][0]))
 
         self.animationStartLineEdit.setText("%.2f" % self.animationLowerBound)
         self.animationEndLineEdit.setText("%.2f" % self.animationUpperBound)
 
-
-
-        self.plotAnimationCanvas = PlotAnimationCanvas(nashflow=self.nashFlow, interface=self, upperBound=self.animationUpperBound, stretchFactor=self.plotAnimationCanvasStretchFactor)
+        self.plotAnimationCanvas = PlotAnimationCanvas(nashflow=self.nashFlow, interface=self,
+                                                       upperBound=self.animationUpperBound,
+                                                       stretchFactor=self.plotAnimationCanvasStretchFactor)
         self.plotAnimationFrameLayout.addWidget(self.plotAnimationCanvas)
         self.timeSlider.setMaximum(99)
         self.output("Generating animation")
         self.timeSlider.setValue(0)
 
-
-
         # Configure plotDiagramFrame
         if self.plotDiagramCanvas is not None:
             self.plotDiagramCanvas.setParent(None)
-        self.plotDiagramCanvas = PlotValuesCanvas(callback=self.callback_plotValuesCanvas)
+        self.plotDiagramCanvas = PlotValuesCanvas(callback=self.callback_plotvaluescanvas)
         self.plotDiagramLayout.addWidget(self.plotDiagramCanvas)
 
+        # Display statistics
         self.statNumberOfNodesLabel.setText(str(self.nashFlow.network.number_of_nodes()))
         self.statNumberOfEdgesLabel.setText(str(self.nashFlow.network.number_of_edges()))
         avgNodes, avgEdges = self.nashFlow.get_stat_preprocessing()
@@ -459,16 +391,12 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.statAvgTimeLabel.setText(str(avgTime))
         self.statTotalTimeLabel.setText(str(totalTime))
 
-
-
-
     def load_graph(self):
         """Load CurrentGraph instance from '.cg' file"""
         dialog = QtGui.QFileDialog
-        # noinspection PyCallByClass
         fopen = dialog.getOpenFileName(self, "Select File", self.defaultLoadSaveDir, "network files (*.cg)")
 
-        if os.name != 'posix':
+        if os.name != 'posix':  # For Windows
             fopen = fopen[0]
         if len(fopen) == 0:
             return
@@ -487,7 +415,6 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
 
     def save_graph(self):
         """Save CurrentGraph instance to '.cg' file"""
-
         self.network.graph['inflowRate'] = float(self.inflowLineEdit.text())
 
         dialog = QtGui.QFileDialog
@@ -530,9 +457,9 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.add_intervals_to_list()
 
         self.tabWidget.setCurrentIndex(1)
+
     def save_nashflow(self):
         """Save Nashflow instance to '.nf' file"""
-
         dialog = QtGui.QFileDialog
         fsave = dialog.getSaveFileName(self, "Select File", "", "nash flow files (*.nf)")
 
@@ -547,6 +474,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.defaultLoadSaveDir = os.path.dirname(fsave)
         self.save_config()
         self.output("Saving nash flow: " + str(fsave))
+
         # Save network instance to file
         with open(fsave, 'wb') as f:
             pickle.dump(self.nashFlow, f)
@@ -566,9 +494,6 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.outputDirectoryLineEdit.setText(fselect)
         self.outputDirectory = fselect
 
-
-
-
     def select_scip_binary(self):
         """Select scip binary"""
         defaultDir = '' if not os.path.isfile(self.scipFile) else os.path.dirname(self.scipFile)
@@ -585,6 +510,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.scipFile = fselect
 
     def load_config(self):
+        """Try to load the config file"""
         self.configFile.add_section('Settings')
         self.configFile.set('Settings', 'outputdir', '')
         self.configFile.set('Settings', 'templatefile', '0')
@@ -618,11 +544,12 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
 
             self.output("Loading config: Success")
 
-        except Exception as err:
+        except Exception:
             self.output("Loading config: Failure")
             return
 
     def save_config(self):
+        """Save the config file"""
         self.configFile.set('Settings', 'outputdir', self.outputDirectory)
         self.configFile.set('Settings', 'templatefile', self.templateFile)
         self.configFile.set('Settings', 'scippath', self.scipFile)
@@ -636,8 +563,11 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
 
         self.output("Saving config: config.cfg")
 
-    def compute_nash_flow(self, next=False):
-
+    def compute_nash_flow(self, nextIntervalOnly=False):
+        """
+        Computes a nash flow
+        :param nextIntervalOnly: If this is True, only one interval(i.e. the next one) is computed
+        """
         # Get remaining settings
         self.numberOfIntervals = self.intervalsLineEdit.text()
         self.templateFile = self.templateComboBox.currentIndex()
@@ -647,19 +577,19 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.tabWidget.setCurrentIndex(1)  # Switch to next tab
         timeout = -1 if not self.timeoutActivated else float(self.timeoutLineEdit.text())
 
-        if not next:
+        if not nextIntervalOnly:
             numberString = str(self.numberOfIntervals) if float(self.numberOfIntervals) != -1 else "all"
             self.output("Starting computation of " + numberString + " flow intervals")
-            self.nashFlow = NashFlow(self.network, float(inflowRate), float(self.numberOfIntervals), self.outputDirectory,
+            self.nashFlow = NashFlow(self.network, float(inflowRate), float(self.numberOfIntervals),
+                                     self.outputDirectory,
                                      self.templateFile, self.scipFile, self.cleanUpEnabled, timeout)
         else:
             self.output("Starting computation of next flow interval")
-        self.nashFlow.run(next=next)
+        self.nashFlow.run(next=nextIntervalOnly)
 
         self.output("Computation complete in " + "%.2f" % self.nashFlow.computationalTime + " seconds")
 
         self.re_init_nashflow_app()
-
         self.add_intervals_to_list()
 
         self.intervalsListWidget.setCurrentRow(0)
@@ -669,27 +599,30 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
             self.computeIntervalPushButton.setEnabled(False)
 
     def compute_next_interval(self):
+        """Computes next interval"""
         if self.nashFlow is None:
             self.numberOfIntervals = 1
             self.compute_nash_flow()
         else:
-            self.compute_nash_flow(next=True)
+            self.compute_nash_flow(nextIntervalOnly=True)
 
     def add_intervals_to_list(self):
+        """Adds NTF-intervals to the ListWidget"""
         for index, interval in enumerate(self.nashFlow.flowIntervals):
             intervalString = 'Interval ' + str(interval[2].id) + ': [' + str("%.2f" % interval[0]) + ',' + str(
                 "%.2f" % interval[1]) + '['
             item = QtGui.QListWidgetItem(intervalString)
-            item.setBackgroundColor(QtGui.QColor(self.plotAnimationCanvas.NTFColors[index % len(self.plotAnimationCanvas.NTFColors)]))
-            #item.setTextColor(QtGui.QColor(self.plotAnimationCanvas.NTFColors[index % len(self.plotAnimationCanvas.NTFColors)]))
-
+            item.setBackgroundColor(
+                QtGui.QColor(self.plotAnimationCanvas.NTFColors[index % len(self.plotAnimationCanvas.NTFColors)]))
             self.intervalsListWidget.addItem(item)  # Add item to listWidget
 
-            plot = PlotNTFCanvas(interval[2].shortestPathNetwork, self, intervalID=index, stretchFactor=self.plotNTFCanvasStretchFactor,
+            plot = PlotNTFCanvas(interval[2].shortestPathNetwork, self, intervalID=index,
+                                 stretchFactor=self.plotNTFCanvasStretchFactor,
                                  showNoFlowEdges=self.showEdgesWithoutFlowCheckBox.isChecked())
             self.NTFPlotList.append(plot)  # Add NTF Plot to List
 
-    def update_NTF_display(self):
+    def update_ntf_display(self):
+        """Update plot of NTF corresponding to currently selected NTF in ListWidget"""
         rowID = self.intervalsListWidget.currentRow()
         lastViewPoint = None
         if rowID < 0:
@@ -705,37 +638,32 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
             else:
                 item.setFont(boldFont)
 
-
-
-
         if self.plotNTFCanvas is not None:
             lastViewPoint = self.plotNTFCanvas.get_viewpoint()
             self.plotNTFCanvas.setParent(None)
 
         self.plotNTFCanvas = self.NTFPlotList[rowID]
-        self.plotNTFCanvas.set_viewpoint(viewPoint=lastViewPoint)
+        self.plotNTFCanvas.set_viewpoint(viewPoint=lastViewPoint)  # Set viewpoint of plotNTF
 
         self.plotNTFFrameLayout.addWidget(self.plotNTFCanvas)
-
-        self.callback_plotValuesCanvas(self.nashFlow.flowIntervals[rowID][0], False)
+        self.callback_plotvaluescanvas(self.nashFlow.flowIntervals[rowID][0], False)  # Update plotValues
 
     def slider_value_change(self):
+        """Slot function for changes of slider val"""
         self.plotAnimationCanvas.time_changed(self.timeSlider.value())
-
-        time = self.plotAnimationCanvas.get_time_from_tick(self.timeSlider.value())
-        self.plotDiagramCanvas.change_vline_position(time)
-
-        self.currentSliderTimeLabel.setText("%.2f" % time)
-
+        currentTime = self.plotAnimationCanvas.get_time_from_tick(self.timeSlider.value())
+        self.plotDiagramCanvas.change_vline_position(currentTime)
+        self.currentSliderTimeLabel.setText("%.2f" % currentTime)
 
     def slider_released(self):
-        time = self.plotAnimationCanvas.get_time_from_tick(self.timeSlider.value())
+        """Slot function for slider release"""
+        currentTime = self.plotAnimationCanvas.get_time_from_tick(self.timeSlider.value())
         lastViewPoint = None
         # Adjust NTF if necessary
         for index, interval in enumerate(self.nashFlow.flowIntervals):
             lowerBound = interval[0]
             upperBound = interval[1]
-            if lowerBound <= time < upperBound:
+            if lowerBound <= currentTime < upperBound:
                 if self.intervalsListWidget.currentRow != index:
                     self.intervalsListWidget.setCurrentRow(index)
                     if self.plotNTFCanvas is not None:
@@ -746,7 +674,6 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
                     self.plotNTFCanvas.set_viewpoint(viewPoint=lastViewPoint)
                     self.plotNTFFrameLayout.addWidget(self.plotNTFCanvas)
                 break
-
 
         rowID = self.intervalsListWidget.currentRow()
 
@@ -759,12 +686,11 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
                 item.setFont(normalFont)
             else:
                 item.setFont(boldFont)
-                #item.setSelected(False)
 
-    def update_node_label_graph(self):
+    def update_node_label_diagram(self):
+        """Update diagram of node label of focusNode"""
         if self.plotAnimationCanvas.focusNode is None:
             return
-
         v = self.plotAnimationCanvas.focusNode
 
         lowerBound = self.animationLowerBound
@@ -774,7 +700,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         yValues = [self.nashFlow.node_label(v, 0)]
         for interval in self.nashFlow.flowIntervals:
             if interval[1] < float('inf'):
-                xValues.append(interval[1])
+                xValues.append(interval[1])  # append upperBound of each interval
                 yValues.append(self.nashFlow.node_label(v, interval[1]))
 
         if upperBound > xValues[-1] and self.nashFlow.flowIntervals[-1][1] == float('inf'):
@@ -783,15 +709,14 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
 
         self.plotDiagramCanvas.update_plot(lowerBound, upperBound, ["Earliest arrival time"], xValues, yValues)
 
-
-    def update_edge_graphs(self):
+    def update_edge_diagrams(self):
+        """Update diagram of node label of focusNode"""
         if self.plotAnimationCanvas.focusEdge is None:
             return
         v, w = self.plotAnimationCanvas.focusEdge[0], self.plotAnimationCanvas.focusEdge[1]
 
         lowerBound = self.animationLowerBound
         upperBound = self.animationUpperBound
-
 
         inflowXValues = self.nashFlow.network[v][w]['cumulativeInflow'].keys()
         inflowYValues = self.nashFlow.network[v][w]['cumulativeInflow'].values()
@@ -820,25 +745,32 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
             lastInflowInterval = next(reversed(self.nashFlow.network[v][w]['inflow']))
             lastInflow = self.nashFlow.network[v][w]['inflow'][lastInflowInterval]
 
-            val = max(0, lastQueueSize + (lastInflow - self.nashFlow.network[v][w]['capacity']) * (upperBound - lastInflowInterval[0]))
+            val = max(0, lastQueueSize + (lastInflow - self.nashFlow.network[v][w]['capacity']) * (
+                upperBound - lastInflowInterval[0]))
 
             queueXValues.append(upperBound)
             queueYValues.append(val)
 
-        self.plotDiagramCanvas.update_plot(lowerBound, upperBound, ["Cumulative Inflow", "Cumulative Outflow", "Queue size"], inflowXValues, inflowYValues, (outflowXValues, outflowYValues), (queueXValues, queueYValues))
+        self.plotDiagramCanvas.update_plot(lowerBound, upperBound,
+                                           ["Cumulative Inflow", "Cumulative Outflow", "Queue size"], inflowXValues,
+                                           inflowYValues, (outflowXValues, outflowYValues),
+                                           (queueXValues, queueYValues))
 
-    def set_plot_range(self):
+    def update_diagrams(self):
+        """Update diagrams of focusEdge or focusNode, depending on whats selected"""
         if self.plotAnimationCanvas.focusEdge is not None:
-            self.update_edge_graphs()
+            self.update_edge_diagrams()
         elif self.plotAnimationCanvas.focusNode is not None:
-            self.update_node_label_graph()
+            self.update_node_label_diagram()
 
     def change_cleanup_state(self):
+        """Active/Deactive cleanup"""
         self.cleanUpEnabled = (self.cleanUpCheckBox.isChecked())
 
     def pressed_delete(self):
+        """Slot for DEL Key"""
         if self.tabWidget.currentIndex() != 0:
-            # Deletion only possible in graph creation mode (i.e. tab 1 is focussed)
+            # Deletion only possible in graph creation mode (i.e. tab 0 is focussed)
             return
 
         if self.graphCreationCanvas.focusNode is not None:
@@ -847,13 +779,19 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
             self.delete_edge()
 
     def set_new_time_manually(self):
+        """Set animation timepoint manually"""
         if self.setTimeLineEdit.text() == "":
             return
         else:
             val = float(self.setTimeLineEdit.text())
-            self.callback_plotValuesCanvas(xVal=val, updateNTF=True)
+            self.callback_plotvaluescanvas(xVal=val, updateNTF=True)
 
-    def callback_plotValuesCanvas(self, xVal, updateNTF=True):
+    def callback_plotvaluescanvas(self, xVal, updateNTF=True):
+        """
+        Callback function for plotValuesCanvas
+        :param xVal: selected time
+        :param updateNTF: if true, then the NTF plot has to be updated
+        """
         xVal = float("%.2f" % xVal)
 
         valueTol = 1e-2
@@ -862,7 +800,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
 
         try:
             # Check if there already exists a timepoint which is sufficiently close
-            xVal = next(time for time in self.plotAnimationCanvas.timePoints if Utilities.is_eq_tol(time, xVal, valueTol))
+            xVal = next(t for t in self.plotAnimationCanvas.timePoints if Utilities.is_eq_tol(t, xVal, valueTol))
         except StopIteration:
             # Add the time point
             self.plotAnimationCanvas.add_time(xVal)
@@ -873,9 +811,11 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
             self.slider_released()
 
     def export_diagram(self):
+        """Export diagram to PDF or PGF"""
         fileType = 'pdf' if self.exportComboBox.currentIndex() == 0 else 'pgf'
         dialog = QtGui.QFileDialog
-        fsave = dialog.getSaveFileName(self, "Select File", self.defaultLoadSaveDir, fileType + " files (*." + fileType + ")")
+        fsave = dialog.getSaveFileName(self, "Select File", self.defaultLoadSaveDir,
+                                       fileType + " files (*." + fileType + ")")
 
         if os.name != 'posix':
             fsave = fsave[0]
@@ -892,31 +832,30 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
 
         self.plotDiagramCanvas.export(path=fsave)
 
-    def update_plotAnimationCanvas_focusSelection(self):
+    def update_plotanimationcanvas_focusselection(self):
+        """Update labels in Tab1 when focus changes"""
         if self.plotAnimationCanvas.focusNode is not None:
-            self.currentFocusLineEdit.setText(str(self.plotAnimationCanvas.focusNode))
-            self.currentCapacityLineEdit.setText("N/A")
-            self.currentTransitTimeLineEdit.setText("N/A")
+            self.currentFocusLabel.setText(str(self.plotAnimationCanvas.focusNode))
+            self.currentCapacityLabel.setText("N/A")
+            self.currentTransitTimeLabel.setText("N/A")
         elif self.plotAnimationCanvas.focusEdge is not None:
             v, w = self.plotAnimationCanvas.focusEdge
-            self.currentFocusLineEdit.setText(str((self.network.node[v]['label'], self.network.node[w]['label'])))
-            self.currentCapacityLineEdit.setText(str(self.network[v][w]['capacity']))
-            self.currentTransitTimeLineEdit.setText(str(self.network[v][w]['transitTime']))
+            self.currentFocusLabel.setText(str((self.network.node[v]['label'], self.network.node[w]['label'])))
+            self.currentCapacityLabel.setText(str(self.network[v][w]['capacity']))
+            self.currentTransitTimeLabel.setText(str(self.network[v][w]['transitTime']))
         else:
-            self.currentFocusLineEdit.setText("N/A")
-            self.currentCapacityLineEdit.setText("N/A")
-            self.currentTransitTimeLineEdit.setText("N/A")
-
+            self.currentFocusLabel.setText("N/A")
+            self.currentCapacityLabel.setText("N/A")
+            self.currentTransitTimeLabel.setText("N/A")
 
     def change_no_flow_show_state(self):
+        """Show/Hide edges without flow in each NTF Plot"""
         for NTF in self.NTFPlotList:
             NTF.change_edge_show_status(show=self.showEdgesWithoutFlowCheckBox.isChecked())
 
-
     def update_focus_node(self):
+        """Select new focusNode"""
         self.graphCreationCanvas.focusEdge = None
-
-
         index = self.nodeSelectionListWidget.currentRow()
         item = self.nodeSelectionListWidget.item(index)
         node = self.nodeToListItem.keys()[self.nodeToListItem.values().index(item)]
@@ -927,9 +866,8 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.update_edge_display()
 
     def update_focus_edge(self):
+        """Select new focusEdge"""
         self.graphCreationCanvas.focusNode = None
-
-
         index = self.edgeSelectionListWidget.currentRow()
         item = self.edgeSelectionListWidget.item(index)
         edge = self.edgeToListItem.keys()[self.edgeToListItem.values().index(item)]
@@ -940,6 +878,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.update_edge_display()
 
     def re_init_node_list(self):
+        """Clear and fill node list"""
         self.nodeSelectionListWidget.clear()
         self.nodeToListItem = dict()
         for node in self.network.nodes():
@@ -948,6 +887,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.nodeSelectionListWidget.sortItems()
 
     def re_init_edge_list(self):
+        """Clear and fill edge list"""
         self.edgeSelectionListWidget.clear()
         self.edgeToListItem = dict()
         for edge in self.network.edges():
@@ -956,12 +896,20 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.edgeSelectionListWidget.sortItems()
 
     def add_node_to_list(self, node):
+        """
+        Add single node to list
+        :param node: node which will be added to ListWidget
+        """
         nodeString = 'Node ' + str(node) + ': ' + self.network.node[node]['label']
         item = QtGui.QListWidgetItem(nodeString)
         self.nodeToListItem[node] = item
         self.nodeSelectionListWidget.addItem(item)  # Add item to listWidget
 
     def add_edge_to_list(self, edge):
+        """
+        Add single edge to list
+        :param edge: edge which will be added to ListWidget
+        """
         v, w = edge
         edgeString = 'Edge: ' + str((self.network.node[v]['label'], self.network.node[w]['label']))
         item = QtGui.QListWidgetItem(edgeString)
@@ -969,14 +917,17 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.edgeSelectionListWidget.addItem(item)  # Add item to listWidget
 
     def change_timeout_state(self):
+        """Activate/Deactivate Timeout"""
         self.timeoutActivated = self.activateTimeoutCheckBox.isChecked()
         self.timeoutLabel.setEnabled(self.timeoutActivated)
         self.timeoutLineEdit.setEnabled(self.timeoutActivated)
 
     def play_animation(self):
+        """Slot to play animation"""
+
         def animate(FPS=4):
             while self.animationRunning and self.timeSlider.value() < self.timeSlider.maximum():
-                time.sleep(1/float(FPS))
+                time.sleep(1 / float(FPS))
                 self.timeSlider.setValue(self.timeSlider.value() + 1)
             self.animationRunning = False
 
@@ -986,12 +937,13 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         t = threading.Thread(target=animate)
         t.start()
 
-
     def pause_animation(self):
+        """Slot to pause animation"""
         self.output("Pausing animation")
         self.animationRunning = False
 
     def stop_animation(self):
+        """Slot to stop animation and jump to beginning"""
         self.animationRunning = False
         self.output("Stopping animation")
         time.sleep(0.5)
@@ -999,6 +951,10 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.timeSlider.setValue(0)
 
     def output(self, txt):
-        time = Utilities.get_time_for_log()
-        logText = time + " - " + txt
+        """
+        Write to log
+        :param txt: will be written to log
+        """
+        currentTime = Utilities.get_time_for_log()
+        logText = currentTime + " - " + txt
         self.logPlainTextEdit.appendPlainText(logText)
