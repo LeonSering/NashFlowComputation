@@ -55,7 +55,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
 
 
         self.outputDirectory = ''
-        self.templateFile = ''
+        self.templateFile = 0
         self.scipFile = ''
         self.timeoutActivated = False
 
@@ -85,7 +85,6 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.updateEdgeButton.clicked.connect(self.update_add_edge)
         self.deleteEdgeButton.clicked.connect(self.delete_edge)
         self.outputDirectoryPushButton.clicked.connect(self.select_output_directory)
-        self.templateFilePushButton.clicked.connect(self.select_template_file)
         self.scipPathPushButton.clicked.connect(self.select_scip_binary)
         self.computeFlowPushButton.clicked.connect(self.compute_nash_flow)
         self.cleanUpCheckBox.clicked.connect(self.change_cleanup_state)
@@ -567,20 +566,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.outputDirectoryLineEdit.setText(fselect)
         self.outputDirectory = fselect
 
-    def select_template_file(self):
-        """Select zimpl template file"""
-        defaultDir = '' if not os.path.isfile(self.templateFile) else os.path.dirname(self.templateFile)
-        dialog = QtGui.QFileDialog
-        fselect = dialog.getOpenFileName(self, "Select File", defaultDir, "zimpl files (*.zpl)")
 
-        if os.name != 'posix':
-            fselect = fselect[0]
-        if len(fselect) == 0:
-            return
-        fselect = str(fselect)
-        self.output("Selecting template file: " + str(fselect))
-        self.templateFileLineEdit.setText(fselect)
-        self.templateFile = fselect
 
 
     def select_scip_binary(self):
@@ -601,7 +587,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
     def load_config(self):
         self.configFile.add_section('Settings')
         self.configFile.set('Settings', 'outputdir', '')
-        self.configFile.set('Settings', 'templatefile', '')
+        self.configFile.set('Settings', 'templatefile', '0')
         self.configFile.set('Settings', 'scippath', '')
         self.configFile.set('Settings', 'cleanup', 'True')
         self.configFile.set('Settings', 'intervals', '-1')
@@ -613,8 +599,8 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
 
             self.outputDirectory = self.configFile.get('Settings', 'outputdir')
             self.outputDirectoryLineEdit.setText(self.outputDirectory)
-            self.templateFile = self.configFile.get('Settings', 'templatefile')
-            self.templateFileLineEdit.setText(self.templateFile)
+            self.templateFile = int(self.configFile.get('Settings', 'templatefile'))
+            self.templateComboBox.setCurrentIndex(self.templateFile)
             self.scipFile = self.configFile.get('Settings', 'scippath')
             self.scipPathLineEdit.setText(self.scipFile)
 
@@ -654,6 +640,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
 
         # Get remaining settings
         self.numberOfIntervals = self.intervalsLineEdit.text()
+        self.templateFile = self.templateComboBox.currentIndex()
         inflowRate = float(self.inflowLineEdit.text())
 
         self.save_config()  # Save config-settings to file

@@ -23,7 +23,13 @@ class NashFlow:
         self.inflowRate = inflowRate  # For the moment: constant
         self.numberOfIntervals = numberOfIntervals
         self.outputDirectory = outputDirectory
-        self.templateFile = templateFile
+
+
+        self.templateFile = os.path.join(os.getcwd(), 'source', 'templates', 'algorithm_' + str(templateFile +1) + '.zpl')
+        self.advancedAlgo = (templateFile == 2)
+
+
+
         self.scipFile = scipFile
         self.cleanUpBool = cleanUpBool
         self.numberOfSolvedIPs = 0
@@ -78,7 +84,7 @@ class NashFlow:
 
         interval = FlowInterval(self.network, resettingEdges=resettingEdges, lowerBoundTime=lowerBoundTime,
                                 inflowRate=self.inflowRate, minCapacity=self.minCapacity, counter=self.counter,
-                                outputDirectory=self.rootPath, templateFile=self.templateFile, scipFile=self.scipFile, timeout=self.timeout)
+                                outputDirectory=self.rootPath, templateFile=self.templateFile, scipFile=self.scipFile, timeout=self.timeout,)
 
         if lowerBoundTime == 0:
             interval.shortestPathNetwork = Utilities.get_shortest_path_network(self.network)  # Compute shortest path network
@@ -87,8 +93,10 @@ class NashFlow:
                 v: self.node_label(v, lowerBoundTime) for v in self.network})  # Compute shortest path network
 
         start = time.time()
-        interval.get_NTF_advanced()
-        #interval.get_NTF()
+        if self.advancedAlgo:
+            interval.get_NTF_advanced()
+        else:
+            interval.get_NTF()
 
         end = time.time()
         self.computationalTime += (end-start)

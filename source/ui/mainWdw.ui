@@ -357,7 +357,7 @@
           <x>10</x>
           <y>550</y>
           <width>1121</width>
-          <height>201</height>
+          <height>181</height>
          </rect>
         </property>
         <property name="styleSheet">
@@ -448,23 +448,13 @@
          <property name="geometry">
           <rect>
            <x>10</x>
-           <y>70</y>
-           <width>121</width>
+           <y>120</y>
+           <width>171</width>
            <height>17</height>
           </rect>
          </property>
          <property name="text">
-          <string>Template file</string>
-         </property>
-        </widget>
-        <widget class="QLineEdit" name="templateFileLineEdit">
-         <property name="geometry">
-          <rect>
-           <x>10</x>
-           <y>90</y>
-           <width>601</width>
-           <height>21</height>
-          </rect>
+          <string>Algorithm &amp; Template</string>
          </property>
         </widget>
         <widget class="QPushButton" name="outputDirectoryPushButton">
@@ -480,24 +470,11 @@
           <string>Select directory</string>
          </property>
         </widget>
-        <widget class="QPushButton" name="templateFilePushButton">
-         <property name="geometry">
-          <rect>
-           <x>620</x>
-           <y>90</y>
-           <width>131</width>
-           <height>21</height>
-          </rect>
-         </property>
-         <property name="text">
-          <string>Select file</string>
-         </property>
-        </widget>
         <widget class="QLineEdit" name="scipPathLineEdit">
          <property name="geometry">
           <rect>
            <x>10</x>
-           <y>140</y>
+           <y>90</y>
            <width>601</width>
            <height>21</height>
           </rect>
@@ -507,7 +484,7 @@
          <property name="geometry">
           <rect>
            <x>10</x>
-           <y>120</y>
+           <y>70</y>
            <width>121</width>
            <height>17</height>
           </rect>
@@ -520,7 +497,7 @@
          <property name="geometry">
           <rect>
            <x>620</x>
-           <y>140</y>
+           <y>90</y>
            <width>131</width>
            <height>21</height>
           </rect>
@@ -587,14 +564,39 @@
           <string>Activate timeout</string>
          </property>
         </widget>
+        <widget class="QComboBox" name="templateComboBox">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>140</y>
+           <width>741</width>
+           <height>31</height>
+          </rect>
+         </property>
+         <item>
+          <property name="text">
+           <string>1. Basic algorithm by Cominetti, Correa and Larré</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>2. Solve only LP/IP</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>3. Advanced algorithm</string>
+          </property>
+         </item>
+        </widget>
        </widget>
        <widget class="QPushButton" name="computeFlowPushButton">
         <property name="geometry">
          <rect>
           <x>730</x>
-          <y>760</y>
+          <y>750</y>
           <width>401</width>
-          <height>171</height>
+          <height>181</height>
          </rect>
         </property>
         <property name="text">
@@ -634,9 +636,9 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>760</y>
+          <y>750</y>
           <width>701</width>
-          <height>171</height>
+          <height>181</height>
          </rect>
         </property>
         <property name="verticalScrollBarPolicy">

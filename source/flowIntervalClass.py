@@ -35,7 +35,6 @@ class FlowInterval:
         self.timeout = timeout
 
 
-
         self.foundNTF = False
         self.aborted = False
         self.alpha = None
@@ -91,7 +90,7 @@ class FlowInterval:
         self.upperBoundTime = self.lowerBoundTime + self.alpha
 
     def get_NTF(self):
-        USE_PREPROCESSING = True
+        USE_PREPROCESSING = False
         graph = self.shortestPathNetwork
         resettingEdges = self.resettingEdges
         self.counter = 0
