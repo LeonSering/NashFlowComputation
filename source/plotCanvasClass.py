@@ -539,8 +539,12 @@ class PlotCanvas(FigureCanvas):
         lbls = self.get_edge_labels()
         for edge, label in self.edgeLabelCollection.iteritems():  # type(label) = matplotlib.text.Text object
             v, w = edge
-            lblTuple = lbls[(v, w)]  # (self.network[v][w]['capacity'], self.network[v][w]['transitTime'])
-            #                lblTuple = "%.2f" % self.NTFEdgeFlowDict[edge]
+            if self.focusNode is not None:
+                if v not in self.focusNode and w not in self.focusNode:
+                    # No need to update anything
+                    continue
+
+            lblTuple = lbls[(v, w)]
             if label.get_text() != lblTuple:
                 label.set_text(lblTuple)
             posv = (self.network.node[v]['position'][0] * 0.5, self.network.node[v]['position'][1] * 0.5)
@@ -548,7 +552,8 @@ class PlotCanvas(FigureCanvas):
             pos = (posv[0] + posw[0], posv[1] + posw[1])
             label.set_position(pos)
 
-            # label.set_rotation(0.0)
+            rotAngle = Utilities.get_edge_label_rotation(self.axes, posv, posw, pos)
+            label.set_rotation(rotAngle)
 
         self.draw_idle()
 

@@ -53,7 +53,29 @@ class Utilities:
     def get_insertion_point_left(L, el):
         return bisect.bisect_left(L, el)
 
-
+    @staticmethod
+    def get_edge_label_rotation(axes, src, dst, pos):
+        """
+        Modified from networkx plotting edge label function
+        :param axes: 
+        :param src: 
+        :param dst: 
+        :param pos: 
+        :return: 
+        """
+        x1, y1 = src
+        x2, y2 = dst
+        angle = np.arctan2(y2 - y1, x2 - x1) / (2.0 * np.pi) * 360  # degrees
+        # make label orientation "right-side-up"
+        if angle > 90:
+            angle -= 180
+        if angle < - 90:
+            angle += 180
+        # transform data coordinate angle to screen coordinate angle
+        xy = np.array(pos)
+        trans_angle = axes.transData.transform_angles(np.array((angle,)),
+                                                    xy.reshape((1, 2)))[0]
+        return trans_angle
 
     @staticmethod
     def get_shortest_path_network(network, labels=None):
