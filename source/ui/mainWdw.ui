@@ -42,7 +42,7 @@
        </sizepolicy>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="tab">
        <attribute name="title">
@@ -965,7 +965,7 @@
           <string>Focus:</string>
          </property>
         </widget>
-        <widget class="QLabel" name="currentFocusLineEdit">
+        <widget class="QLabel" name="currentFocusLabel">
          <property name="geometry">
           <rect>
            <x>60</x>
@@ -978,7 +978,7 @@
           <string>N/A</string>
          </property>
         </widget>
-        <widget class="QLabel" name="currentCapacityLineEdit">
+        <widget class="QLabel" name="currentCapacityLabel">
          <property name="geometry">
           <rect>
            <x>210</x>
@@ -1017,7 +1017,7 @@
           <string>Transit time:</string>
          </property>
         </widget>
-        <widget class="QLabel" name="currentTransitTimeLineEdit">
+        <widget class="QLabel" name="currentTransitTimeLabel">
          <property name="geometry">
           <rect>
            <x>390</x>

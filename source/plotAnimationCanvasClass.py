@@ -299,9 +299,9 @@ class PlotAnimationCanvas(PlotCanvas):
                 # Selected an existing edge
                 self.focusEdge = clickedEdge
                 self.focusNode = None
-                self.interface.update_edge_graphs()
-                self.interface.update_node_label_graph()
-                self.interface.update_plotAnimationCanvas_focusSelection()
+                self.interface.update_edge_diagrams()
+                self.interface.update_node_label_diagram()
+                self.interface.update_plotanimationcanvas_focusselection()
                 self.update_edges(color=True)
                 self.update_nodes(color=True)
             elif clickedNode is not None:
@@ -310,9 +310,9 @@ class PlotAnimationCanvas(PlotCanvas):
                 self.mouseLeftPressTime = None
                 self.update_nodes(added=False, color=True)
                 self.update_edges(color=True)
-                self.interface.update_plotAnimationCanvas_focusSelection()
-                self.interface.update_node_label_graph()
-                self.interface.update_edge_graphs()
+                self.interface.update_plotanimationcanvas_focusselection()
+                self.interface.update_node_label_diagram()
+                self.interface.update_edge_diagrams()
 
         elif action == 2:
             # Wheel was clicked, move visible part of canvas

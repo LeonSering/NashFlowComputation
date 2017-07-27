@@ -2,82 +2,89 @@
 # Author:       Max ZIMMER
 # Project:      NashFlowComputation 2017
 # File:         flowIntervalClass.py
-# Description:  
+# Description:  FlowInterval class managing one alpha-extension
 # ===========================================================================
-import os
 from itertools import combinations
 from collections import deque
-from normalizedThinFlowClass import NormalizedThinFlow
-from utilitiesClass import Utilities
+import os
 import threading
 import time
 import signal
 import subprocess
-TOL = 1e-8
+
+from normalizedThinFlowClass import NormalizedThinFlow
+from utilitiesClass import Utilities
+
+# =======================================================================================================================
+
+TOL = 1e-8  # Tolerance
 
 
 class FlowInterval:
-    """description of class"""
+    """Managing flow interval, i.e. one alpha-extension"""
 
     def __init__(self, network, resettingEdges, lowerBoundTime, inflowRate, minCapacity, counter, outputDirectory,
                  templateFile, scipFile, timeout):
 
         self.network = network
         self.resettingEdges = resettingEdges
-        self.lowerBoundTime = lowerBoundTime
-        self.upperBoundTime = None
+        self.lowerBoundTime = lowerBoundTime  # theta_k
+        self.upperBoundTime = None  # theta_{k+1} = theta_k + self.alpha
         self.inflowRate = inflowRate
-        self.minCapacity = minCapacity
+        self.minCapacity = minCapacity  # Needed for zimpl files
         self.id = counter
         self.outputDirectory = outputDirectory
         self.templateFile = templateFile
         self.scipFile = scipFile
         self.timeout = timeout
 
-
         self.foundNTF = False
         self.aborted = False
         self.alpha = None
         self.shortestPathNetwork = None  # to be set from NashFlowClass
         self.numberOfSolvedIPs = 0
-        self.computationalTime = -1
+        self.computationalTime = -1  # Elapsed computation time in seconds
         self.preprocessedNodes = 0
         self.preprocessedEdges = 0
         self.NTFNodeLabelDict = {node: 0 for node in self.network}
         self.NTFEdgeFlowDict = {edge: 0 for edge in self.network.edges()}
 
-
+        # Create FlowInterval Directory
         self.rootPath = os.path.join(self.outputDirectory, str(self.id) + '-FlowInterval-' + Utilities.get_time())
         Utilities.create_dir(self.rootPath)
 
         if self.timeout > 0:
+            # Start thread controlling whether computation should be aborted
             self.timeoutThread = threading.Thread(target=self.timeout_control)
             self.timeoutThread.start()
 
     def timeout_control(self):
+        """Controlling whether timeout has been reached -> kill process"""
         startTime = time.time()
         while not self.foundNTF and time.time() - startTime <= self.timeout:
             time.sleep(1)
 
         if not self.foundNTF:
             self.aborted = True
-            out = subprocess.check_output(['ps', '-A'])
+            out = subprocess.check_output(['ps', '-A'])  # Get active processes on UNIX
             for line in out.splitlines():
                 if "scip" in line:
                     print "KILLING SCIP PROCESS"
                     pid = int(line.split(None, 1)[0])
-                    os.kill(pid, signal.SIGKILL)
-
-
+                    os.kill(pid, signal.SIGKILL)  # Kill SCIP process
 
     def compute_alpha(self, labelLowerBoundTimeDict):
+        """
+        Compute alpha respecting the conditions
+        :param labelLowerBoundTimeDict: Dict assigning lower bound times to nodes, i.e. v:l_v(\theta_k)
+        """
+        # Function term in conditions on alpha
         func = lambda v, w: (
                                 self.network[v][w]['transitTime'] + labelLowerBoundTimeDict[v] -
                                 labelLowerBoundTimeDict[w]) \
                             / (self.NTFNodeLabelDict[w] - self.NTFNodeLabelDict[v])
 
         self.alpha = float('inf')
-
         for v, w in self.network.edges():
             e = (v, w)
             if e not in self.shortestPathNetwork.edges():
@@ -87,19 +94,20 @@ class FlowInterval:
                 if self.NTFNodeLabelDict[v] - self.NTFNodeLabelDict[w] > TOL:
                     self.alpha = min([self.alpha, func(v, w)])
 
-        self.upperBoundTime = self.lowerBoundTime + self.alpha
+        self.upperBoundTime = self.lowerBoundTime + self.alpha  # Set theta_{k+1}
 
-    def get_NTF(self):
-        USE_PREPROCESSING = False
+    def get_ntf(self):
+        """Naive approach to get an NTF"""
+        USE_PREPROCESSING = False  # Always disabled
         graph = self.shortestPathNetwork
         resettingEdges = self.resettingEdges
         self.counter = 0
-        # self.naive_NTF_search() # Do not use, might lead to unwanted behaviour (i.e. could find solution to LP, even though E_0 was guessed badly -> result is not an NTF)
+
         if USE_PREPROCESSING:
             graph, removedVertices = self.preprocessing()
             resettingEdges = [edge for edge in graph.edges() if edge in self.resettingEdges]
 
-        self.backtrack_NTF_search_naive(remainingNodes=[v for v in graph.nodes() if v != 's'],
+        self.backtrack_ntf_search_naive(remainingNodes=[v for v in graph.nodes() if v != 's'],
                                         E_0=[], graph=graph, resettingEdges=resettingEdges)
 
         labels, flow = self.NTF.get_labels_and_flow()
@@ -107,15 +115,14 @@ class FlowInterval:
         if USE_PREPROCESSING:
             labels = self.postprocessing(labels, removedVertices)
 
-
         self.NTFNodeLabelDict.update(labels)
         self.NTFEdgeFlowDict.update(flow)
 
-        self.assert_NTF()
+        self.assert_ntf()
 
-    def get_NTF_advanced(self):
-
-        USE_PREPROCESSING = True
+    def get_ntf_advanced(self):
+        """Advanced approach to get an NTF"""
+        USE_PREPROCESSING = True  # Always active
         self.counter = 0
         graph = self.shortestPathNetwork
         E_0 = []
@@ -124,7 +131,7 @@ class FlowInterval:
             # All resetting edges have to be part of E_0
             E_0 = [e for e in self.resettingEdges if e in graph.edges()]  # Init
 
-
+        # Check which nodes are violated by adding E* to E_0
         isolationDict = dict()
         violatedNodes = []
         remainingEdges = [e for e in graph.edges() if e not in E_0]
@@ -138,7 +145,6 @@ class FlowInterval:
                 if edge in E_0:
                     foundIn = True
                     break
-
             if v == 's':
                 foundIn = True
             elif v == 't':
@@ -149,9 +155,10 @@ class FlowInterval:
                 violatedNodes.append(v)
 
         if USE_PREPROCESSING:
-            self.backtrack_NTF_search_advanced(E_0, isolationDict, violatedNodes, remainingEdges, graph, E_0)
+            self.backtrack_ntf_search_advanced(E_0, isolationDict, violatedNodes, remainingEdges, graph, E_0)
         else:
-            self.backtrack_NTF_search_advanced(E_0, isolationDict, violatedNodes, remainingEdges, graph, self.resettingEdges)
+            self.backtrack_ntf_search_advanced(E_0, isolationDict, violatedNodes, remainingEdges, graph,
+                                               self.resettingEdges)
 
         labels, flow = self.NTF.get_labels_and_flow()
 
@@ -160,30 +167,43 @@ class FlowInterval:
         self.NTFNodeLabelDict.update(labels)
         self.NTFEdgeFlowDict.update(flow)
 
-        self.assert_NTF()
+        self.assert_ntf()
 
-    def violatedTuple(self, t):
+    @staticmethod
+    def violatedtuple(t):
+        """
+        :param t: tuple
+        :return: False if the two elements from t are the same
+        """
         return t[0] != t[1]
 
-    def backtrack_NTF_search_advanced(self, E_0, isolationDict, violatedNodes, remainingEdges, graph, resettingEdges):
-        # Ensures that each node lies on some path s-t-path in E_0 or is isolated
+    def backtrack_ntf_search_advanced(self, E_0, isolationDict, violatedNodes, remainingEdges, graph, resettingEdges):
+        """
+        Advanced backtracking: Ensures that each node lies on some path s-t-path in E_0 or is isolated
+        :param E_0: list of selected edges
+        :param isolationDict: dict keeping track of which nodes are violated
+        :param violatedNodes: list of violated nodes
+        :param remainingEdges: list of edges that can be still considered
+        :param graph: the graph
+        :param resettingEdges: the resetting edges of graph
+        :return: True if NTF found, else False
+        """
 
         # Check whether already aborted
         if self.aborted:
             return True
-
         if not violatedNodes:
             self.NTF = NormalizedThinFlow(shortestPathNetwork=graph, id=self.counter,
-                                     resettingEdges=resettingEdges, flowEdges=E_0, inflowRate=self.inflowRate,
-                                     minCapacity=self.minCapacity, outputDirectory=self.rootPath,
-                                     templateFile=self.templateFile, scipFile=self.scipFile)
+                                          resettingEdges=resettingEdges, flowEdges=E_0, inflowRate=self.inflowRate,
+                                          minCapacity=self.minCapacity, outputDirectory=self.rootPath,
+                                          templateFile=self.templateFile, scipFile=self.scipFile)
             self.NTF.run_order()
             self.numberOfSolvedIPs += 1
             if self.NTF.is_valid():
                 self.foundNTF = True
                 return True
             else:
-                # Drop instance (necessary?)
+                # Drop instance
                 del self.NTF
                 self.counter += 1
 
@@ -199,10 +219,14 @@ class FlowInterval:
                                 isolationDictCopy[v] = (isolationDictCopy[v][0], True)
                                 isolationDictCopy[w] = (True, isolationDictCopy[w][1])
 
-                            recursiveCall = self.backtrack_NTF_search_advanced(E_0 + selectedRemainers, isolationDictCopy,
-                                                                          [v for v in graph.nodes() if
-                                                                           self.violatedTuple(isolationDictCopy[v])],
-                                                                          [e for e in remainingEdges if e not in selectedRemainers], graph, resettingEdges)
+                            recursiveCall = self.backtrack_ntf_search_advanced(E_0 + selectedRemainers,
+                                                                               isolationDictCopy,
+                                                                               [v for v in graph.nodes() if
+                                                                                self.violatedtuple(
+                                                                                    isolationDictCopy[v])],
+                                                                               [e for e in remainingEdges if
+                                                                                e not in selectedRemainers], graph,
+                                                                               resettingEdges)
 
                             if recursiveCall:
                                 return True
@@ -222,17 +246,13 @@ class FlowInterval:
                     selectedRemainers = list(selectedRemainers)
                     isolationDictCopy = dict(isolationDict)
 
-
-
                     for edge in selectedRemainers:
-                        v = edge[1] # Edge from w to v
+                        v = edge[1]  # Edge from w to v
                         isolationDictCopy[v] = (True, isolationDictCopy[v][1])
 
-
-
-                    recursiveCall = self.backtrack_NTF_search_advanced(E_0 + selectedRemainers, isolationDictCopy,
+                    recursiveCall = self.backtrack_ntf_search_advanced(E_0 + selectedRemainers, isolationDictCopy,
                                                                        [v for v in graph.nodes() if
-                                                                        self.violatedTuple(isolationDictCopy[v])],
+                                                                        self.violatedtuple(isolationDictCopy[v])],
                                                                        [e for e in remainingEdges if
                                                                         e not in selectedRemainers], graph,
                                                                        resettingEdges)
@@ -252,12 +272,12 @@ class FlowInterval:
                     selectedRemainers = list(selectedRemainers)
                     isolationDictCopy = dict(isolationDict)
                     for edge in selectedRemainers:
-                        v = edge[0] # Edge from v to w
+                        v = edge[0]  # Edge from v to w
                         isolationDictCopy[v] = (isolationDictCopy[v][0], True)
 
-                    recursiveCall = self.backtrack_NTF_search_advanced(E_0 + selectedRemainers, isolationDictCopy,
+                    recursiveCall = self.backtrack_ntf_search_advanced(E_0 + selectedRemainers, isolationDictCopy,
                                                                        [v for v in graph.nodes() if
-                                                                        self.violatedTuple(isolationDictCopy[v])],
+                                                                        self.violatedtuple(isolationDictCopy[v])],
                                                                        [e for e in remainingEdges if
                                                                         e not in selectedRemainers], graph,
                                                                        resettingEdges)
@@ -267,13 +287,12 @@ class FlowInterval:
 
         return False
 
-
     def preprocessing(self):
-        '''Iteratively remove all nodes that have no outgoing edges (except sink t)'''
+        """Iteratively remove all nodes that have no outgoing edges (except sink t)"""
         graph = self.shortestPathNetwork.copy()
 
         queue = deque([w for w in graph.nodes()
-                 if w != 't' and graph.out_degree(w) == 0])
+                       if w != 't' and graph.out_degree(w) == 0])
 
         removedVertices = deque([])
 
@@ -292,7 +311,7 @@ class FlowInterval:
         return graph, removedVertices
 
     def postprocessing(self, labels, missingVertices):
-        '''Update node labels for all missing vertices'''
+        """Update node labels for all missing vertices"""
 
         while missingVertices:
             w = missingVertices.pop()
@@ -308,10 +327,15 @@ class FlowInterval:
 
         return labels
 
-
-
-    def backtrack_NTF_search_naive(self, remainingNodes, E_0, graph, resettingEdges):
-        # Guarantees that f.a. nodes w there is at least one edge e=vw in E_0
+    def backtrack_ntf_search_naive(self, remainingNodes, E_0, graph, resettingEdges):
+        """
+        Naive NTF Search: Ensures that f.a. nodes w there is at least one edge e=vw in E_0
+        :param remainingNodes: List of nodes not handled yet
+        :param E_0: list of selected edges
+        :param graph: the graph
+        :param resettingEdges: list of resetting edges of graph 
+        :return: True if NTF found, else False
+        """
 
         # Check whether already aborted
         if self.aborted:
@@ -320,9 +344,9 @@ class FlowInterval:
         if not remainingNodes:
 
             self.NTF = NormalizedThinFlow(shortestPathNetwork=graph, id=self.counter,
-                                     resettingEdges=resettingEdges, flowEdges=E_0, inflowRate=self.inflowRate,
-                                     minCapacity=self.minCapacity, outputDirectory=self.rootPath,
-                                     templateFile=self.templateFile, scipFile=self.scipFile)
+                                          resettingEdges=resettingEdges, flowEdges=E_0, inflowRate=self.inflowRate,
+                                          minCapacity=self.minCapacity, outputDirectory=self.rootPath,
+                                          templateFile=self.templateFile, scipFile=self.scipFile)
             self.NTF.run_order()
             self.numberOfSolvedIPs += 1
             if self.NTF.is_valid():
@@ -343,46 +367,17 @@ class FlowInterval:
             for partE_0 in combinations(incomingEdges, k):
                 partE_0 = list(partE_0)
 
-                recursiveCall = self.backtrack_NTF_search_naive(remainingNodes=remainingNodes[1:], E_0=E_0 + partE_0, graph=graph, resettingEdges=resettingEdges)
+                recursiveCall = self.backtrack_ntf_search_naive(remainingNodes=remainingNodes[1:], E_0=E_0 + partE_0,
+                                                                graph=graph, resettingEdges=resettingEdges)
                 if recursiveCall:
                     return True
             k -= 1
 
         return False
 
-    def naive_NTF_search(self):
-
-
-
-        found = False
-        k = self.shortestPathNetwork.number_of_edges()
-        edges = self.shortestPathNetwork.edges()
-        while k > 0 and not found:
-            for E_0 in combinations(edges, k):
-                # Check whether already aborted
-                if self.aborted:
-                    return True
-
-                self.numberOfSolvedIPs += 1
-                E_0 = list(E_0)
-                self.NTF = NormalizedThinFlow(shortestPathNetwork=self.shortestPathNetwork, id=self.counter,
-                                         resettingEdges=self.resettingEdges, flowEdges=E_0, inflowRate=self.inflowRate,
-                                         minCapacity=self.minCapacity, outputDirectory=self.rootPath,
-                                         templateFile=self.templateFile, scipFile=self.scipFile)
-                self.NTF.run_order()
-                if self.NTF.is_valid():
-                    found = True
-                    self.foundNTF = True
-                    break
-                else:
-                    # Drop instance (necessary?)
-                    del self.NTF
-
-                self.counter += 1
-            k -= 1
-
-    def assert_NTF(self):
-        # Works only on shortest path network!!
+    def assert_ntf(self):
+        """Check if computed NTF really is an NTF"""
+        # Works only on shortest path network
         p = lambda (v, w): max(
             [self.NTFNodeLabelDict[v], self.NTFEdgeFlowDict[(v, w)] / self.network[v][w]['capacity']]) \
             if (v, w) not in self.resettingEdges \

@@ -94,9 +94,9 @@ class NashFlow:
 
         start = time.time()
         if self.advancedAlgo:
-            interval.get_NTF_advanced()
+            interval.get_ntf_advanced()
         else:
-            interval.get_NTF()
+            interval.get_ntf()
 
         end = time.time()
         self.computationalTime += (end-start)
