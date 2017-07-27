@@ -90,6 +90,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.actionExit.triggered.connect(QtGui.QApplication.quit)
         self.actionLoad_NashFlow.triggered.connect(self.load_nashflow)
         self.actionSave_NashFlow.triggered.connect(self.save_nashflow)
+        self.actionOpen_manual.triggered.connect(self.show_help)
         self.intervalsListWidget.itemClicked.connect(self.update_ntf_display)
         self.generateAnimationPushButton.clicked.connect(self.generate_animation)
 
@@ -213,8 +214,8 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
                 self.add_node_to_list(vertex)
                 self.nodeSelectionListWidget.sortItems()  # Re-sort
 
-            movedBool = (self.network.node[vertex]['position'] != (int(XPos), int(YPos)))
-            self.network.node[vertex]['position'] = (int(XPos), int(YPos))
+            movedBool = (self.network.node[vertex]['position'] != (float(XPos), float(YPos)))
+            self.network.node[vertex]['position'] = (float(XPos), float(YPos))
 
             self.graphCreationCanvas.update_nodes(moved=movedBool)  # Update UI
             if movedBool:
@@ -958,3 +959,8 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         currentTime = Utilities.get_time_for_log()
         logText = currentTime + " - " + txt
         self.logPlainTextEdit.appendPlainText(logText)
+
+
+    def show_help(self):
+        """Open thesis to display manual"""
+        os.system('xdg-open documentation/thesis.pdf')

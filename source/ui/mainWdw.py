@@ -434,6 +434,8 @@ class Ui_MainWindow(object):
         self.menubar.setObjectName(_fromUtf8("menubar"))
         self.menuFile = QtGui.QMenu(self.menubar)
         self.menuFile.setObjectName(_fromUtf8("menuFile"))
+        self.menuHelp = QtGui.QMenu(self.menubar)
+        self.menuHelp.setObjectName(_fromUtf8("menuHelp"))
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QtGui.QStatusBar(MainWindow)
         self.statusbar.setObjectName(_fromUtf8("statusbar"))
@@ -454,16 +456,22 @@ class Ui_MainWindow(object):
         self.actionLoad_NashFlow.setObjectName(_fromUtf8("actionLoad_NashFlow"))
         self.actionSave_NashFlow = QtGui.QAction(MainWindow)
         self.actionSave_NashFlow.setObjectName(_fromUtf8("actionSave_NashFlow"))
+        self.actionOpen_manual = QtGui.QAction(MainWindow)
+        self.actionOpen_manual.setObjectName(_fromUtf8("actionOpen_manual"))
+        self.actionAbout = QtGui.QAction(MainWindow)
+        self.actionAbout.setObjectName(_fromUtf8("actionAbout"))
         self.menuFile.addAction(self.actionNew_graph)
         self.menuFile.addAction(self.actionLoad_graph)
         self.menuFile.addAction(self.actionSave_graph)
         self.menuFile.addAction(self.actionLoad_NashFlow)
         self.menuFile.addAction(self.actionSave_NashFlow)
         self.menuFile.addAction(self.actionExit)
+        self.menuHelp.addAction(self.actionOpen_manual)
         self.menubar.addAction(self.menuFile.menuAction())
+        self.menubar.addAction(self.menuHelp.menuAction())
 
         self.retranslateUi(MainWindow)
-        self.tabWidget.setCurrentIndex(1)
+        self.tabWidget.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
@@ -543,6 +551,7 @@ class Ui_MainWindow(object):
         self.computeIntervalPushButton.setText(_translate("MainWindow", "Compute next interval", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), _translate("MainWindow", "Compute Nash flow", None))
         self.menuFile.setTitle(_translate("MainWindow", "File", None))
+        self.menuHelp.setTitle(_translate("MainWindow", "Help", None))
         self.actionLoad_Graph.setText(_translate("MainWindow", "Load Graph", None))
         self.actionSave_Graph.setText(_translate("MainWindow", "Save Graph", None))
         self.actionNew_graph.setText(_translate("MainWindow", "New graph", None))
@@ -551,5 +560,7 @@ class Ui_MainWindow(object):
         self.actionExit.setText(_translate("MainWindow", "Exit", None))
         self.actionLoad_NashFlow.setText(_translate("MainWindow", "Load NashFlow", None))
         self.actionSave_NashFlow.setText(_translate("MainWindow", "Save NashFlow", None))
+        self.actionOpen_manual.setText(_translate("MainWindow", "Open manual", None))
+        self.actionAbout.setText(_translate("MainWindow", "About", None))
 
 import icons_rc

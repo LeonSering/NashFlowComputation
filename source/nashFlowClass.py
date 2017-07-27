@@ -49,7 +49,7 @@ class NashFlow:
         self.rootPath = os.path.join(self.outputDirectory, 'NashFlow-' + Utilities.get_time())
         Utilities.create_dir(self.rootPath)
 
-        self.flowIntervals = []
+        self.flowIntervals = [] # List containing triplets of form (lowerBound, upperBound, FlowInterval-instance)
         self.lowerBoundsToIntervalDict = OrderedDict()
         self.animationIntervals = {edge: [] for edge in self.network.edges()}
 
