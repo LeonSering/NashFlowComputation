@@ -2,33 +2,36 @@
 # Author:       Max ZIMMER
 # Project:      NashFlowComputation 2017
 # File:         nashFlowClass.py
-# Description:  
+# Description:  Class NashFlow maintains a list of FlowInterval instances; coordinates computation of dynamic equilibrium
 # ===========================================================================
-import os
+
 from collections import OrderedDict
 from shutil import rmtree
+import os
+import time
 
 from flowIntervalClass import FlowInterval
 from utilitiesClass import Utilities
-import time
 
-TOL = 1e-8
+# =======================================================================================================================
+
+TOL = 1e-8  # Tolerance
 
 
 class NashFlow:
-    """description of class"""
+    """Maintains Nash Flow over time"""
 
-    def __init__(self, graph, inflowRate, numberOfIntervals, outputDirectory, templateFile, scipFile, cleanUpBool, timeout):
+    def __init__(self, graph, inflowRate, numberOfIntervals, outputDirectory, templateFile, scipFile, cleanUpBool,
+                 timeout):
         self.network = graph.copy()
         self.inflowRate = inflowRate  # For the moment: constant
-        self.numberOfIntervals = numberOfIntervals
+        self.numberOfIntervals = numberOfIntervals  # No. of intervals to compute
         self.outputDirectory = outputDirectory
 
-
-        self.templateFile = os.path.join(os.getcwd(), 'source', 'templates', 'algorithm_' + str(templateFile +1) + '.zpl')
-        self.advancedAlgo = (templateFile == 2)
-
-
+        # Template File from /source/templates
+        self.templateFile = os.path.join(os.getcwd(), 'source', 'templates',
+                                         'algorithm_' + str(templateFile + 1) + '.zpl')
+        self.advancedAlgo = (templateFile == 2)  # If true, then advanced backtracking with preprocessing
 
         self.scipFile = scipFile
         self.cleanUpBool = cleanUpBool
@@ -48,13 +51,17 @@ class NashFlow:
 
         self.flowIntervals = []
         self.lowerBoundsToIntervalDict = OrderedDict()
-        self.animationIntervals = {edge:[] for edge in self.network.edges()}
+        self.animationIntervals = {edge: [] for edge in self.network.edges()}
 
-    def run(self, next=False):
+    def run(self, nextIntervalOnly=False):
+        """
+        Compute the flow intervals up to self.numberOfIntervals
+        :param nextIntervalOnly: If True, only the next flow interval is computed
+        """
         computedUpperBound = 0
         k = 1 if self.numberOfIntervals != -1 else -float('inf')
 
-        if next:
+        if nextIntervalOnly:
             Utilities.create_dir(self.rootPath)
             self.compute_flowInterval()
         else:
@@ -70,24 +77,23 @@ class NashFlow:
         print "TOTAL Solved IPs: ", str(self.numberOfSolvedIPs), " TOTAL Time: ", "%.2f" % self.computationalTime
 
     def compute_flowInterval(self):
-        # NOTE TO MYSELF: computing shortest paths and resetting edges is only necessary for first flowInterval -> later: implement in flowIntervallClass
-
-        # get lowerBoundTime
+        """Method to compute a single flowInterval"""
+        # Get lowerBoundTime
         lowerBoundTime = 0 if not self.flowIntervals else self.flowIntervals[-1][1]
 
-        # compute resettingEdges
-        # method using self.queue_size might lead to problems, as outflow could not be defined properly
-        # resettingEdges = [(v,w) for v, w in self.network.edges_iter() if self.queue_size(v,w,self.node_label(v,lowerBoundTime)) > TOL] if lowerBoundTime > 0 else []
+        # Compute resettingEdges
         resettingEdges = [(v, w) for v, w in self.network.edges_iter() if
                           self.node_label(w, lowerBoundTime) > self.node_label(v, lowerBoundTime) + self.network[v][w][
                               'transitTime'] + TOL] if lowerBoundTime > 0 else []
 
         interval = FlowInterval(self.network, resettingEdges=resettingEdges, lowerBoundTime=lowerBoundTime,
                                 inflowRate=self.inflowRate, minCapacity=self.minCapacity, counter=self.counter,
-                                outputDirectory=self.rootPath, templateFile=self.templateFile, scipFile=self.scipFile, timeout=self.timeout,)
+                                outputDirectory=self.rootPath, templateFile=self.templateFile, scipFile=self.scipFile,
+                                timeout=self.timeout, )
 
         if lowerBoundTime == 0:
-            interval.shortestPathNetwork = Utilities.get_shortest_path_network(self.network)  # Compute shortest path network
+            interval.shortestPathNetwork = Utilities.get_shortest_path_network(
+                self.network)  # Compute shortest path network
         else:
             interval.shortestPathNetwork = Utilities.get_shortest_path_network(self.network, labels={
                 v: self.node_label(v, lowerBoundTime) for v in self.network})  # Compute shortest path network
@@ -99,11 +105,11 @@ class NashFlow:
             interval.get_ntf()
 
         end = time.time()
-        self.computationalTime += (end-start)
-        interval.computationalTime = end-start
+        self.computationalTime += (end - start)
+        interval.computationalTime = end - start
         self.preprocessedNodes += interval.preprocessedNodes
         self.preprocessedEdges += interval.preprocessedEdges
-        print "Solved IPs: ", str(interval.numberOfSolvedIPs), " Time: ", "%.2f" % (end-start)
+        print "Solved IPs: ", str(interval.numberOfSolvedIPs), " Time: ", "%.2f" % (end - start)
         self.lowerBoundsToIntervalDict[lowerBoundTime] = interval
 
         interval.compute_alpha({node: self.node_label(node, lowerBoundTime) for node in self.network})
@@ -173,116 +179,136 @@ class NashFlow:
                 self.network[v][w]['queueSize'][vTimeUpper] = max(0, lastQueueSize + (
                     inflowVal - self.network[v][w]['capacity']) * (vTimeUpper - vTimeLower))
 
-            self.animationIntervals[(v,w)].append(((vTimeLower, vTimeUpper), (wTimeLower, wTimeUpper)))
-
+            self.animationIntervals[(v, w)].append(((vTimeLower, vTimeUpper), (wTimeLower, wTimeUpper)))
 
         self.counter += 1
         self.numberOfSolvedIPs += interval.numberOfSolvedIPs
 
         self.infinityReached = (interval.alpha == float('inf'))
 
-    def node_label(self, v, time):
-        if time == float('inf'):
+    def node_label(self, v, t):
+        """
+        Equivalent to l_v(time)
+        :param v: node
+        :param t: float
+        :return: l_v(time)
+        """
+        if t == float('inf'):
             return float('inf')
-        intervalLowerBoundTime = self.time_interval_correspondence(time)
+        intervalLowerBoundTime = self.time_interval_correspondence(t)
         interval = self.lowerBoundsToIntervalDict[intervalLowerBoundTime]
-        label = interval.shortestPathNetwork.node[v]['dist'] + (time - intervalLowerBoundTime) * \
+        label = interval.shortestPathNetwork.node[v]['dist'] + (t - intervalLowerBoundTime) * \
                                                                interval.NTFNodeLabelDict[v]
         return label
 
-    def queue_size(self, v, w, time):
-        return self.cumulative_inflow(v, w, time) - self.cumulative_outflow(v, w,
-                                                                            time + self.network[v][w]['transitTime'])
+    def queue_size(self, v, w, t):
+        """
+        Returns the queue size of edge e = vw given a timepoint t
+        :param v: tail
+        :param w: head
+        :param t: timepoint
+        :return: z_{vw}(t)
+        """
+        return self.cumulative_inflow(v, w, t) - self.cumulative_outflow(v, w,
+                                                                         t + self.network[v][w]['transitTime'])
 
-    def queue_delay(self, v, w, time):
-        return self.queue_size(v, w, time) / float(self.network[v][w]['capacity'])
+    def queue_delay(self, v, w, t):
+        """
+        Returns the queue delay of edge e = vw given a timepoint time
+        :param v: tail
+        :param w: head
+        :param t: timepoint
+        :return: q_{vw}(time)
+        """
+        return self.queue_size(v, w, t) / float(self.network[v][w]['capacity'])
 
-    def cumulative_inflow(self, v, w, time):
-        if time <= TOL:
+    def cumulative_inflow(self, v, w, t):
+        """
+        Returns cumulative inflow of edge e=vw given time
+        :param v: tail
+        :param w: head
+        :param t: timepoint
+        :return: F^+_e(time)
+        """
+        if t <= TOL:
             return 0
 
         lastIntervalKey, lastIntervalValue = self.network[v][w]['inflow'].popitem(last=True)
         self.network[v][w]['inflow'][lastIntervalKey] = lastIntervalValue
 
-        assert (Utilities.is_geq_tol(lastIntervalKey[1], time))
+        assert (Utilities.is_geq_tol(lastIntervalKey[1], t))
 
         integral = 0
         for lowerBound, upperBound in self.network[v][w]['inflow']:
             intervalInflow = self.network[v][w]['inflow'][(lowerBound, upperBound)]
-            if time > upperBound + TOL:
+            if t > upperBound + TOL:
                 integral += (upperBound - lowerBound) * intervalInflow
-            elif Utilities.is_geq_tol(time, lowerBound) and Utilities.is_geq_tol(upperBound, time):
-                integral += (time - lowerBound) * intervalInflow
+            elif Utilities.is_geq_tol(t, lowerBound) and Utilities.is_geq_tol(upperBound, t):
+                integral += (t - lowerBound) * intervalInflow
             else:
                 break
         return integral
 
-    def cumulative_inflow_work_in_progress(self, v, w, time):
-        if time <= TOL:
-            return 0
-
-        lastCumulativeInflowTime = next(reversed(self.network[v][w]['cumulativeInflow']))
-
-        assert (Utilities.is_geq_tol(lastCumulativeInflowTime, time) or self.infinityReached)
-
-        # Find position of element to the left
-        timesList = self.network[v][w]['cumulativeInflow'].keys()
-        pos = Utilities.get_insertion_point_left(timesList, time)
-        if pos == 0:
-            return 0
-        elif pos > len(timesList):
-            lastTime = timesList[pos - 1]
-            inflow = self.network[v][w]['inflow'][next(reversed(self.network[v][w]['inflow']))]
-            return self.network[v][w]['cumulativeInflow'][lastTime] + (time - lastTime) * inflow
-        else:
-            pass
-
-    def cumulative_outflow(self, v, w, time):
-        if time <= TOL:
+    def cumulative_outflow(self, v, w, t):
+        """
+        Returns cumulative outflow of edge e=vw given time
+        :param v: tail
+        :param w: head
+        :param t: timepoint
+        :return: F^-_e(time)
+        """
+        if t <= TOL:
             return 0
 
         lastIntervalKey, lastIntervalValue = self.network[v][w]['outflow'].popitem(last=True)
         self.network[v][w]['outflow'][lastIntervalKey] = lastIntervalValue
 
-        assert (Utilities.is_geq_tol(lastIntervalKey[1], time))
+        assert (Utilities.is_geq_tol(lastIntervalKey[1], t))
 
         integral = 0
         for lowerBound, upperBound in self.network[v][w]['outflow']:
             intervalOutflow = self.network[v][w]['outflow'][(lowerBound, upperBound)]
-            if time > upperBound + TOL:
+            if t > upperBound + TOL:
                 integral += (upperBound - lowerBound) * intervalOutflow
-            elif Utilities.is_geq_tol(time, lowerBound) and Utilities.is_geq_tol(upperBound, time):
-                integral += (time - lowerBound) * intervalOutflow
+            elif Utilities.is_geq_tol(t, lowerBound) and Utilities.is_geq_tol(upperBound, t):
+                integral += (t - lowerBound) * intervalOutflow
             else:
                 break
         return integral
 
-    def time_interval_correspondence(self, time):
-        if Utilities.is_eq_tol(time, 0):
+    def time_interval_correspondence(self, t):
+        """
+        :param t: timepoint
+        :return: lastTime: lowerBound of flowInterval containing time
+        """
+        if Utilities.is_eq_tol(t, 0):
             return 0
         for lowerBoundTime in self.lowerBoundsToIntervalDict:
-            if Utilities.is_geq_tol(time, lowerBoundTime):
+            if Utilities.is_geq_tol(t, lowerBoundTime):
                 lastTime = lowerBoundTime
         return lastTime
 
     def get_stat_preprocessing(self):
+        """Returns strings for preprocessing statistics"""
         if len(self.flowIntervals) == 0:
             return "N/A", "N/A"
 
         totalNodes, totalEdges = self.preprocessedNodes, self.preprocessedEdges
-        avgNodes, avgEdges = float(totalNodes)/len(self.flowIntervals), float(totalEdges)/len(self.flowIntervals)
+        avgNodes, avgEdges = float(totalNodes) / len(self.flowIntervals), float(totalEdges) / len(self.flowIntervals)
         return "%.2f" % avgNodes, "%.2f" % avgEdges
 
     def get_stat_solved_IPs(self):
+        """Returns strings for No. of solved IPs statistics"""
         total = self.numberOfSolvedIPs
         if len(self.flowIntervals) == 0:
             return "N/A", "N/A"
-        avg = float(total)/len(self.flowIntervals)
+        avg = float(total) / len(self.flowIntervals)
         return "%.2f" % avg, total
 
     def get_stat_time(self):
+        """Returns strings for elapsed-time statistics"""
         total = self.computationalTime
         if len(self.flowIntervals) == 0:
             return "N/A", "N/A"
-        avg = float(total)/len(self.flowIntervals)
+        avg = float(total) / len(self.flowIntervals)
         return "%.2f" % avg, "%.2f" % total

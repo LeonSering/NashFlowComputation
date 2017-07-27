@@ -585,7 +585,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
                                      self.templateFile, self.scipFile, self.cleanUpEnabled, timeout)
         else:
             self.output("Starting computation of next flow interval")
-        self.nashFlow.run(next=nextIntervalOnly)
+        self.nashFlow.run(nextIntervalOnly=nextIntervalOnly)
 
         self.output("Computation complete in " + "%.2f" % self.nashFlow.computationalTime + " seconds")
 
