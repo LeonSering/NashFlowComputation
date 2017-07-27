@@ -133,6 +133,14 @@ class PlotAnimationCanvas(PlotCanvas):
     def get_time_from_tick(self, sliderVal):
         return self.timePoints[sliderVal]
 
+    def get_flowinterval_index_from_tick(self, sliderVal):
+        t = self.get_time_from_tick(sliderVal)
+        for index, interval in enumerate(self.nashFlow.flowIntervals):
+            if interval[0] <= t <= interval[1]:
+                return index
+        return -1
+
+
     def update_time_labels(self):
         # Update additional node labels
 

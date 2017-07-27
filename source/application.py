@@ -24,7 +24,7 @@ from utilitiesClass import Utilities
 
 # =======================================================================================================================
 filterwarnings('ignore')  # For the moment: ignore warnings as pyplot.hold is deprecated
-
+QtCore.QCoreApplication.setAttribute(QtCore.Qt.AA_X11InitThreads)   # This is necessary if threads access the GUI
 
 class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
     """Controls GUI"""
@@ -656,25 +656,19 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.plotDiagramCanvas.change_vline_position(currentTime)
         self.currentSliderTimeLabel.setText("%.2f" % currentTime)
 
-    def slider_released(self):
-        """Slot function for slider release"""
-        currentTime = self.plotAnimationCanvas.get_time_from_tick(self.timeSlider.value())
+    def change_NTF_display(self, index):
+        """
+        Changes currently displayed NTF to index
+        """
         lastViewPoint = None
-        # Adjust NTF if necessary
-        for index, interval in enumerate(self.nashFlow.flowIntervals):
-            lowerBound = interval[0]
-            upperBound = interval[1]
-            if lowerBound <= currentTime < upperBound:
-                if self.intervalsListWidget.currentRow != index:
-                    self.intervalsListWidget.setCurrentRow(index)
-                    if self.plotNTFCanvas is not None:
-                        lastViewPoint = self.plotNTFCanvas.get_viewpoint()
-                        self.plotNTFCanvas.setParent(None)
+        self.intervalsListWidget.setCurrentRow(index)
+        if self.plotNTFCanvas is not None:
+            lastViewPoint = self.plotNTFCanvas.get_viewpoint()
+            self.plotNTFCanvas.setParent(None)
 
-                    self.plotNTFCanvas = self.NTFPlotList[index]
-                    self.plotNTFCanvas.set_viewpoint(viewPoint=lastViewPoint)
-                    self.plotNTFFrameLayout.addWidget(self.plotNTFCanvas)
-                break
+        self.plotNTFCanvas = self.NTFPlotList[index]
+        self.plotNTFCanvas.set_viewpoint(viewPoint=lastViewPoint)
+        self.plotNTFFrameLayout.addWidget(self.plotNTFCanvas)
 
         rowID = self.intervalsListWidget.currentRow()
 
@@ -687,6 +681,21 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
                 item.setFont(normalFont)
             else:
                 item.setFont(boldFont)
+
+    def slider_released(self):
+        """Slot function for slider release"""
+        currentTime = self.plotAnimationCanvas.get_time_from_tick(self.timeSlider.value())
+        lastViewPoint = None
+        # Adjust NTF if necessary
+        for index, interval in enumerate(self.nashFlow.flowIntervals):
+            lowerBound = interval[0]
+            upperBound = interval[1]
+            if lowerBound <= currentTime < upperBound:
+                if self.intervalsListWidget.currentRow != index:
+                    self.change_NTF_display(index)
+                break
+
+
 
     def update_node_label_diagram(self):
         """Update diagram of node label of focusNode"""
@@ -927,15 +936,39 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         """Slot to play animation"""
 
         def animate(FPS=4):
+            currentIntervalIndex = self.plotAnimationCanvas.get_flowinterval_index_from_tick(self.timeSlider.value())
+            self.change_NTF_display(currentIntervalIndex)
+
+            get_next_bound = lambda currentIntervalIndex: self.nashFlow.flowIntervals[currentIntervalIndex +1][0] \
+                if currentIntervalIndex + 1 < len(self.nashFlow.flowIntervals) else float('inf')
+
+            nextBound = get_next_bound(currentIntervalIndex)
+            lastTime = self.plotAnimationCanvas.get_time_from_tick(self.timeSlider.value())
             while self.animationRunning and self.timeSlider.value() < self.timeSlider.maximum():
                 time.sleep(1 / float(FPS))
                 self.timeSlider.setValue(self.timeSlider.value() + 1)
+                if self.plotAnimationCanvas.get_time_from_tick(self.timeSlider.value()) >= nextBound:
+                    currentIntervalIndex += 1
+                    self.change_NTF_display(currentIntervalIndex)
+                    nextBound = get_next_bound(currentIntervalIndex)
+
+
+                if self.timeSlider.value >= 1 and lastTime != self.plotAnimationCanvas.get_time_from_tick(self.timeSlider.value() - 1):
+                    # Necessary to check, as user could click somewhere on the slider
+                    currentIntervalIndex = self.plotAnimationCanvas.get_flowinterval_index_from_tick(
+                        self.timeSlider.value())
+                    self.change_NTF_display(currentIntervalIndex)
+                    nextBound = get_next_bound(currentIntervalIndex)
+                lastTime = self.plotAnimationCanvas.get_time_from_tick(self.timeSlider.value())
+
+
             self.animationRunning = False
 
         self.output("Starting animation")
 
         self.animationRunning = True
         t = threading.Thread(target=animate)
+        t.daemon = True # Enforcing that thread gets killed if main exits
         t.start()
 
     def pause_animation(self):
