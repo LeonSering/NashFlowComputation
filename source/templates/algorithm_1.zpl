@@ -27,8 +27,7 @@ var x[E] real >= 0;
 var z[E_0 without E_star] binary;
 
 #OBJECTIVE
-maximize labels: l['s']; #irrelevant
-
+maximize labels: sum <v> in V: l[v];
 
 #CONSTRAINTS
 #1: Normal Flow Constraints

@@ -362,6 +362,8 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
             if self.nashFlow.flowIntervals[-1][1] < float('inf') \
             else Utilities.round_up(self.nashFlow.node_label('t', self.nashFlow.flowIntervals[-1][0]))
 
+        self.animationUpperBound = self.animationUpperBound if self.animationUpperBound > 0 else 10 # This can only happen when infinity is reached
+
         self.animationStartLineEdit.setText("%.2f" % self.animationLowerBound)
         self.animationEndLineEdit.setText("%.2f" % self.animationUpperBound)
 
@@ -413,6 +415,11 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.re_init_graph_creation_app(NoNewGraph=True)
 
         self.tabWidget.setCurrentIndex(0)
+
+        try:
+            print next(nx.simple_cycles(self.network))
+        except:
+            print "NO CYCLE"
 
     def save_graph(self):
         """Save CurrentGraph instance to '.cg' file"""

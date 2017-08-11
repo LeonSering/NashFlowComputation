@@ -9,7 +9,7 @@ from collections import OrderedDict
 from shutil import rmtree
 import os
 import time
-
+import numpy as np
 from flowIntervalClass import FlowInterval
 from utilitiesClass import Utilities
 
@@ -74,7 +74,8 @@ class NashFlow:
         if self.cleanUpBool:
             rmtree(self.rootPath)
 
-        print "TOTAL Solved IPs: ", str(self.numberOfSolvedIPs), " TOTAL Time: ", "%.2f" % self.computationalTime
+        totalBinaryList = [no for i in range(len(self.flowIntervals)) for no in self.flowIntervals[i][2].binaryVariableNumberList]  # To be deleted before handing in
+        print "TOTAL Solved IPs: ", str(self.numberOfSolvedIPs), " TOTAL Time: %.2f" % self.computationalTime, " TOTAL Deleted Nodes: %.2f" % self.preprocessedNodes,  " TOTAL Deleted Edges: %.2f" % self.preprocessedEdges, "TOTAL Avg. Binaries: %.2f" % np.mean(totalBinaryList)
 
     def compute_flowInterval(self):
         """Method to compute a single flowInterval"""
@@ -109,7 +110,7 @@ class NashFlow:
         interval.computationalTime = end - start
         self.preprocessedNodes += interval.preprocessedNodes
         self.preprocessedEdges += interval.preprocessedEdges
-        print "Solved IPs: ", str(interval.numberOfSolvedIPs), " Time: ", "%.2f" % (end - start)
+        print "Solved IPs: ", str(interval.numberOfSolvedIPs), " Time: %.2f" % (end - start), " Deleted nodes: %.2f" % interval.preprocessedNodes, " Deleted edges: %.2f" % interval.preprocessedEdges, " Avg. Binaries: %.2f" % np.mean(interval.binaryVariableNumberList)
         self.lowerBoundsToIntervalDict[lowerBoundTime] = interval
 
         interval.compute_alpha({node: self.node_label(node, lowerBoundTime) for node in self.network})

@@ -48,6 +48,7 @@ class FlowInterval:
         self.preprocessedEdges = 0
         self.NTFNodeLabelDict = {node: 0 for node in self.network}
         self.NTFEdgeFlowDict = {edge: 0 for edge in self.network.edges()}
+        self.binaryVariableNumberList = []  # List where each element is the size of E'_0 in a NTF call
 
         # Create FlowInterval Directory
         self.rootPath = os.path.join(self.outputDirectory, str(self.id) + '-FlowInterval-' + Utilities.get_time())
@@ -193,6 +194,7 @@ class FlowInterval:
         if self.aborted:
             return True
         if not violatedNodes:
+            self.binaryVariableNumberList.append(len(E_0))
             self.NTF = NormalizedThinFlow(shortestPathNetwork=graph, id=self.counter,
                                           resettingEdges=resettingEdges, flowEdges=E_0, inflowRate=self.inflowRate,
                                           minCapacity=self.minCapacity, outputDirectory=self.rootPath,
@@ -342,7 +344,7 @@ class FlowInterval:
             return True
 
         if not remainingNodes:
-
+            self.binaryVariableNumberList.append(len(E_0))
             self.NTF = NormalizedThinFlow(shortestPathNetwork=graph, id=self.counter,
                                           resettingEdges=resettingEdges, flowEdges=E_0, inflowRate=self.inflowRate,
                                           minCapacity=self.minCapacity, outputDirectory=self.rootPath,
@@ -361,9 +363,9 @@ class FlowInterval:
         w = remainingNodes[0]  # Node handled in this recursive call
 
         incomingEdges = graph.in_edges(w)
-        k = len(incomingEdges)
-
-        while k > 0:
+        n = len(incomingEdges)
+        k = 1
+        while k <= n:
             for partE_0 in combinations(incomingEdges, k):
                 partE_0 = list(partE_0)
 
@@ -371,7 +373,7 @@ class FlowInterval:
                                                                 graph=graph, resettingEdges=resettingEdges)
                 if recursiveCall:
                     return True
-            k -= 1
+            k += 1
 
         return False
 

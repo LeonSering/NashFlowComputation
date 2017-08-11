@@ -23,7 +23,7 @@ from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.colors import colorConverter
 
 from networkx import draw_networkx_nodes, draw_networkx_labels, draw_networkx_edge_labels
-
+import random
 # Config
 SIMILARITY_DIST = 9  # Maximal distance at which a click is recognized as a click on a node/edge
 
@@ -181,7 +181,7 @@ class PlotCanvas(FigureCanvas):
                 if self.selectedNode is not None and self.selectedNode != clickedNode:
                     # Add the corresponding edge, if valid
                     if not self.network.has_edge(self.selectedNode, clickedNode):
-                        self.network.add_edge(self.selectedNode, clickedNode, transitTime=1, capacity=1)
+                        self.network.add_edge(self.selectedNode, clickedNode, transitTime=random.randint(0,2), capacity=random.randint(1,10))
 
                         self.focusEdge = (self.selectedNode, clickedNode)
                         self.focusNode = None
