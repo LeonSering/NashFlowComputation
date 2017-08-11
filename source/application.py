@@ -972,11 +972,11 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
             self.animationRunning = False
 
         self.output("Starting animation")
-
-        self.animationRunning = True
-        t = threading.Thread(target=animate)
-        t.daemon = True # Enforcing that thread gets killed if main exits
-        t.start()
+        if not self.animationRunning:
+            self.animationRunning = True
+            t = threading.Thread(target=animate)
+            t.daemon = True # Enforcing that thread gets killed if main exits
+            t.start()
 
     def pause_animation(self):
         """Slot to pause animation"""
