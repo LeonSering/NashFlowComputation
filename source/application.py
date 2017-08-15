@@ -124,7 +124,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
     def init_graph():
         """
         Creates the initial network
-        :return: network :initial network
+        :return: network:initial network
         """
         network = nx.DiGraph()
         network.add_nodes_from(
