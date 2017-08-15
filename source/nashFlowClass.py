@@ -85,13 +85,6 @@ class NashFlow:
         if self.cleanUpBool:
             rmtree(self.rootPath)
 
-        div = float(len(self.flowIntervals))
-        if not self.allInOne:
-            totalBinaryList = [no for i in range(len(self.flowIntervals)) for no in self.flowIntervals[i][2].binaryVariableNumberList]  # To be deleted before handing in
-        else:
-            totalBinaryList = [(2*self.flowIntervals[i][2].shortestPathNetwork.number_of_edges() - len(self.flowIntervals[i][2].resettingEdges)) for i in range(len(self.flowIntervals)) for no in
-                               self.flowIntervals[i][2].binaryVariableNumberList]
-
     def compute_flowInterval(self):
         """Method to compute a single flowInterval"""
         # Get lowerBoundTime
