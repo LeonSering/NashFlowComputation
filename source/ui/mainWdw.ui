@@ -1472,13 +1472,22 @@
    </property>
   </action>
   <action name="actionLoad_NashFlow">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Load NashFlow</string>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
    </property>
   </action>
   <action name="actionSave_NashFlow">
    <property name="text">
     <string>Save NashFlow</string>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
    </property>
   </action>
   <action name="actionOpen_manual">

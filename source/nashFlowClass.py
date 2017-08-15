@@ -2,18 +2,17 @@
 # Author:       Max ZIMMER
 # Project:      NashFlowComputation 2017
 # File:         nashFlowClass.py
-# Description:  Class NashFlow maintains a list of FlowInterval instances; coordinates computation of dynamic equilibrium
+# Description:  Class NashFlow maintains list of FlowInterval instances; coordinates computation of dynamic equilibrium
 # ===========================================================================
 
 from collections import OrderedDict
 from shutil import rmtree
 import os
 import time
-import numpy as np
 from flowIntervalClass import FlowInterval
 from utilitiesClass import Utilities
 
-# =======================================================================================================================
+# ======================================================================================================================
 
 TOL = 1e-8  # Tolerance
 
@@ -23,6 +22,17 @@ class NashFlow:
 
     def __init__(self, graph, inflowRate, numberOfIntervals, outputDirectory, templateFile, scipFile, cleanUpBool,
                  timeout):
+        """
+        :param graph: Networkx Digraph instance
+        :param inflowRate: u_0
+        :param numberOfIntervals: number of intervals that will be computed. -1 if all
+        :param outputDirectory: path where output should be saved
+        :param templateFile: Selected method, i.e. 0,1,2
+        :param scipFile: path to scip binary
+        :param cleanUpBool: If true, then cleanup
+        :param timeout: seconds until timeout. Deactivated if equal to 0
+        """
+
         self.network = graph.copy()
         self.inflowRate = inflowRate  # For the moment: constant
         self.numberOfIntervals = numberOfIntervals  # No. of intervals to compute
@@ -31,6 +41,7 @@ class NashFlow:
         # Template File from /source/templates
         self.templateFile = os.path.join(os.getcwd(), 'source', 'templates',
                                          'algorithm_' + str(templateFile + 1) + '.zpl')
+        self.allInOne = (templateFile == 1)
         self.advancedAlgo = (templateFile == 2)  # If true, then advanced backtracking with preprocessing
 
         self.scipFile = scipFile
@@ -74,8 +85,12 @@ class NashFlow:
         if self.cleanUpBool:
             rmtree(self.rootPath)
 
-        totalBinaryList = [no for i in range(len(self.flowIntervals)) for no in self.flowIntervals[i][2].binaryVariableNumberList]  # To be deleted before handing in
-        print "TOTAL Solved IPs: ", str(self.numberOfSolvedIPs), " TOTAL Time: %.2f" % self.computationalTime, " TOTAL Deleted Nodes: %.2f" % self.preprocessedNodes,  " TOTAL Deleted Edges: %.2f" % self.preprocessedEdges, "TOTAL Avg. Binaries: %.2f" % np.mean(totalBinaryList)
+        div = float(len(self.flowIntervals))
+        if not self.allInOne:
+            totalBinaryList = [no for i in range(len(self.flowIntervals)) for no in self.flowIntervals[i][2].binaryVariableNumberList]  # To be deleted before handing in
+        else:
+            totalBinaryList = [(2*self.flowIntervals[i][2].shortestPathNetwork.number_of_edges() - len(self.flowIntervals[i][2].resettingEdges)) for i in range(len(self.flowIntervals)) for no in
+                               self.flowIntervals[i][2].binaryVariableNumberList]
 
     def compute_flowInterval(self):
         """Method to compute a single flowInterval"""
@@ -110,7 +125,6 @@ class NashFlow:
         interval.computationalTime = end - start
         self.preprocessedNodes += interval.preprocessedNodes
         self.preprocessedEdges += interval.preprocessedEdges
-        print "Solved IPs: ", str(interval.numberOfSolvedIPs), " Time: %.2f" % (end - start), " Deleted nodes: %.2f" % interval.preprocessedNodes, " Deleted edges: %.2f" % interval.preprocessedEdges, " Avg. Binaries: %.2f" % np.mean(interval.binaryVariableNumberList)
         self.lowerBoundsToIntervalDict[lowerBoundTime] = interval
 
         interval.compute_alpha({node: self.node_label(node, lowerBoundTime) for node in self.network})

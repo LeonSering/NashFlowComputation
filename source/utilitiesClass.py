@@ -2,7 +2,7 @@
 # Author:       Max ZIMMER
 # Project:      NashFlowComputation 2017
 # File:         utilitiesClass.py
-# Description:
+# Description:  Class containing utility functions
 # ===========================================================================
 
 import os
@@ -11,14 +11,14 @@ import networkx as nx
 import matplotlib
 from matplotlib.patches import Rectangle, Circle, Polygon
 from matplotlib.collections import PatchCollection, CircleCollection
-
-
 matplotlib.use("Qt4Agg")
 import numpy as np
 import bisect
+# ======================================================================================================================
 
-#TOL = 1e-8
-TOL = 1e-3
+
+
+TOL = 1e-3  # Tolerance
 
 
 class Utilities:
@@ -27,42 +27,47 @@ class Utilities:
 
     @staticmethod
     def create_dir(path):
+        """
+        Create directory if not existing
+        :param path: path to the directory
+        """
         if not os.path.isdir(path):
             os.mkdir(path)
 
     @staticmethod
     def get_time():
+        """Get formatted time"""
         return time.strftime("%d_%m_%Y-%H_%M_%S", time.localtime())
 
     @staticmethod
     def get_time_for_log():
+        """Get formatted time"""
         return time.strftime("%H:%M:%S", time.localtime())
 
     @staticmethod
     def is_eq_tol(a, b, tol=TOL):
+        """Is equal to with tolerance"""
         return abs(a - b) <= tol
 
     @staticmethod
     def is_not_eq_tol(a, b, tol=TOL):
+        """Is not equal to with tolerance"""
         return abs(a - b) > tol
 
     @staticmethod
     def is_geq_tol(a, b, tol=TOL):
+        """Is greater-equal to with tolerance"""
         return a - b + tol >= 0
 
     @staticmethod
     def get_insertion_point_left(L, el):
+        """Get insertion point of element el in list L"""
         return bisect.bisect_left(L, el)
 
     @staticmethod
     def get_edge_label_rotation(axes, src, dst, pos):
         """
         Modified from networkx plotting edge label function
-        :param axes: 
-        :param src: 
-        :param dst: 
-        :param pos: 
-        :return: 
         """
         x1, y1 = src
         x2, y2 = dst
@@ -80,6 +85,12 @@ class Utilities:
 
     @staticmethod
     def get_shortest_path_network(network, labels=None):
+        """
+        Computes shortest path network
+        :param network: the graph on which to compute the shortest path network
+        :param labels: label functions. If None, then use edge transitTimes
+        :return: networkx digraph: shortest path network of network given labels
+        """
 
         if not labels:
             # Use transit-times as edge weight
@@ -112,6 +123,7 @@ class Utilities:
 
     @staticmethod
     def compute_min_capacity(network):
+        """Computes the minimal capacity of all edges"""
         minimumCapacity = float('inf')
         for edge in network.edges():
             v, w = edge[0], edge[1]
@@ -121,17 +133,23 @@ class Utilities:
 
     @staticmethod
     def join_intersect_dicts(dict1, dict2):
+        """Intersect two dict"""
         return {key: (dict1[key], dict2[key]) for key in dict1 if key in dict2}
 
     @staticmethod
     def add_and_round_up(x, n):
+        """Add n and round up to 10s"""
         x += n
         return x if x % 10 == 0 else x + 10 - x % 10
 
     @staticmethod
     def round_up(x):
+        """Round up to 10s"""
         return x if x % 10 == 0 else x + 10 - x % 10
 
+
+    #   All following functions are modifications of networkx functions to draw different edge styles
+    '''Modified function networkx.draw_networkx_edges'''
     @staticmethod
     def draw_edges(G, pos,
                    edgelist=None,
@@ -263,7 +281,6 @@ class Utilities:
         return edgeCollection, arrow_collection
 
     '''Modified function networkx.draw_networkx_edges'''
-
     @staticmethod
     def draw_edges_with_boxes(G, pos,
                    edgelist=None,
@@ -384,6 +401,7 @@ class Utilities:
 
         return edge_collection, box_collection
 
+    '''Modified function networkx.draw_networkx_edges'''
     @staticmethod
     def draw_animation_edges(G, pos,
                    edgelist=None,
@@ -530,6 +548,7 @@ class Utilities:
 
         return edge_collection, arrow_collection, tube_collection
 
+    '''Modified function networkx.draw_networkx_edges'''
     @staticmethod
     def get_boxes(edge_colors= None, edge_pos=None, width=1.0):
         import matplotlib.pyplot as plt
@@ -575,6 +594,7 @@ class Utilities:
                                             # alpha=0.5)
         return arrow_collection
 
+    '''Modified function networkx.draw_networkx_nodes'''
     @staticmethod
     def draw_nodes(G,
                     pos,

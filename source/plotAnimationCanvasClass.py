@@ -2,8 +2,7 @@
 # Author:       Max ZIMMER
 # Project:      NashFlowComputation 2017
 # File:         plotAnimationCanvasClass.py
-# Description:
-# Parameters:
+# Description:  Class to extend plotCanvas in order to visualize animation
 # ===========================================================================
 
 from plotCanvasClass import PlotCanvas
@@ -17,23 +16,31 @@ from matplotlib.patches import Rectangle
 from matplotlib.collections import PatchCollection, LineCollection
 from matplotlib.colors import colorConverter
 
-
 # ======================================================================================================================
 
-
-
 class PlotAnimationCanvas(PlotCanvas):
+    """Class to extend plotCanvas in order to visualize animation"""
     def __init__(self, nashflow, interface, upperBound, stretchFactor):
+        """
+        :param nashflow: NashFlow instance
+        :param interface: Interface instance
+        :param upperBound: upper bound for the animation
+        :param stretchFactor: factor to stretch canvas to avoid distortion
+        """
+
         self.nashFlow = nashflow
         self.upperBound = upperBound
         self.network = self.nashFlow.network
         self.currentTimeIndex = 0
         self.maxTimeIndex = 99
+
+        # Contains all times of animation
         self.timePoints = [(float(i) / self.maxTimeIndex) * self.upperBound for i in range(self.maxTimeIndex + 1)]
-        self.nodeLabelByTimeDict = {node: dict() for node in self.network.nodes()}
+
         self.NTFColors = ['seagreen', 'darkorange', 'aquamarine', 'deepskyblue', 'mediumpurple']
 
-
+        # Dicts to save animation information
+        self.nodeLabelByTimeDict = {node: dict() for node in self.network.nodes()}
         self.flowOnEntireEdge = {edge:{i:dict() for i in range(len(self.nashFlow.flowIntervals))} for edge in self.network.edges()}
         self.flowOnEdgeNotQueue = {edge: {i: dict() for i in range(len(self.nashFlow.flowIntervals))} for edge in
                                  self.network.edges()}
@@ -57,6 +64,10 @@ class PlotAnimationCanvas(PlotCanvas):
         self.zoom(factor=None)
 
     def precompute_information(self, timeList=None):
+        """
+        Compute information needed for the animation
+        :param timeList: list of times for which information is computed. If None, then self.timePoints is used
+        """
         if not timeList:
             # Circumvent that default arguments are evaluated at function definition time
             timeList = self.timePoints
@@ -67,6 +78,7 @@ class PlotAnimationCanvas(PlotCanvas):
                 self.nodeLabelByTimeDict[v][time] = self.nashFlow.node_label(v, time)
 
         for fk in range(len(self.nashFlow.flowIntervals)):
+            # Compute information for each flowInterval fk
             for edge in self.network.edges():
                 v, w = edge
 
@@ -88,7 +100,6 @@ class PlotAnimationCanvas(PlotCanvas):
                                                                  - max(0, outflow*(min(time, wTimeUpper)-wTimeLower)))
                     self.flowOnEntireEdge[edge][fk][time] = flowOnEntireEdge
 
-                    #self.flowOnEdgeNotQueue[edge][fk][time] = max(0, outflow*(min(time, wTimeUpper - transitTime)-(wTimeLower - transitTime)))
                     if wTimeLower - transitTime >= time or time >= wTimeUpper:
                         flowOnEdgeNotQueue = 0
                     elif wTimeLower - transitTime <= time <= wTimeLower:
@@ -114,6 +125,11 @@ class PlotAnimationCanvas(PlotCanvas):
 
 
     def reset_bounds(self, lowerBound, upperBound):
+        """
+        Resets animation time bounds
+        :param lowerBound: lower time bound of animation
+        :param upperBound: upper time bound of animation
+        """
         self.lowerBound = lowerBound
         self.upperBound = upperBound
         self.timePoints = [self.lowerBound + float(i) / self.maxTimeIndex * (self.upperBound-self.lowerBound) for i in range(self.maxTimeIndex + 1)]
@@ -121,19 +137,35 @@ class PlotAnimationCanvas(PlotCanvas):
         self.update_time_labels()
 
     def add_time(self, time):
+        """
+        Add time to self.timePoints
+        """
         insort(self.timePoints, time)
         self.maxTimeIndex += 1
         self.precompute_information(timeList=[time])
 
     def time_changed(self, sliderVal):
+        """
+        Update the animation given a time index
+        :param sliderVal: index
+        """
         self.currentTimeIndex = sliderVal
         self.update_time_labels()
         self.update_flow_animation()
 
     def get_time_from_tick(self, sliderVal):
+        """
+        :param sliderVal: time index
+        :return: time corresponding to time index sliderVal
+        """
         return self.timePoints[sliderVal]
 
     def get_flowinterval_index_from_tick(self, sliderVal):
+        """
+        Get index of flowInterval in list self.nashFlow.flowIntervals corresponding to time index sliderVal
+        :param sliderVal: time index
+        :return: -1 if not found, otherwise the flowInterval in which self.get_time_from_tick(sliderVal) lies
+        """
         t = self.get_time_from_tick(sliderVal)
         for index, interval in enumerate(self.nashFlow.flowIntervals):
             if interval[0] <= t <= interval[1]:
@@ -142,8 +174,7 @@ class PlotAnimationCanvas(PlotCanvas):
 
 
     def update_time_labels(self):
-        # Update additional node labels
-
+        """Update additional node labels"""
         nodeLabelSize = int(round(self.nodeLabelFontSize))
 
         for v, label in self.additionalNodeLabelCollection.iteritems():  # type(label) = matplotlib.text.Text object
@@ -155,17 +186,22 @@ class PlotAnimationCanvas(PlotCanvas):
         self.draw_idle()
 
     def update_flow_animation(self):
-
+        """Update the animation"""
         for edge in self.network.edges():
             v,w = edge
             src, dst = self.network.node[v]['position'], self.network.node[w]['position']
             self.draw_queue_color_box(edge, src, dst)
             self.draw_edge_colors(edge, src, dst)
-
-
         self.draw_idle()
 
     def draw_edge_colors(self, edge, src, dst, p=0.25):
+        """
+        Draw colors of flow animation
+        :param edge: edge = vw to draw
+        :param src: position of v
+        :param dst: position of w
+        :param p: length of box
+        """
         if self.edgeColoring[edge] is not None:
             self.edgeColoring[edge].remove()
         self.edgeColoring[edge] = None
@@ -193,7 +229,7 @@ class PlotAnimationCanvas(PlotCanvas):
             inflowInterval, outflowInterval = self.nashFlow.animationIntervals[edge][fk]
             wTimeLower, wTimeUpper = outflowInterval
 
-            # these position factors are using that the amount on the edgeNotQueue has to be positive at this point
+            # These position factors are using that the amount on the edgeNotQueue has to be positive at this point
             startFac = float(transitTime - (wTimeUpper-time))/transitTime if time >= wTimeUpper - transitTime else 0
             endFac = float(transitTime-(wTimeLower-time))/transitTime if wTimeLower - transitTime <= time <= wTimeLower else 1
             start = srcAfterBox + startFac * s
@@ -220,6 +256,15 @@ class PlotAnimationCanvas(PlotCanvas):
 
 
     def draw_queue_color_box(self, edge, src, dst, p=0.25, radius=7, lastProportion=1):
+        """
+        Daw queue box with color of NTF
+        :param edge: edge e=vw
+        :param src: position of v
+        :param dst: position of w
+        :param p: length of box
+        :param radius: radius/height of box
+        :param lastProportion: start
+        """
         if self.boxColoring[edge] is not None:
             self.boxColoring[edge].remove()
         self.boxColoring[edge] = None
@@ -274,10 +319,12 @@ class PlotAnimationCanvas(PlotCanvas):
 
 
     def get_additional_node_labels(self):
+        """Return node label dict"""
         return {node: "%.2f" % self.nodeLabelByTimeDict[node][self.timePoints[self.currentTimeIndex]] for node in
                 self.network.nodes()}
 
     def get_edge_labels(self):
+        """Return edge label dict"""
         return {}
 
     def on_click(self, event):
@@ -301,7 +348,7 @@ class PlotAnimationCanvas(PlotCanvas):
             clickedEdge = self.check_edge_clicked((xAbsolute, yAbsolute))
 
             # Determine whether we clicked a node or not
-            clickedNode = self.check_node_clicked((xAbsolute, yAbsolute), edgePossible=True)  # never add a new node
+            clickedNode = self.check_node_clicked((xAbsolute, yAbsolute), edgePossible=True)  # Never add a new node
 
             if clickedEdge is not None and clickedNode is None:
                 # Selected an existing edge
@@ -368,6 +415,7 @@ class PlotAnimationCanvas(PlotCanvas):
                    arrows=True,
                    label=None,
                    **kwds):
+        """Workaround to call specific edge drawing function"""
 
         edges, boxes, tubes = Utilities.draw_animation_edges(G, pos,
                    edgelist,
@@ -385,24 +433,8 @@ class PlotAnimationCanvas(PlotCanvas):
         self.tube_collection = tubes
         return edges, boxes
 
-    def get_inflow_interval(self, edge, time):
-        v,w = edge
-        for lowerBound, upperBound in self.network[v][w]['inflow']:
-            if lowerBound <= time <= upperBound:
-                return (lowerBound, upperBound)
-
-        return -1
-
-
-    def get_outflow_interval(self, edge, time):
-        v,w = edge
-        for lowerBound, upperBound in self.network[v][w]['outflow']:
-            if lowerBound <= time <= upperBound:
-                return (lowerBound, upperBound)
-
-        return -1
-
     def zoom(self, factor=None):
+        """Zoom by a factor"""
         if factor is not None:
             smaller = lambda val: factor * val  # Returns smaller value if factor < 1, i.e. if zooming out
             bigger = lambda val: (1. / factor) * val  # Returns bigger value if factor < 1, i.e. if zooming out
@@ -432,7 +464,6 @@ class PlotAnimationCanvas(PlotCanvas):
             if colorEdgeCollection is not None:
                 colorEdgeCollection.set_linewidth(self.tubeWidthSize)
 
-
         # Scale font size of node labels
         self.nodeLabelFontSize = smaller(self.nodeLabelFontSize)
         nodeLabelSize = int(round(self.nodeLabelFontSize))
@@ -448,7 +479,5 @@ class PlotAnimationCanvas(PlotCanvas):
         edgeLabelSize = int(round(self.edgeLabelFontSize))
         for edge, label in self.edgeLabelCollection.iteritems():
             label.set_fontsize(edgeLabelSize)
-
-
 
         self.draw_idle()

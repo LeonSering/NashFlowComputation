@@ -2,7 +2,7 @@
 # Author:       Max ZIMMER
 # Project:      NashFlowComputation 2017
 # File:         application.py
-# Description:  Interface class; controlling signals/slots & communication between widgets et cetera
+# Description:  Interface class; controlling signals/slots & communication between widgets
 # ===========================================================================
 
 from PyQt4 import QtGui, QtCore
@@ -24,7 +24,8 @@ from utilitiesClass import Utilities
 
 # =======================================================================================================================
 filterwarnings('ignore')  # For the moment: ignore warnings as pyplot.hold is deprecated
-QtCore.QCoreApplication.setAttribute(QtCore.Qt.AA_X11InitThreads)   # This is necessary if threads access the GUI
+QtCore.QCoreApplication.setAttribute(QtCore.Qt.AA_X11InitThreads)  # This is necessary if threads access the GUI
+
 
 class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
     """Controls GUI"""
@@ -362,7 +363,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
             if self.nashFlow.flowIntervals[-1][1] < float('inf') \
             else Utilities.round_up(self.nashFlow.node_label('t', self.nashFlow.flowIntervals[-1][0]))
 
-        self.animationUpperBound = self.animationUpperBound if self.animationUpperBound > 0 else 10 # This can only happen when infinity is reached
+        self.animationUpperBound = self.animationUpperBound if self.animationUpperBound > 0 else 10  # This can only happen when infinity is reached
 
         self.animationStartLineEdit.setText("%.2f" % self.animationLowerBound)
         self.animationEndLineEdit.setText("%.2f" % self.animationUpperBound)
@@ -415,11 +416,6 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.re_init_graph_creation_app(NoNewGraph=True)
 
         self.tabWidget.setCurrentIndex(0)
-
-        try:
-            print next(nx.simple_cycles(self.network))
-        except:
-            print "NO CYCLE"
 
     def save_graph(self):
         """Save CurrentGraph instance to '.cg' file"""
@@ -692,7 +688,6 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
     def slider_released(self):
         """Slot function for slider release"""
         currentTime = self.plotAnimationCanvas.get_time_from_tick(self.timeSlider.value())
-        lastViewPoint = None
         # Adjust NTF if necessary
         for index, interval in enumerate(self.nashFlow.flowIntervals):
             lowerBound = interval[0]
@@ -701,8 +696,6 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
                 if self.intervalsListWidget.currentRow != index:
                     self.change_NTF_display(index)
                 break
-
-
 
     def update_node_label_diagram(self):
         """Update diagram of node label of focusNode"""
@@ -943,10 +936,14 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         """Slot to play animation"""
 
         def animate(FPS=4):
+            """
+            Animation function called by thread
+            :param FPS: frames per second
+            """
             currentIntervalIndex = self.plotAnimationCanvas.get_flowinterval_index_from_tick(self.timeSlider.value())
             self.change_NTF_display(currentIntervalIndex)
 
-            get_next_bound = lambda currentIntervalIndex: self.nashFlow.flowIntervals[currentIntervalIndex +1][0] \
+            get_next_bound = lambda currentIntervalIndex: self.nashFlow.flowIntervals[currentIntervalIndex + 1][0] \
                 if currentIntervalIndex + 1 < len(self.nashFlow.flowIntervals) else float('inf')
 
             nextBound = get_next_bound(currentIntervalIndex)
@@ -959,8 +956,8 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
                     self.change_NTF_display(currentIntervalIndex)
                     nextBound = get_next_bound(currentIntervalIndex)
 
-
-                if self.timeSlider.value >= 1 and lastTime != self.plotAnimationCanvas.get_time_from_tick(self.timeSlider.value() - 1):
+                if self.timeSlider.value >= 1 and lastTime != self.plotAnimationCanvas.get_time_from_tick(
+                                self.timeSlider.value() - 1):
                     # Necessary to check, as user could click somewhere on the slider
                     currentIntervalIndex = self.plotAnimationCanvas.get_flowinterval_index_from_tick(
                         self.timeSlider.value())
@@ -968,14 +965,13 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
                     nextBound = get_next_bound(currentIntervalIndex)
                 lastTime = self.plotAnimationCanvas.get_time_from_tick(self.timeSlider.value())
 
-
             self.animationRunning = False
 
-        self.output("Starting animation")
         if not self.animationRunning:
+            self.output("Starting animation")
             self.animationRunning = True
             t = threading.Thread(target=animate)
-            t.daemon = True # Enforcing that thread gets killed if main exits
+            t.daemon = True  # Enforcing that thread gets killed if main exits
             t.start()
 
     def pause_animation(self):
@@ -999,7 +995,6 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         currentTime = Utilities.get_time_for_log()
         logText = currentTime + " - " + txt
         self.logPlainTextEdit.appendPlainText(logText)
-
 
     def show_help(self):
         """Open thesis to display manual"""

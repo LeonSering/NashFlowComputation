@@ -2,14 +2,13 @@
 # Author:       Max ZIMMER
 # Project:      NashFlowComputation 2017
 # File:         plotNTFCanvasClass.py
-# Description:
-# Parameters:
+# Description:  Extends plotCanvas for the display of NTFs
 # ===========================================================================
 
 import matplotlib.figure
+import networkx as nx
 from utilitiesClass import Utilities
 from plotCanvasClass import PlotCanvas
-import networkx as nx
 matplotlib.use("Qt4Agg")
 
 
@@ -32,9 +31,11 @@ class PlotNTFCanvas(PlotCanvas):
             self.change_edge_show_status(showNoFlowEdges)
 
     def get_additional_node_labels(self):
+        """Returns additional node labels"""
         return {node: "%.2f" % self.NTFNodeLabelDict[node] for node in self.network.nodes()}
 
     def get_edge_labels(self):
+        """Returns edge labels"""
         return {edge: "%.2f" % self.NTFEdgeFlowDict[edge] for edge in self.network.edges()}
 
     def on_click(self, event):
@@ -71,6 +72,10 @@ class PlotNTFCanvas(PlotCanvas):
             self.mouseWheelPressedPosition = None
 
     def on_motion(self, event):
+        """
+        Move-Mouse-event handling
+        :param event: event which is emitted by matplotlib
+        """
         if event.xdata is None or event.ydata is None:
             return
 
@@ -83,6 +88,9 @@ class PlotNTFCanvas(PlotCanvas):
             self.draw_idle()
 
     def change_edge_show_status(self, show=True):
+        """
+        Change whether zero-flow edges are visible or not
+        """
         if show:
             self.network = self.originalNetwork.copy()
         else:
@@ -94,13 +102,14 @@ class PlotNTFCanvas(PlotCanvas):
         self.init_plot()
 
     def get_viewpoint(self):
+        """Get the field of view setting"""
         return (self.Xlim, self.Ylim, self.edgeWidthSize, self.nodeLabelFontSize, self.edgeLabelFontSize)
 
     def set_viewpoint(self, viewPoint=None):
+        """Set the field of view settings"""
         if viewPoint is None:
             return
 
         self.Xlim, self.Ylim, self.edgeWidthSize, self.nodeLabelFontSize, self.edgeLabelFontSize = viewPoint
-
         self.zoom(factor=None)
 

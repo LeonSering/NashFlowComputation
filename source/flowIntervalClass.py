@@ -25,6 +25,18 @@ class FlowInterval:
 
     def __init__(self, network, resettingEdges, lowerBoundTime, inflowRate, minCapacity, counter, outputDirectory,
                  templateFile, scipFile, timeout):
+        """
+        :param network: Networkx Digraph instance
+        :param resettingEdges: list of resetting edges
+        :param lowerBoundTime: \theta_k
+        :param inflowRate: u_0
+        :param minCapacity: minimum capacity of all edges in network
+        :param counter: unique ID of FlowInterval - needed for directory creation
+        :param outputDirectory: directory to output scip logs
+        :param templateFile: path of template which is used by SCIP
+        :param scipFile: path to scip binary
+        :param timeout: seconds until timeout. Deactivated if equal to 0
+        """
 
         self.network = network
         self.resettingEdges = resettingEdges
