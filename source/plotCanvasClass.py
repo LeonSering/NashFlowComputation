@@ -10,6 +10,7 @@ import numpy as np
 import networkx as nx
 from math import sqrt
 from utilitiesClass import Utilities
+from utilitiesClass import Utilities
 matplotlib.use("Qt4Agg")
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.colors import colorConverter
