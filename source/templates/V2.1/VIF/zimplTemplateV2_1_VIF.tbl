@@ -1,0 +1,66 @@
+zimpl	v       0	l$s             	"l$s"
+zimpl	v       1	l$t             	"l$t"
+zimpl	v       2	l$0             	"l$0"
+zimpl	v       3	l$1             	"l$1"
+zimpl	v       4	x$s$0           	"x$s$0"
+zimpl	v       5	x$0$1           	"x$0$1"
+zimpl	v       6	x$0$t           	"x$0$t"
+zimpl	v       7	x$1$t           	"x$1$t"
+zimpl	v       8	z$s$0           	"z$s$0"
+zimpl	v       9	z$0$t           	"z$0$t"
+zimpl	v      10	z$1$t           	"z$1$t"
+zimpl	v      11	__FlowNoResett@b	"@@FlowNoResetting_3_xp_0"	0.0000000000000000e+00
+zimpl	v      12	__FlowNoResett@c	"@@FlowNoResetting_3_xm_1"
+zimpl	v      13	__FlowNoResett@d	"@@FlowNoResetting_3_bp_2"
+zimpl	v      14	__FlowNoResett@e	"@@FlowNoResetting_3_bm_3"
+zimpl	v      15	__FlowNoResett@f	"@@FlowNoResetting_3_re_4"
+zimpl	v      16	__FlowNoReset@10	"@@FlowNoResetting_6_xp_5"	0.0000000000000000e+00
+zimpl	v      17	__FlowNoReset@11	"@@FlowNoResetting_6_xm_6"
+zimpl	v      18	__FlowNoReset@12	"@@FlowNoResetting_6_bp_7"
+zimpl	v      19	__FlowNoReset@13	"@@FlowNoResetting_6_bm_8"
+zimpl	v      20	__FlowNoReset@14	"@@FlowNoResetting_6_re_9"
+zimpl	v      21	__FlowNoReset@15	"@@FlowNoResetting_9_xp_10"	0.0000000000000000e+00
+zimpl	v      22	__FlowNoReset@16	"@@FlowNoResetting_9_xm_11"
+zimpl	v      23	__FlowNoReset@17	"@@FlowNoResetting_9_bp_12"
+zimpl	v      24	__FlowNoReset@18	"@@FlowNoResetting_9_bm_13"
+zimpl	v      25	__FlowNoReset@19	"@@FlowNoResetting_9_re_14"
+zimpl	c       0	conservation_v_1	"conservation_v_1"	0.0000000000000000e+00
+zimpl	c       1	conservation_v_2	"conservation_v_2"	0.0000000000000000e+00
+zimpl	c       2	conservation_s_1	"conservation_s_1"	0.0000000000000000e+00
+zimpl	c       3	conservation_t_1	"conservation_t_1"	0.0000000000000000e+00
+zimpl	c       4	lInit_1         	"lInit_1"	0.0000000000000000e+00
+zimpl	c       5	FlowButResetti@5	"FlowButResetting_1"	0.0000000000000000e+00
+zimpl	c       6	boundForVif_1   	"boundForVif_1"	0.0000000000000000e+00
+zimpl	c       7	boundForVif_2   	"boundForVif_2"	0.0000000000000000e+00
+zimpl	c       8	boundForVif_3   	"boundForVif_3"	0.0000000000000000e+00
+zimpl	c       9	boundForVif_4   	"boundForVif_4"	0.0000000000000000e+00
+zimpl	c      10	FlowNoResettin@a	"FlowNoResetting_1"	0.0000000000000000e+00
+zimpl	c      11	FlowNoResettin@b	"FlowNoResetting_2"	0.0000000000000000e+00
+zimpl	c      12	FlowNoResettin@c	"FlowNoResetting_3_a_0"	0.0000000000000000e+00
+zimpl	c      13	FlowNoResettin@d	"FlowNoResetting_3_b_1"	0.0000000000000000e+00
+zimpl	c      14	FlowNoResettin@e	"FlowNoResetting_3_c_2"	0.0000000000000000e+00
+zimpl	c      15	FlowNoResettin@f	"FlowNoResetting_3_d_3"	0.0000000000000000e+00
+zimpl	c      16	FlowNoResetti@10	"FlowNoResetting_3_e_4"	0.0000000000000000e+00
+zimpl	c      17	FlowNoResetti@11	"FlowNoResetting_3_f_5"	0.0000000000000000e+00
+zimpl	c      18	FlowNoResetti@12	"FlowNoResetting_3_t_r"	0.0000000000000000e+00
+zimpl	c      19	FlowNoResetti@13	"FlowNoResetting_3_e_r"	0.0000000000000000e+00
+zimpl	c      20	FlowNoResetti@14	"FlowNoResetting_4"	0.0000000000000000e+00
+zimpl	c      21	FlowNoResetti@15	"FlowNoResetting_5"	0.0000000000000000e+00
+zimpl	c      22	FlowNoResetti@16	"FlowNoResetting_6_a_6"	0.0000000000000000e+00
+zimpl	c      23	FlowNoResetti@17	"FlowNoResetting_6_b_7"	0.0000000000000000e+00
+zimpl	c      24	FlowNoResetti@18	"FlowNoResetting_6_c_8"	0.0000000000000000e+00
+zimpl	c      25	FlowNoResetti@19	"FlowNoResetting_6_d_9"	0.0000000000000000e+00
+zimpl	c      26	FlowNoResetti@1a	"FlowNoResetting_6_e_10"	0.0000000000000000e+00
+zimpl	c      27	FlowNoResetti@1b	"FlowNoResetting_6_f_11"	0.0000000000000000e+00
+zimpl	c      28	FlowNoResetti@1c	"FlowNoResetting_6_t_r"	0.0000000000000000e+00
+zimpl	c      29	FlowNoResetti@1d	"FlowNoResetting_6_e_r"	0.0000000000000000e+00
+zimpl	c      30	FlowNoResetti@1e	"FlowNoResetting_7"	0.0000000000000000e+00
+zimpl	c      31	FlowNoResetti@1f	"FlowNoResetting_8"	0.0000000000000000e+00
+zimpl	c      32	FlowNoResetti@20	"FlowNoResetting_9_a_12"	0.0000000000000000e+00
+zimpl	c      33	FlowNoResetti@21	"FlowNoResetting_9_b_13"	0.0000000000000000e+00
+zimpl	c      34	FlowNoResetti@22	"FlowNoResetting_9_c_14"	0.0000000000000000e+00
+zimpl	c      35	FlowNoResetti@23	"FlowNoResetting_9_d_15"	0.0000000000000000e+00
+zimpl	c      36	FlowNoResetti@24	"FlowNoResetting_9_e_16"	0.0000000000000000e+00
+zimpl	c      37	FlowNoResetti@25	"FlowNoResetting_9_f_17"	0.0000000000000000e+00
+zimpl	c      38	FlowNoResetti@26	"FlowNoResetting_9_t_r"	0.0000000000000000e+00
+zimpl	c      39	FlowNoResetti@27	"FlowNoResetting_9_e_r"	0.0000000000000000e+00

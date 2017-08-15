@@ -1,0 +1,35 @@
+zimpl	v       0	l$s             	"l$s"
+zimpl	v       1	l$t             	"l$t"
+zimpl	v       2	l$0             	"l$0"
+zimpl	v       3	l$1             	"l$1"
+zimpl	v       4	x$s$0           	"x$s$0"
+zimpl	v       5	x$0$1           	"x$0$1"
+zimpl	v       6	x$0$t           	"x$0$t"
+zimpl	v       7	x$1$t           	"x$1$t"
+zimpl	v       8	z$s$0           	"z$s$0"
+zimpl	v       9	z$0$t           	"z$0$t"
+zimpl	v      10	z$1$t           	"z$1$t"
+zimpl	v      11	alp$s$0         	"alp$s$0"
+zimpl	v      12	alp$0$t         	"alp$0$t"
+zimpl	v      13	alp$1$t         	"alp$1$t"
+zimpl	c       0	conservation_v_1	"conservation_v_1"	0.0000000000000000e+00
+zimpl	c       1	conservation_v_2	"conservation_v_2"	0.0000000000000000e+00
+zimpl	c       2	conservation_s_1	"conservation_s_1"	0.0000000000000000e+00
+zimpl	c       3	conservation_t_1	"conservation_t_1"	0.0000000000000000e+00
+zimpl	c       4	lInit_1         	"lInit_1"	0.0000000000000000e+00
+zimpl	c       5	FlowButResetti@5	"FlowButResetting_1"	0.0000000000000000e+00
+zimpl	c       6	FlowNoResettin@6	"FlowNoResetting_1"	0.0000000000000000e+00
+zimpl	c       7	FlowNoResettin@7	"FlowNoResetting_2"	0.0000000000000000e+00
+zimpl	c       8	FlowNoResettin@8	"FlowNoResetting_3"	0.0000000000000000e+00
+zimpl	c       9	FlowNoResettin@9	"FlowNoResetting_4"	0.0000000000000000e+00
+zimpl	c      10	FlowNoResettin@a	"FlowNoResetting_5"	0.0000000000000000e+00
+zimpl	c      11	FlowNoResettin@b	"FlowNoResetting_6"	0.0000000000000000e+00
+zimpl	c      12	FlowNoResettin@c	"FlowNoResetting_7"	0.0000000000000000e+00
+zimpl	c      13	FlowNoResettin@d	"FlowNoResetting_8"	0.0000000000000000e+00
+zimpl	c      14	FlowNoResettin@e	"FlowNoResetting_9"	0.0000000000000000e+00
+zimpl	c      15	FlowNoResettin@f	"FlowNoResetting_10"	0.0000000000000000e+00
+zimpl	c      16	FlowNoResetti@10	"FlowNoResetting_11"	0.0000000000000000e+00
+zimpl	c      17	FlowNoResetti@11	"FlowNoResetting_12"	0.0000000000000000e+00
+zimpl	c      18	quad_1          	"quad_1"	0.0000000000000000e+00
+zimpl	c      19	quad_2          	"quad_2"	0.0000000000000000e+00
+zimpl	c      20	quad_3          	"quad_3"	0.0000000000000000e+00
