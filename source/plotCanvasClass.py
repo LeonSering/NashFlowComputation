@@ -333,8 +333,8 @@ class PlotCanvas(FigureCanvas):
             edgeCollection, boxCollection = self.draw_edges(self.network, pos=positions, ax=self.axes,
                                                             arrow=True,
                                                             edge_color=edgeColorList, width=self.edgeWidthSize)
-            self.edgeCollections.append((self.network.edges(), edgeCollection))
-            self.boxCollections.append((self.network.edges(), boxCollection))
+            self.edgeCollections.append((list(self.network.edges()), edgeCollection))
+            self.boxCollections.append((list(self.network.edges()), boxCollection))
 
         additionalNodeLabels = self.get_additional_node_labels()
         if additionalNodeLabels:
