@@ -232,7 +232,7 @@ class PlotCanvas(FigureCanvas):
         :return: clicked edge (None if no edge has been selected)
         """
         clickedEdge = None
-        for edge in self.network.edges_iter():
+        for edge in self.network.edges():
             startpos = self.network.node[edge[0]]['position']
             endpos = self.network.node[edge[1]]['position']
             dist = self.compute_dist_projection_on_segment(clickpos, startpos, endpos)

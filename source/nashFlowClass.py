@@ -91,7 +91,7 @@ class NashFlow:
         lowerBoundTime = 0 if not self.flowIntervals else self.flowIntervals[-1][1]
 
         # Compute resettingEdges
-        resettingEdges = [(v, w) for v, w in self.network.edges_iter() if
+        resettingEdges = [(v, w) for v, w in self.network.edges() if
                           self.node_label(w, lowerBoundTime) > self.node_label(v, lowerBoundTime) + self.network[v][w][
                               'transitTime'] + TOL] if lowerBoundTime > 0 else []
 
@@ -126,7 +126,7 @@ class NashFlow:
         # Update in/out-flow rates
         if lowerBoundTime == 0:
             # init in/outflow
-            for v, w in self.network.edges_iter():
+            for v, w in self.network.edges():
                 vTimeLower = self.node_label(v, 0)
                 wTimeLower = self.node_label(w, 0)
 
@@ -148,7 +148,7 @@ class NashFlow:
                 self.network[v][w]['queueSize'][0] = 0
                 self.network[v][w]['queueSize'][vTimeLower] = 0
 
-        for v, w in self.network.edges_iter():
+        for v, w in self.network.edges():
 
             # Inflow changes
             vTimeLower, vTimeUpper = self.node_label(v, interval.lowerBoundTime), self.node_label(v,
