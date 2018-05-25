@@ -94,9 +94,11 @@ class PlotNTFCanvas(PlotCanvas):
         if show:
             self.network = self.originalNetwork.copy()
         else:
+            removedEdges = []
             for edge in self.network.edges():
                 if Utilities.is_eq_tol(self.NTFEdgeFlowDict[edge], 0):
-                    self.network.remove_edge(edge[0], edge[1])
+                    removedEdges.append(edge)
+            self.network.remove_edges_from(removedEdges)
             self.network.remove_nodes_from(nx.isolates(self.network))
 
         self.init_plot()

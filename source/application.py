@@ -623,6 +623,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
             plot = PlotNTFCanvas(interval[2].shortestPathNetwork, self, intervalID=index,
                                  stretchFactor=self.plotNTFCanvasStretchFactor,
                                  showNoFlowEdges=self.showEdgesWithoutFlowCheckBox.isChecked())
+            # Note: this could create problems if user changes showEdgesWithoutFlowCheckBox between interval computations
             self.NTFPlotList.append(plot)  # Add NTF Plot to List
 
     def update_ntf_display(self):
