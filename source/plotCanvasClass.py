@@ -207,8 +207,9 @@ class PlotCanvas(FigureCanvas):
 
         elif self.mouseRightPressed and self.selectedNode is not None:
             self.network.node[self.selectedNode]['position'] = (xAbsolute, yAbsolute)
-            self.update_nodes(moved=True)
+            self.update_nodes(moved=True, color=True)
             self.update_edges(moved=True)
+            self.interface.update_node_display()
 
     def on_scroll(self, event):
         """
