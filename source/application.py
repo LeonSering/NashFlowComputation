@@ -218,7 +218,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
             movedBool = (self.network.node[vertex]['position'] != (float(XPos), float(YPos)))
             self.network.node[vertex]['position'] = (float(XPos), float(YPos))
 
-            self.graphCreationCanvas.update_nodes(moved=movedBool)  # Update UI
+            self.graphCreationCanvas.update_nodes(moved=movedBool, color=True)  # Update UI
             if movedBool:
                 self.graphCreationCanvas.update_edges(moved=movedBool)
 
