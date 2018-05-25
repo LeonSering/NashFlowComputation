@@ -272,6 +272,7 @@ class PlotCanvas(FigureCanvas):
         :param edgePossible: bool indicating whether click corresponds to an edge
         :return: clicked node (None if no node has been selected)
         """
+
         xAbsolute, yAbsolute = clickpos[0], clickpos[1]
         clickedNode = None
         minDist = float('inf')
@@ -315,7 +316,7 @@ class PlotCanvas(FigureCanvas):
         self.nodeCollections = []
         nodeColor = lambda v: 'r' if v != self.focusNode else 'b'
         nodeColorList = [nodeColor(v) for v in self.network.nodes()]
-        self.nodeCollections.append((self.network.nodes(),
+        self.nodeCollections.append((list(self.network.nodes()),
                                      self.draw_nodes(self.network, pos=positions, ax=self.axes,
                                                      node_size=self.nodeSize, node_color=nodeColorList)))
 
@@ -399,7 +400,7 @@ class PlotCanvas(FigureCanvas):
                                                                   ax=self.axes, node_size=self.nodeSize,
                                                                   nodelist=[v], node_color='b')))
         elif added:
-            # A node has been added (can we do better than plotting all nodes again)
+            # A node has been added (can we do better than plotting all nodes again?)
             if self.focusNode is not None and all([self.focusNode not in entry for entry in self.nodeCollections]):
                 v = self.focusNode
                 self.nodeCollections.append(([v], self.draw_nodes(self.network,
