@@ -10,6 +10,7 @@ if __name__ == '__main__':
     from math import ceil
     from source import application
 
+
     def onResize(event, widgetList, referenceSize):
         '''
         Resizes widgets when the main window is being resized
@@ -17,29 +18,39 @@ if __name__ == '__main__':
         :param widgetList: List of all widgets that need to be resized
         :param referenceSize: original size of main window
         '''
-        newMainWindowSize = event.size() # New size of main window
         if (event.oldSize().height(), event.oldSize().width()) == (-1, -1):
             # Initialization should be ignored
             return
 
-        # Compute rescaling factor in x and y direction
-        xNew, yNew = float(newMainWindowSize.width()), float(newMainWindowSize.height())
-        xRescale, yRescale = xNew / referenceSize.width(), yNew / referenceSize.height()
+        newMainWindowSize = event.size() # New size of main window
+        widthToHeightRatio = float(referenceSize.width()) / referenceSize.height()
+        fixedHeight = int(ceil(1. / widthToHeightRatio * form.width()))
+        sizeDiff = newMainWindowSize - event.oldSize()
+        widthDiff, heightDiff = sizeDiff.width(), sizeDiff.height()
 
-        for widget, size, position, fontPointSize in widgetList:
-            # Update the widgets size
-            newSize = application.QtCore.QSize(int(ceil(xRescale * size.width())), int(ceil(yRescale * size.height())))
-            widget.resize(newSize)
+        if widthDiff != 0 and heightDiff == 0:
+            #Window changed width -> adjust height
+            form.setMinimumHeight(fixedHeight)
+            form.setMaximumHeight(fixedHeight)
+        else:
+            # Compute rescaling factor in x and y direction
+            xNew, yNew = float(newMainWindowSize.width()), float(newMainWindowSize.height())
+            xRescale, yRescale = xNew / referenceSize.width(), yNew / referenceSize.height()
 
-            # Update the widgets position
-            newPos = application.QtCore.QPoint(int(ceil(xRescale * position.x())), int(ceil(yRescale * position.y())))
-            widget.move(newPos)
+            for widget, size, position, fontPointSize in widgetList:
+                # Update the widgets size
+                newSize = application.QtCore.QSize(int(ceil(xRescale * size.width())), int(ceil(yRescale * size.height())))
+                widget.resize(newSize)
 
-            # Update the widgets font size
-            newFont = widget.font() # This should be returned as constant?
-            newFontSize = int(ceil((0.5 * (xRescale + yRescale) * fontPointSize)))
-            newFont.setPointSize(newFontSize)
-            widget.setFont(newFont)
+                # Update the widgets position
+                newPos = application.QtCore.QPoint(int(ceil(xRescale * position.x())), int(ceil(yRescale * position.y())))
+                widget.move(newPos)
+
+                # Update the widgets font size
+                newFont = widget.font() # This should be returned as constant?
+                newFontSize = int(ceil((0.5 * (xRescale + yRescale) * fontPointSize)))
+                newFont.setPointSize(newFontSize)
+                widget.setFont(newFont)
 
 
 
@@ -58,6 +69,13 @@ if __name__ == '__main__':
     widgetList = widgetListbyType + additionalWidgetList
 
     referenceSize = form.size() # Get reference size of main window
+
+    # Set initial height to avoid automatic shrinking at the beginning
+    form.setMinimumHeight(referenceSize.height())
+    form.setMaximumHeight(referenceSize.height())
+
+    # Called to update window
     form.resizeEvent = lambda event: onResize(event, widgetList, referenceSize)
+
     form.show()
     app.exec_()
