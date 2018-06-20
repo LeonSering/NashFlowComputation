@@ -27,12 +27,13 @@ SIMILARITY_DIST = 9  # Maximal distance at which a click is recognized as a clic
 class PlotCanvas(FigureCanvas):
     """Class to plot networkx graphs in widgets and control click events"""
 
-    def __init__(self, graph, interface, stretchFactor=1.57):
+    def __init__(self, graph, interface, stretchFactor=1.57, onlyNTF=False):
         self.figure = matplotlib.figure.Figure()
         super(PlotCanvas, self).__init__(self.figure)  # Call parents constructor
         self.figure.patch.set_facecolor('lightgrey')
         self.network = graph
         self.interface = interface
+        self.onlyNTF = onlyNTF # If this is true, then PlotCanvas displays certain NTFs
 
         # Visualization Settings
         self.Xlim = (stretchFactor * (-100), stretchFactor * 100)
@@ -71,8 +72,11 @@ class PlotCanvas(FigureCanvas):
 
     def get_edge_labels(self):
         """Returns dict of edge labels"""
-        return Utilities.join_intersect_dicts(nx.get_edge_attributes(self.network, 'capacity'),
-                                              nx.get_edge_attributes(self.network, 'transitTime'))  # Edge labels
+        if not self.onlyNTF:
+            return Utilities.join_intersect_dicts(nx.get_edge_attributes(self.network, 'capacity'),
+                                                  nx.get_edge_attributes(self.network, 'transitTime'))  # Edge labels
+        else:
+            return nx.get_edge_attributes(self.network, 'capacity')
 
     def on_click(self, event):
         """

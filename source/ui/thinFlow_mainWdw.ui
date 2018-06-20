@@ -82,7 +82,7 @@
                </widget>
               </item>
               <item row="0" column="1">
-               <widget class="QLineEdit" name="tailLineEdit"/>
+               <widget class="QLineEdit" name="tailLineEdit_general"/>
               </item>
               <item row="1" column="0">
                <widget class="QLabel" name="label_4">
@@ -92,7 +92,7 @@
                </widget>
               </item>
               <item row="1" column="1">
-               <widget class="QLineEdit" name="headLineEdit"/>
+               <widget class="QLineEdit" name="headLineEdit_general"/>
               </item>
               <item row="2" column="0">
                <widget class="QLabel" name="label_7">
@@ -102,12 +102,12 @@
                </widget>
               </item>
               <item row="2" column="1">
-               <widget class="QLineEdit" name="capacityLineEdit"/>
+               <widget class="QLineEdit" name="capacityLineEdit_general"/>
               </item>
              </layout>
             </item>
             <item>
-             <widget class="QPushButton" name="updateEdgeButton">
+             <widget class="QPushButton" name="updateEdgeButton_general">
               <property name="text">
                <string>Add/Upd. edge</string>
               </property>
@@ -123,7 +123,7 @@
              </widget>
             </item>
             <item>
-             <widget class="QPushButton" name="deleteEdgeButton">
+             <widget class="QPushButton" name="deleteEdgeButton_general">
               <property name="text">
                <string>Delete edge</string>
               </property>
@@ -160,7 +160,7 @@
            </property>
            <layout class="QGridLayout" name="gridLayout_4">
             <item row="2" column="0">
-             <widget class="QPushButton" name="updateNodeButton">
+             <widget class="QPushButton" name="updateNodeButton_general">
               <property name="text">
                <string>Update node</string>
               </property>
@@ -185,7 +185,7 @@
                </widget>
               </item>
               <item row="0" column="1">
-               <widget class="QLineEdit" name="nodeNameLineEdit"/>
+               <widget class="QLineEdit" name="nodeNameLineEdit_general"/>
               </item>
               <item row="1" column="0">
                <widget class="QLabel" name="label_2">
@@ -202,15 +202,15 @@
                </widget>
               </item>
               <item row="1" column="1">
-               <widget class="QLineEdit" name="nodeXLineEdit"/>
+               <widget class="QLineEdit" name="nodeXLineEdit_general"/>
               </item>
               <item row="2" column="1">
-               <widget class="QLineEdit" name="nodeYLineEdit"/>
+               <widget class="QLineEdit" name="nodeYLineEdit_general"/>
               </item>
              </layout>
             </item>
             <item row="3" column="0">
-             <widget class="QPushButton" name="deleteNodeButton">
+             <widget class="QPushButton" name="deleteNodeButton_general">
               <property name="text">
                <string>Delete node</string>
               </property>
@@ -247,7 +247,7 @@
          <item row="1" column="1" colspan="2">
           <layout class="QGridLayout" name="gridLayout_3">
            <item row="0" column="1">
-            <widget class="QListWidget" name="nodeSelectionListWidget">
+            <widget class="QListWidget" name="nodeSelectionListWidget_general">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
                <horstretch>0</horstretch>
@@ -257,7 +257,7 @@
             </widget>
            </item>
            <item row="1" column="0" colspan="2">
-            <widget class="QPushButton" name="computeThinFlowPushButton">
+            <widget class="QPushButton" name="computeThinFlowPushButton_general">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
                <horstretch>0</horstretch>
@@ -270,7 +270,7 @@
             </widget>
            </item>
            <item row="0" column="0">
-            <widget class="QListWidget" name="edgeSelectionListWidget">
+            <widget class="QListWidget" name="edgeSelectionListWidget_general">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
                <horstretch>0</horstretch>
@@ -282,7 +282,7 @@
           </layout>
          </item>
          <item row="1" column="0">
-          <widget class="QFrame" name="plotNTFFrame">
+          <widget class="QFrame" name="plotNTFFrame_general">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
              <horstretch>0</horstretch>
@@ -295,7 +295,7 @@
           </widget>
          </item>
          <item row="0" column="0">
-          <widget class="QFrame" name="plotFrame">
+          <widget class="QFrame" name="plotFrame_general">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
              <horstretch>4</horstretch>
