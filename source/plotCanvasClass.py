@@ -169,7 +169,8 @@ class PlotCanvas(FigureCanvas):
                 if self.selectedNode is not None and self.selectedNode != clickedNode:
                     # Add the corresponding edge, if valid
                     if not self.network.has_edge(self.selectedNode, clickedNode):
-                        self.network.add_edge(self.selectedNode, clickedNode, transitTime=1, capacity=1)
+                        resettingEnabledBool = False if self.onlyNTF else None # Either 0 or 1. Activated only if onlyNTF
+                        self.network.add_edge(self.selectedNode, clickedNode, transitTime=1, capacity=1, resettingEnabled=resettingEnabledBool)
 
                         self.focusEdge = (self.selectedNode, clickedNode)
                         self.focusNode = None
@@ -528,14 +529,15 @@ class PlotCanvas(FigureCanvas):
 
         if color:
             # Update colors
-            edgeColor = lambda v, w: 'black' if (v, w) != self.focusEdge else 'b'
+            edgeColor = lambda v, w: 'b' if (v, w) == self.focusEdge else ('r' if self.network[v][w]['resettingEnabled'] else 'black')
             edgeSize = lambda v, w: self.edgeWidthSize if (v, w) != self.focusEdge else self.edgeWidthSize + 1
             boxSize = lambda v, w: 1 if (v, w) != self.focusEdge else 2
             collectionIndex = 0
             for edges, edgeCollection in self.edgeCollections:
                 if edges:
                     edgeColorList = [colorConverter.to_rgba(edgeColor(v, w), 1) for v, w in
-                                     edges] if not removal else 'black'
+                                     edges]
+
                     edgeCollection.set_color(edgeColorList)
                     edgeCollection.set_linewidth([edgeSize(v, w) for v, w in edges])
 

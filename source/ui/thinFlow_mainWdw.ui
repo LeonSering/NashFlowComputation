@@ -104,6 +104,23 @@
               <item row="2" column="1">
                <widget class="QLineEdit" name="capacityLineEdit_general"/>
               </item>
+              <item row="3" column="0">
+               <widget class="QLabel" name="label_6">
+                <property name="text">
+                 <string>Resetting</string>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="1">
+               <widget class="QPushButton" name="resettingSwitchButton_general">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+                <property name="text">
+                 <string>Off</string>
+                </property>
+               </widget>
+              </item>
              </layout>
             </item>
             <item>

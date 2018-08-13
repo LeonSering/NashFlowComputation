@@ -20,6 +20,7 @@ from plotNTFCanvasClass import PlotNTFCanvas
 from ui import thinFlow_mainWdw
 from utilitiesClass import Utilities
 from application import Interface as app_Interface
+from normalizedThinFlowClass import NormalizedThinFlow
 
 
 
@@ -71,6 +72,8 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
         self.nodeSelectionListWidget_general.itemClicked.connect(self.update_focus_node)
         self.edgeSelectionListWidget_general.itemClicked.connect(self.update_focus_edge)
         self.activateTimeoutCheckBox.clicked.connect(self.change_timeout_state)
+        self.computeThinFlowPushButton_general.clicked.connect(self.compute_NTF)
+        self.resettingSwitchButton_general.clicked.connect(self.change_resetting)
         # TO BE DONE LATER
         #self.actionNew_graph.triggered.connect(self.re_init_graph_creation_app)
         #self.actionLoad_graph.triggered.connect(self.load_graph)
@@ -254,6 +257,8 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
 
         self.setFocus()  # Focus has to leave LineEdits
 
+        self.adjust_resettingSwitchButton(edge)
+
     def update_add_edge(self):
         """Add an edge or update attributes of focusNode, if existing"""
         if self.graphCreationCanvas_general.focusEdge is None:
@@ -350,6 +355,8 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
         self.update_node_display()
         self.update_edge_display()
 
+        self.adjust_resettingSwitchButton(None)
+
     def update_focus_edge(self):
         """Select new focusEdge"""
         self.graphCreationCanvas_general.focusNode = None
@@ -361,3 +368,44 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
         self.graphCreationCanvas_general.update_edges(color=True)
         self.update_node_display()
         self.update_edge_display()
+
+        self.adjust_resettingSwitchButton(edge)
+
+    def adjust_resettingSwitchButton(self, edge):
+        if edge is None:
+            # Turn button off
+            self.resettingSwitchButton_general.setText("Off")
+            self.resettingSwitchButton_general.setEnabled(False)
+        else:
+            # Turn button on, adjust Label accordingly
+            resettingStatusBool = self.network_general[edge[0]][edge[1]]['resettingEnabled']
+            resettingSwitchButtonLabel = "On" if resettingStatusBool else "Off"
+            self.resettingSwitchButton_general.setText(resettingSwitchButtonLabel)
+            self.resettingSwitchButton_general.setEnabled(True)
+
+    def re_init_NTF_frame(self):
+        """Clears the nashflow tab for new nashflow computation"""
+        # Configure plotNTFFrame to display plots of NTF
+        if self.plotNTFCanvas_general is not None:
+            self.plotNTFCanvas_general.setParent(None)
+        self.plotNTFCanvas_general = None
+
+    def change_resetting(self):
+        edge = self.graphCreationCanvas_general.focusEdge
+        if edge is None:
+            return
+
+        # Change resettingEnabled Boolean
+        self.network_general[edge[0]][edge[1]]['resettingEnabled'] = not self.network_general[edge[0]][edge[1]]['resettingEnabled']
+        self.adjust_resettingSwitchButton(edge) # Change button accordingly
+
+        # Update display
+        self.graphCreationCanvas_general.update_edges(color=True)
+
+    def compute_NTF(self):
+        """Computes NTF in current tab"""
+        self.shortestPathNetwork_general = self.network_general # the shortestPathNetwork is given by user
+        #resettingEdgeList = []
+
+        #self.NTF_general = NormalizedThinFlow(self.shortestPathNetwork_general, id, resettingEdges, flowEdges, inflowRate, minCapacity, outputDirectory,
+        #         templateFile, scipFile)
