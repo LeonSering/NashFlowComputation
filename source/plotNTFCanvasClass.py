@@ -9,6 +9,7 @@ import matplotlib.figure
 import networkx as nx
 from utilitiesClass import Utilities
 from plotCanvasClass import PlotCanvas
+from copy import deepcopy
 matplotlib.use("Qt4Agg")
 
 
@@ -17,12 +18,22 @@ matplotlib.use("Qt4Agg")
 
 
 class PlotNTFCanvas(PlotCanvas):
-    def __init__(self, graph, interface, intervalID, stretchFactor, showNoFlowEdges=True):
+    def __init__(self, graph, interface, intervalID, stretchFactor, showNoFlowEdges=True, onlyNTF=False):
         self.figure = matplotlib.figure.Figure()
+        self.onlyNTF = onlyNTF  # If this is true, then PlotCanvas belongs to Thinflow Computation App
 
-        flowLabels = interface.nashFlow.flowIntervals[intervalID][2].NTFEdgeFlowDict
-        self.NTFNodeLabelDict = interface.nashFlow.flowIntervals[intervalID][2].NTFNodeLabelDict
-        self.NTFEdgeFlowDict = {edge: flowLabels[edge] for edge in graph.edges()}
+        if nx.number_of_nodes(graph) != 0:
+            # Graph is not empty. Otherwise dont do stuff because the call was made by thinFlow_application initialization
+            if not self.onlyNTF:
+                # We have a regular nashFlow instance
+                flowLabels = interface.nashFlow.flowIntervals[intervalID][2].NTFEdgeFlowDict
+                self.NTFNodeLabelDict = interface.nashFlow.flowIntervals[intervalID][2].NTFNodeLabelDict
+                self.NTFEdgeFlowDict = {edge: flowLabels[edge] for edge in graph.edges()}
+            else:
+                # We just have a flowInterval instance
+                flowLabels = interface.interval_general.NTFEdgeFlowDict
+                self.NTFNodeLabelDict = interface.interval_general.NTFNodeLabelDict
+                self.NTFEdgeFlowDict = {edge: flowLabels[edge] for edge in graph.edges()}
 
         PlotCanvas.__init__(self, graph, interface, stretchFactor=stretchFactor)  # Call parents constructor
         self.network = self.network.copy() # Copy network to avoid modifying it in other Canvas when deleting/adding zero flow edges
@@ -93,13 +104,15 @@ class PlotNTFCanvas(PlotCanvas):
         """
         if show:
             self.network = self.originalNetwork.copy()
+            #self.network = deepcopy(self.originalNetwork)
         else:
             removedEdges = []
             for edge in self.network.edges():
                 if Utilities.is_eq_tol(self.NTFEdgeFlowDict[edge], 0):
                     removedEdges.append(edge)
             self.network.remove_edges_from(removedEdges)
-            self.network.remove_nodes_from(nx.isolates(self.network))
+            isolated_nodes = list(nx.isolates(self.network))
+            self.network.remove_nodes_from(isolated_nodes)
 
         self.init_plot()
 

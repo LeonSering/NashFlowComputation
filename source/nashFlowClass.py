@@ -42,7 +42,7 @@ class NashFlow:
         self.templateFile = os.path.join(os.getcwd(), 'source', 'templates',
                                          'algorithm_' + str(templateFile + 1) + '.zpl')
         self.allInOne = (templateFile == 1)
-        self.advancedAlgo = (templateFile == 2)  # If true, then advanced backtracking with preprocessing
+        self.advancedAlgo = (templateFile == 2)  # If true, then advanced backtracking with preprocessing is performed
 
         self.scipFile = scipFile
         self.cleanUpBool = cleanUpBool

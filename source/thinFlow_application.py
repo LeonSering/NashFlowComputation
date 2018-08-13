@@ -12,6 +12,7 @@ import os
 import pickle
 import threading
 import time
+from copy import deepcopy
 import networkx as nx
 from warnings import filterwarnings
 
@@ -20,7 +21,7 @@ from plotNTFCanvasClass import PlotNTFCanvas
 from ui import thinFlow_mainWdw
 from utilitiesClass import Utilities
 from application import Interface as app_Interface
-from normalizedThinFlowClass import NormalizedThinFlow
+from flowIntervalClass import FlowInterval
 
 
 
@@ -68,7 +69,7 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
         self.outputDirectoryPushButton.clicked.connect(self.select_output_directory)
         self.scipPathPushButton.clicked.connect(self.select_scip_binary)
         self.cleanUpCheckBox.clicked.connect(self.change_cleanup_state)
-        #self.showEdgesWithoutFlowCheckBox.clicked.connect(self.change_no_flow_show_state) # To be done at later stage maybe
+        self.showEdgesWithoutFlowCheckBox.clicked.connect(self.change_no_flow_show_state)
         self.nodeSelectionListWidget_general.itemClicked.connect(self.update_focus_node)
         self.edgeSelectionListWidget_general.itemClicked.connect(self.update_focus_edge)
         self.activateTimeoutCheckBox.clicked.connect(self.change_timeout_state)
@@ -95,7 +96,11 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
         # Configure plotNTFFrame
         self.plotNTFFrameLayout_general = QtGui.QVBoxLayout()
         self.plotNTFFrame_general.setLayout(self.plotNTFFrameLayout_general)
-        self.plotNTFCanvas_general = None
+        # Add empty graph to plotNTFCanvas to not destroy layout
+        self.plotNTFCanvas_general = PlotNTFCanvas(nx.DiGraph(), self, intervalID=None,
+                             stretchFactor=self.plotNTFCanvasStretchFactor,
+                             showNoFlowEdges=self.showEdgesWithoutFlowCheckBox.isChecked(), onlyNTF=True)
+        self.plotNTFFrameLayout_general.addWidget(self.plotNTFCanvas_general)
 
     def re_init_node_list(self):
         """Clear and fill node list"""
@@ -320,7 +325,6 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
         if len(fselect) == 0:
             return
         fselect = str(fselect)
-        self.output("Selecting output directory: " + str(fselect))
         self.outputDirectoryLineEdit.setText(fselect)
         self.outputDirectory = fselect
 
@@ -335,9 +339,20 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
         if len(fselect) == 0:
             return
         fselect = str(fselect)
-        self.output("Selecting scip binary: " + str(fselect))
         self.scipPathLineEdit.setText(fselect)
         self.scipFile = fselect
+
+    def save_config(self):
+        """Save the config file"""
+        self.configFile.set('Settings', 'outputdir', self.outputDirectory)
+        self.configFile.set('Settings', 'templatefile', self.templateFile)
+        self.configFile.set('Settings', 'scippath', self.scipFile)
+        self.configFile.set('Settings', 'cleanup', self.cleanUpEnabled)
+        self.configFile.set('Settings', 'defaultloadsavedir', self.defaultLoadSaveDir)
+        self.configFile.set('Settings', 'timeoutactivated', self.timeoutActivated)
+
+        with open('thinFlow_config.cfg', 'wb') as configfile:
+            self.configFile.write(configfile)
 
     def change_cleanup_state(self):
         """Active/Deactive cleanup"""
@@ -372,6 +387,7 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
         self.adjust_resettingSwitchButton(edge)
 
     def adjust_resettingSwitchButton(self, edge):
+        "Adjustment of resettingSwitchButton in GUI"
         if edge is None:
             # Turn button off
             self.resettingSwitchButton_general.setText("Off")
@@ -384,13 +400,13 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
             self.resettingSwitchButton_general.setEnabled(True)
 
     def re_init_NTF_frame(self):
-        """Clears the nashflow tab for new nashflow computation"""
-        # Configure plotNTFFrame to display plots of NTF
+        """Clears the NTF frame"""
         if self.plotNTFCanvas_general is not None:
             self.plotNTFCanvas_general.setParent(None)
         self.plotNTFCanvas_general = None
 
     def change_resetting(self):
+        """Changes the resettingEnabled status of an edge"""
         edge = self.graphCreationCanvas_general.focusEdge
         if edge is None:
             return
@@ -402,10 +418,49 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
         # Update display
         self.graphCreationCanvas_general.update_edges(color=True)
 
+    def change_no_flow_show_state(self):
+        """Show/Hide edges without flow in each NTF Plot"""
+        self.plotNTFCanvas_general.change_edge_show_status(show=self.showEdgesWithoutFlowCheckBox.isChecked())
+
     def compute_NTF(self):
         """Computes NTF in current tab"""
-        self.shortestPathNetwork_general = self.network_general # the shortestPathNetwork is given by user
-        #resettingEdgeList = []
 
-        #self.NTF_general = NormalizedThinFlow(self.shortestPathNetwork_general, id, resettingEdges, flowEdges, inflowRate, minCapacity, outputDirectory,
-        #         templateFile, scipFile)
+        # Drop current NTF plot
+        self.re_init_NTF_frame()
+
+        # Get necessary data
+        resettingEdges = [edge for edge in self.network_general.edges() if self.network_general[edge[0]][edge[1]]['resettingEnabled']]
+        lowerBoundTime = 0  # No needed for different times as only one flowInterval is being computed
+        inflowRate = float(self.inflowLineEdit.text())
+        minCapacity = Utilities.compute_min_capacity(self.network_general)
+        counter = "Standalone"
+        rootPath = self.outputDirectory
+        templateFile = os.path.join(os.getcwd(), 'templates',
+                                         'algorithm_' + str(self.templateFile + 1) + '.zpl')
+        scipFile = self.scipFile
+        timeout = float(self.timeoutLineEdit.text())
+
+        self.save_config()
+
+        self.interval_general = FlowInterval(self.network_general, resettingEdges=resettingEdges, lowerBoundTime=lowerBoundTime,
+                                inflowRate=inflowRate, minCapacity=minCapacity, counter=counter,
+                                outputDirectory=rootPath, templateFile=templateFile, scipFile=scipFile,
+                                timeout=timeout, )
+
+        # Set shortest path network manually to entire graph (is the deepcopy really needed?)
+        self.interval_general.shortestPathNetwork = deepcopy(self.network_general)
+
+        self.advancedAlgo = (templateFile == 2)  # If true, then advanced backtracking with preprocessing is performed
+
+        if self.advancedAlgo:
+            self.interval_general.get_ntf_advanced()
+        else:
+            self.interval_general.get_ntf()
+
+        self.plotNTFCanvas_general = PlotNTFCanvas(self.interval_general.shortestPathNetwork, self, intervalID=None,
+                             stretchFactor=self.plotNTFCanvasStretchFactor,
+                             showNoFlowEdges=self.showEdgesWithoutFlowCheckBox.isChecked(), onlyNTF=True)
+
+        self.plotNTFFrameLayout_general.addWidget(self.plotNTFCanvas_general)
+
+

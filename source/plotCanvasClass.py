@@ -33,7 +33,7 @@ class PlotCanvas(FigureCanvas):
         self.figure.patch.set_facecolor('lightgrey')
         self.network = graph
         self.interface = interface
-        self.onlyNTF = onlyNTF # If this is true, then PlotCanvas displays certain NTFs
+        self.onlyNTF = onlyNTF # If this is true, then PlotCanvas belongs to Thinflow Computation App
 
         # Visualization Settings
         self.Xlim = (stretchFactor * (-100), stretchFactor * 100)
