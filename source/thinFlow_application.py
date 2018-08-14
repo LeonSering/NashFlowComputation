@@ -12,6 +12,7 @@ import os
 import pickle
 import threading
 import time
+from shutil import rmtree
 from copy import deepcopy
 import networkx as nx
 from warnings import filterwarnings
@@ -440,6 +441,12 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
         elif self.graphCreationCanvas_general.focusEdge is not None:
             self.delete_edge()
 
+    def cleanup(self):
+        """Cleanup if activated. Note: In NFC this functionality is part of the nashFlow Class"""
+        if self.cleanUpEnabled:
+            rmtree(self.interval_general.rootPath)
+
+
     def compute_NTF(self):
         """Computes NTF in current tab"""
 
@@ -480,5 +487,5 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
                              showNoFlowEdges=self.showEdgesWithoutFlowCheckBox.isChecked(), onlyNTF=True)
 
         self.plotNTFFrameLayout_general.addWidget(self.plotNTFCanvas_general)
-
+        self.cleanup()
 
