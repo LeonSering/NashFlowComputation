@@ -82,6 +82,17 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
         #self.actionExit.triggered.connect(QtGui.QApplication.quit)
         #self.actionOpen_manual.triggered.connect(self.show_help)
 
+        # Keyboard shortcuts
+        QtGui.QShortcut(QtGui.QKeySequence(QtCore.Qt.Key_Delete), self).activated.connect(
+            self.pressed_delete)  # Pressed Delete
+        self.tailLineEdit_general.returnPressed.connect(self.update_add_edge)
+        self.headLineEdit_general.returnPressed.connect(self.update_add_edge)
+        self.capacityLineEdit_general.returnPressed.connect(self.update_add_edge)
+        self.nodeNameLineEdit_general.returnPressed.connect(self.update_node)
+        self.nodeXLineEdit_general.returnPressed.connect(self.update_node)
+        self.nodeYLineEdit_general.returnPressed.connect(self.update_node)
+
+
     def init_app(self): # former: init_graph_creation_app
         """Initialization of Tab 0"""
         # Configure plotFrame to display plots of graphs
@@ -287,7 +298,7 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
             self.graphCreationCanvas_general.update_edges()
         else:
             # Add a new edge
-            self.network_general.add_edge(tail, head, capacity=capacityText)
+            self.network_general.add_edge(tail, head, capacity=capacityText, resettingEnabled=False)
             self.graphCreationCanvas_general.focusEdge = (tail, head)
             self.graphCreationCanvas_general.update_edges(added=True, color=True)
             self.graphCreationCanvas_general.update_nodes(color=True)
@@ -421,6 +432,13 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
     def change_no_flow_show_state(self):
         """Show/Hide edges without flow in each NTF Plot"""
         self.plotNTFCanvas_general.change_edge_show_status(show=self.showEdgesWithoutFlowCheckBox.isChecked())
+
+    def pressed_delete(self):
+        """Slot for DEL Key"""
+        if self.graphCreationCanvas_general.focusNode is not None:
+            self.delete_node()
+        elif self.graphCreationCanvas_general.focusEdge is not None:
+            self.delete_edge()
 
     def compute_NTF(self):
         """Computes NTF in current tab"""

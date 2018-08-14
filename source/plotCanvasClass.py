@@ -492,7 +492,10 @@ class PlotCanvas(FigureCanvas):
                 self.edgeCollections.append(([self.focusEdge], edgeCollection))
                 self.boxCollections.append(([self.focusEdge], boxCollection))
                 edgeLabelSize = int(round(self.edgeLabelFontSize))
-                lbl = {self.focusEdge: (self.network[v][w]['capacity'], self.network[v][w]['transitTime'])}
+                if not self.onlyNTF:
+                    lbl = {self.focusEdge: (self.network[v][w]['capacity'], self.network[v][w]['transitTime'])}
+                else:
+                    lbl = {self.focusEdge: (self.network[v][w]['capacity'])}
                 self.edgeLabelCollection.update(draw_networkx_edge_labels(self.network,
                                                                           pos={v: self.network.node[v]['position'],
                                                                                w: self.network.node[w]['position']},
