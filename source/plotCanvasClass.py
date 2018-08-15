@@ -333,7 +333,8 @@ class PlotCanvas(FigureCanvas):
 
         # Plot Edges
         self.edgeCollections, self.boxCollections = [], []
-        edgeColor = lambda v, w: 'black' if (v, w) != self.focusEdge else 'b'
+        edgeColor = lambda v, w: 'b' if (v, w) == self.focusEdge else (
+        'r' if self.network[v][w]['resettingEnabled'] else 'black')
         edgeColorList = [edgeColor(v, w) for v, w in self.network.edges()]
         if edgeColorList:
             edgeCollection, boxCollection = self.draw_edges(self.network, pos=positions, ax=self.axes,

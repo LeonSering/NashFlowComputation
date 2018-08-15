@@ -76,11 +76,11 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
         self.activateTimeoutCheckBox.clicked.connect(self.change_timeout_state)
         self.computeThinFlowPushButton_general.clicked.connect(self.compute_NTF)
         self.resettingSwitchButton_general.clicked.connect(self.change_resetting)
+        self.actionNew_graph.triggered.connect(self.re_init_app)
+        self.actionLoad_graph.triggered.connect(self.load_graph)
+        self.actionSave_graph.triggered.connect(self.save_graph)
+        self.actionExit.triggered.connect(QtGui.QApplication.quit)
         # TO BE DONE LATER
-        #self.actionNew_graph.triggered.connect(self.re_init_graph_creation_app)
-        #self.actionLoad_graph.triggered.connect(self.load_graph)
-        #self.actionSave_graph.triggered.connect(self.save_graph)
-        #self.actionExit.triggered.connect(QtGui.QApplication.quit)
         #self.actionOpen_manual.triggered.connect(self.show_help)
 
         # Keyboard shortcuts
@@ -417,6 +417,34 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
             self.plotNTFCanvas_general.setParent(None)
         self.plotNTFCanvas_general = None
 
+    def re_init_app(self, NoNewGraph=False):
+        """
+        Clears the graph creation frame for new graph creation
+        :param NoNewGraph: (bool) - specify whether a new graph should be initiated or the old one kept
+        """
+        if not NoNewGraph:
+            self.network_general = app_Interface.init_graph()  # Reinstantiation of the CurrentGraph
+
+        # Reinitialization of graphCreationCanvas
+        self.graphCreationCanvas_general.setParent(None)  # Drop graphCreationCanvas widget
+        self.graphCreationCanvas_general = PlotCanvas(self.network_general, self, self.plotCanvasStretchFactor, onlyNTF=True)
+        self.plotFrameLayout_general.addWidget(self.graphCreationCanvas_general)  # Add graphCreationCanvas-widget to application
+
+        # Reinitialization of plotNTFCanvas
+        self.plotNTFCanvas_general.setParent(None)
+        self.plotNTFCanvas_general = PlotNTFCanvas(nx.DiGraph(), self, intervalID=None,
+                             stretchFactor=self.plotNTFCanvasStretchFactor,
+                             showNoFlowEdges=self.showEdgesWithoutFlowCheckBox.isChecked(), onlyNTF=True)
+        self.plotNTFFrameLayout_general.addWidget(self.plotNTFCanvas_general)
+
+        # Update UI
+        self.update_node_display()
+        self.update_edge_display()
+        self.inflowLineEdit.setText(str(self.network_general.graph['inflowRate']))
+
+        self.re_init_node_list()
+        self.re_init_edge_list()
+
     def change_resetting(self):
         """Changes the resettingEnabled status of an edge"""
         edge = self.graphCreationCanvas_general.focusEdge
@@ -446,6 +474,56 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
         if self.cleanUpEnabled:
             rmtree(self.interval_general.rootPath)
 
+    def load_graph(self):
+        """Load graph instance from '.cg' file"""
+        dialog = QtGui.QFileDialog
+        fopen = dialog.getOpenFileName(self, "Select File", self.defaultLoadSaveDir, "network files (*.cg)")
+
+        if os.name != 'posix':  # For Windows
+            fopen = fopen[0]
+        if len(fopen) == 0:
+            return
+        fopen = str(fopen)
+
+        # Read file
+        with open(fopen, 'rb') as f:
+            self.network_general = pickle.load(f)
+
+        # Make sure that each edge has the property 'resettingEnabled'
+        for edge in self.network_general.edges():
+            v, w = edge
+            try:
+                property = self.network_general[v][w]['resettingEnabled']
+            except KeyError:
+                self.network_general[v][w]['resettingEnabled'] = None
+
+
+        self.defaultLoadSaveDir = os.path.dirname(fopen)
+        self.save_config()
+
+        self.re_init_app(NoNewGraph=True)
+
+    def save_graph(self):
+        """Save CurrentGraph instance to '.cg' file"""
+        self.network_general.graph['inflowRate'] = float(self.inflowLineEdit.text())
+
+        dialog = QtGui.QFileDialog
+        fsave = dialog.getSaveFileName(self, "Select File", "", "network files (*.cg)")
+
+        if os.name != 'posix':
+            fsave = fsave[0]
+        if len(fsave) == 0:
+            return
+        fsave = str(fsave)
+
+        if not fsave.endswith('cg'):
+            fsave += ".cg"
+        self.defaultLoadSaveDir = os.path.dirname(fsave)
+        self.save_config()
+
+        # Save network instance to file
+        with open(fsave, 'wb') as f:
+            pickle.dump(self.network_general, f)
 
     def compute_NTF(self):
         """Computes NTF in current tab"""
