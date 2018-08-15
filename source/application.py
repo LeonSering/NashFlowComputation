@@ -523,6 +523,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.configFile.set('Settings', 'intervals', '-1')
         self.configFile.set('Settings', 'defaultloadsavedir', '')
         self.configFile.set('Settings', 'timeoutactivated', 'True')
+        self.configFile.set('Settings', 'timeoutTime', '300')
 
         try:
             self.configFile.read('config.cfg')
@@ -546,6 +547,9 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
             self.activateTimeoutCheckBox.setChecked(self.timeoutActivated)
             self.change_timeout_state()
 
+            timeoutTime = self.configFile.get('Settings', 'timeoutTime')
+            self.timeoutLineEdit.setText(timeoutTime)
+
             self.output("Loading config: Success")
 
         except Exception:
@@ -561,6 +565,8 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.configFile.set('Settings', 'intervals', self.numberOfIntervals)
         self.configFile.set('Settings', 'defaultloadsavedir', self.defaultLoadSaveDir)
         self.configFile.set('Settings', 'timeoutactivated', self.timeoutActivated)
+        timeoutTime = str(self.timeoutLineEdit.text())
+        self.configFile.set('Settings', 'timeoutTime', timeoutTime)
 
         with open('config.cfg', 'wb') as configfile:
             self.configFile.write(configfile)
