@@ -176,7 +176,6 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
             self.cleanUpEnabled = (self.configFile.get('Settings', 'cleanup') == 'True')
             self.cleanUpCheckBox.setChecked(self.cleanUpEnabled)
 
-
             self.defaultLoadSaveDir = self.configFile.get('Settings', 'defaultloadsavedir')
 
             self.timeoutActivated = (self.configFile.get('Settings', 'timeoutactivated') == 'True')
@@ -508,7 +507,7 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
         self.network_general.graph['inflowRate'] = float(self.inflowLineEdit.text())
 
         dialog = QtGui.QFileDialog
-        fsave = dialog.getSaveFileName(self, "Select File", "", "network files (*.cg)")
+        fsave = dialog.getSaveFileName(self, "Select File", self.defaultLoadSaveDir, "network files (*.cg)")
 
         if os.name != 'posix':
             fsave = fsave[0]

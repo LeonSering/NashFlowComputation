@@ -422,7 +422,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.network.graph['inflowRate'] = float(self.inflowLineEdit.text())
 
         dialog = QtGui.QFileDialog
-        fsave = dialog.getSaveFileName(self, "Select File", "", "network files (*.cg)")
+        fsave = dialog.getSaveFileName(self, "Select File", self.defaultLoadSaveDir, "network files (*.cg)")
 
         if os.name != 'posix':
             fsave = fsave[0]
