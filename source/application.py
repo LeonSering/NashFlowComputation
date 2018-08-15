@@ -189,8 +189,8 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         if self.graphCreationCanvas.focusNode is not None:
             vertex = self.graphCreationCanvas.focusNode
             self.nodeNameLineEdit.setText(self.network.node[vertex]['label'])
-            self.nodeXLineEdit.setText(str(self.network.node[vertex]['position'][0]))
-            self.nodeYLineEdit.setText(str(self.network.node[vertex]['position'][1]))
+            self.nodeXLineEdit.setText(str(round(self.network.node[vertex]['position'][0], 2)))
+            self.nodeYLineEdit.setText(str(round(self.network.node[vertex]['position'][1], 2)))
         else:
             self.nodeNameLineEdit.setText("")
             self.nodeXLineEdit.setText("")

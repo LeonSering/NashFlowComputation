@@ -249,8 +249,8 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
         if self.graphCreationCanvas_general.focusNode is not None:
             vertex = self.graphCreationCanvas_general.focusNode
             self.nodeNameLineEdit_general.setText(self.network_general.node[vertex]['label'])
-            self.nodeXLineEdit_general.setText(str(self.network_general.node[vertex]['position'][0]))
-            self.nodeYLineEdit_general.setText(str(self.network_general.node[vertex]['position'][1]))
+            self.nodeXLineEdit_general.setText(str(round(self.network_general.node[vertex]['position'][0], 2)))
+            self.nodeYLineEdit_general.setText(str(round(self.network_general.node[vertex]['position'][1], 2)))
         else:
             self.nodeNameLineEdit_general.setText("")
             self.nodeXLineEdit_general.setText("")
