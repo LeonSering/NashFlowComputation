@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>ThinFlowComputation</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout">
@@ -529,6 +529,33 @@
    </property>
   </action>
  </widget>
+ <tabstops>
+  <tabstop>tabWidget</tabstop>
+  <tabstop>tailLineEdit_general</tabstop>
+  <tabstop>headLineEdit_general</tabstop>
+  <tabstop>capacityLineEdit_general</tabstop>
+  <tabstop>resettingSwitchButton_general</tabstop>
+  <tabstop>updateEdgeButton_general</tabstop>
+  <tabstop>deleteEdgeButton_general</tabstop>
+  <tabstop>nodeNameLineEdit_general</tabstop>
+  <tabstop>nodeXLineEdit_general</tabstop>
+  <tabstop>nodeYLineEdit_general</tabstop>
+  <tabstop>updateNodeButton_general</tabstop>
+  <tabstop>deleteNodeButton_general</tabstop>
+  <tabstop>edgeSelectionListWidget_general</tabstop>
+  <tabstop>nodeSelectionListWidget_general</tabstop>
+  <tabstop>computeThinFlowPushButton_general</tabstop>
+  <tabstop>outputDirectoryLineEdit</tabstop>
+  <tabstop>outputDirectoryPushButton</tabstop>
+  <tabstop>scipPathLineEdit</tabstop>
+  <tabstop>scipPathPushButton</tabstop>
+  <tabstop>templateComboBox</tabstop>
+  <tabstop>cleanUpCheckBox</tabstop>
+  <tabstop>inflowLineEdit</tabstop>
+  <tabstop>activateTimeoutCheckBox</tabstop>
+  <tabstop>timeoutLineEdit</tabstop>
+  <tabstop>showEdgesWithoutFlowCheckBox</tabstop>
+ </tabstops>
  <resources>
   <include location="icons.qrc"/>
  </resources>

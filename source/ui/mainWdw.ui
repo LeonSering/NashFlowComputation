@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>NashFlowComputation</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout">
@@ -24,7 +24,7 @@
        </sizepolicy>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="tab">
        <attribute name="title">
@@ -1483,6 +1483,48 @@
    </property>
   </action>
  </widget>
+ <tabstops>
+  <tabstop>tabWidget</tabstop>
+  <tabstop>tailLineEdit</tabstop>
+  <tabstop>headLineEdit</tabstop>
+  <tabstop>capacityLineEdit</tabstop>
+  <tabstop>transitTimeLineEdit</tabstop>
+  <tabstop>updateEdgeButton</tabstop>
+  <tabstop>deleteEdgeButton</tabstop>
+  <tabstop>nodeNameLineEdit</tabstop>
+  <tabstop>nodeXLineEdit</tabstop>
+  <tabstop>nodeYLineEdit</tabstop>
+  <tabstop>updateNodeButton</tabstop>
+  <tabstop>deleteNodeButton</tabstop>
+  <tabstop>edgeSelectionListWidget</tabstop>
+  <tabstop>nodeSelectionListWidget</tabstop>
+  <tabstop>outputDirectoryLineEdit</tabstop>
+  <tabstop>outputDirectoryPushButton</tabstop>
+  <tabstop>scipPathLineEdit</tabstop>
+  <tabstop>scipPathPushButton</tabstop>
+  <tabstop>templateComboBox</tabstop>
+  <tabstop>cleanUpCheckBox</tabstop>
+  <tabstop>activateTimeoutCheckBox</tabstop>
+  <tabstop>timeoutLineEdit</tabstop>
+  <tabstop>inflowLineEdit</tabstop>
+  <tabstop>intervalsLineEdit</tabstop>
+  <tabstop>logPlainTextEdit</tabstop>
+  <tabstop>computeFlowPushButton</tabstop>
+  <tabstop>timeSlider</tabstop>
+  <tabstop>animationStartLineEdit</tabstop>
+  <tabstop>animationEndLineEdit</tabstop>
+  <tabstop>generateAnimationPushButton</tabstop>
+  <tabstop>playPushButton</tabstop>
+  <tabstop>pausePushButton</tabstop>
+  <tabstop>stopPushButton</tabstop>
+  <tabstop>exportComboBox</tabstop>
+  <tabstop>exportDiagramPushButton</tabstop>
+  <tabstop>setTimeLineEdit</tabstop>
+  <tabstop>setTimePushButton</tabstop>
+  <tabstop>intervalsListWidget</tabstop>
+  <tabstop>showEdgesWithoutFlowCheckBox</tabstop>
+  <tabstop>computeIntervalPushButton</tabstop>
+ </tabstops>
  <resources>
   <include location="icons.qrc"/>
  </resources>

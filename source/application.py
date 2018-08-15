@@ -578,6 +578,9 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         Computes a nash flow
         :param nextIntervalOnly: If this is True, only one interval(i.e. the next one) is computed
         """
+        # While computing it should not be possible to change showEdgesWithoutFlowCheckBox
+        self.showEdgesWithoutFlowCheckBox.setEnabled(False)
+
         # Get remaining settings
         self.numberOfIntervals = self.intervalsLineEdit.text()
         self.templateFile = self.templateComboBox.currentIndex()
@@ -607,6 +610,8 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
 
         if self.nashFlow.infinityReached:
             self.computeIntervalPushButton.setEnabled(False)
+
+        self.showEdgesWithoutFlowCheckBox.setEnabled(True)
 
     def compute_next_interval(self):
         """Computes next interval"""
