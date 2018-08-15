@@ -504,6 +504,8 @@
     <addaction name="actionNew_graph"/>
     <addaction name="actionLoad_graph"/>
     <addaction name="actionSave_graph"/>
+    <addaction name="actionLoad_Thinflow"/>
+    <addaction name="actionSave_Thinflow"/>
     <addaction name="actionExit"/>
    </widget>
    <addaction name="menuFile"/>
@@ -526,6 +528,16 @@
   <action name="actionExit">
    <property name="text">
     <string>Exit</string>
+   </property>
+  </action>
+  <action name="actionLoad_Thinflow">
+   <property name="text">
+    <string>Load Thinflow</string>
+   </property>
+  </action>
+  <action name="actionSave_Thinflow">
+   <property name="text">
+    <string>Save Thinflow</string>
    </property>
   </action>
  </widget>

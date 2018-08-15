@@ -290,9 +290,15 @@ class Ui_MainWindow(object):
         self.actionSave_graph.setObjectName(_fromUtf8("actionSave_graph"))
         self.actionExit = QtGui.QAction(MainWindow)
         self.actionExit.setObjectName(_fromUtf8("actionExit"))
+        self.actionLoad_Thinflow = QtGui.QAction(MainWindow)
+        self.actionLoad_Thinflow.setObjectName(_fromUtf8("actionLoad_Thinflow"))
+        self.actionSave_Thinflow = QtGui.QAction(MainWindow)
+        self.actionSave_Thinflow.setObjectName(_fromUtf8("actionSave_Thinflow"))
         self.menuFile.addAction(self.actionNew_graph)
         self.menuFile.addAction(self.actionLoad_graph)
         self.menuFile.addAction(self.actionSave_graph)
+        self.menuFile.addAction(self.actionLoad_Thinflow)
+        self.menuFile.addAction(self.actionSave_Thinflow)
         self.menuFile.addAction(self.actionExit)
         self.menuBar.addAction(self.menuFile.menuAction())
 
@@ -364,5 +370,7 @@ class Ui_MainWindow(object):
         self.actionLoad_graph.setText(_translate("MainWindow", "Load graph", None))
         self.actionSave_graph.setText(_translate("MainWindow", "Save graph", None))
         self.actionExit.setText(_translate("MainWindow", "Exit", None))
+        self.actionLoad_Thinflow.setText(_translate("MainWindow", "Load Thinflow", None))
+        self.actionSave_Thinflow.setText(_translate("MainWindow", "Save Thinflow", None))
 
 import icons_rc

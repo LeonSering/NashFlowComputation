@@ -80,6 +80,8 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
         self.actionLoad_graph.triggered.connect(self.load_graph)
         self.actionSave_graph.triggered.connect(self.save_graph)
         self.actionExit.triggered.connect(QtGui.QApplication.quit)
+        self.actionLoad_Thinflow.triggered.connect(self.load_thinflow)
+        self.actionSave_Thinflow.triggered.connect(self.save_thinflow)
         # TO BE DONE LATER
         #self.actionOpen_manual.triggered.connect(self.show_help)
 
@@ -410,11 +412,20 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
             self.resettingSwitchButton_general.setText(resettingSwitchButtonLabel)
             self.resettingSwitchButton_general.setEnabled(True)
 
-    def re_init_NTF_frame(self):
-        """Clears the NTF frame"""
-        if self.plotNTFCanvas_general is not None:
+    def re_init_NTF_frame(self, newThinFlow=False):
+        """Reinits the NTF frame"""
+        if not newThinFlow:
+            if self.plotNTFCanvas_general is not None:
+                self.plotNTFCanvas_general.setParent(None)
+            self.plotNTFCanvas_general = None
+        else:
+            """Reinitialization of plotNTFCanvas with given thinflow"""
             self.plotNTFCanvas_general.setParent(None)
-        self.plotNTFCanvas_general = None
+            self.plotNTFCanvas_general = PlotNTFCanvas(self.interval_general.network, self, intervalID=None,
+                                                       stretchFactor=self.plotNTFCanvasStretchFactor,
+                                                       showNoFlowEdges=self.showEdgesWithoutFlowCheckBox.isChecked(),
+                                                       onlyNTF=True)
+            self.plotNTFFrameLayout_general.addWidget(self.plotNTFCanvas_general)
 
     def re_init_app(self, NoNewGraph=False):
         """
@@ -443,6 +454,8 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
 
         self.re_init_node_list()
         self.re_init_edge_list()
+
+
 
     def change_resetting(self):
         """Changes the resettingEnabled status of an edge"""
@@ -502,6 +515,26 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
 
         self.re_init_app(NoNewGraph=True)
 
+    def load_thinflow(self):
+        """Load thinflow '.tf' file"""
+        dialog = QtGui.QFileDialog
+        fopen = dialog.getOpenFileName(self, "Select File", self.defaultLoadSaveDir, "thinflow files (*.tf)")
+
+        if os.name != 'posix':  # For Windows
+            fopen = fopen[0]
+        if len(fopen) == 0:
+            return
+        fopen = str(fopen)
+
+        # Read file
+        with open(fopen, 'rb') as f:
+            self.interval_general = pickle.load(f)
+
+        self.defaultLoadSaveDir = os.path.dirname(fopen)
+        self.save_config()
+
+        self.re_init_NTF_frame(newThinFlow=True)
+
     def save_graph(self):
         """Save CurrentGraph instance to '.cg' file"""
         self.network_general.graph['inflowRate'] = float(self.inflowLineEdit.text())
@@ -523,6 +556,26 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
         # Save network instance to file
         with open(fsave, 'wb') as f:
             pickle.dump(self.network_general, f)
+
+    def save_thinflow(self):
+        """Save thinflow to '.tf' file"""
+        dialog = QtGui.QFileDialog
+        fsave = dialog.getSaveFileName(self, "Select File", self.defaultLoadSaveDir, "thinflow files (*.tf)")
+
+        if os.name != 'posix':
+            fsave = fsave[0]
+        if len(fsave) == 0:
+            return
+        fsave = str(fsave)
+
+        if not fsave.endswith('tf'):
+            fsave += ".tf"
+        self.defaultLoadSaveDir = os.path.dirname(fsave)
+        self.save_config()
+
+        # Save network instance to file
+        with open(fsave, 'wb') as f:
+            pickle.dump(self.interval_general, f)
 
     def compute_NTF(self):
         """Computes NTF in current tab"""

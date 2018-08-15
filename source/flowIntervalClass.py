@@ -71,6 +71,12 @@ class FlowInterval:
             self.timeoutThread = threading.Thread(target=self.timeout_control)
             self.timeoutThread.start()
 
+    def __getstate__(self):
+        """Function specifying what attributes pickle is loading. Exclude thread to avoid 'Cant pickle lock'-error"""
+        attributeDict = dict(self.__dict__)
+        del attributeDict['timeoutThread']
+        return attributeDict
+
     def timeout_control(self):
         """Controlling whether timeout has been reached -> kill process"""
         startTime = time.time()
@@ -85,6 +91,7 @@ class FlowInterval:
                     print "KILLING SCIP PROCESS"
                     pid = int(line.split(None, 1)[0])
                     os.kill(pid, signal.SIGKILL)  # Kill SCIP process
+
 
     def compute_alpha(self, labelLowerBoundTimeDict):
         """
