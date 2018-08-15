@@ -333,8 +333,14 @@ class PlotCanvas(FigureCanvas):
 
         # Plot Edges
         self.edgeCollections, self.boxCollections = [], []
-        edgeColor = lambda v, w: 'b' if (v, w) == self.focusEdge else (
-        'r' if self.network[v][w]['resettingEnabled'] else 'black')
+        if not self.onlyNTF:
+            # Don't color resetting edges
+            edgeColor = lambda v, w: 'b' if (v, w) == self.focusEdge else 'black'
+        else:
+            # Color resetting edges
+            edgeColor = lambda v, w: 'b' if (v, w) == self.focusEdge else (
+                'r' if self.network[v][w]['resettingEnabled'] else 'black')
+
         edgeColorList = [edgeColor(v, w) for v, w in self.network.edges()]
         if edgeColorList:
             edgeCollection, boxCollection = self.draw_edges(self.network, pos=positions, ax=self.axes,
@@ -533,7 +539,13 @@ class PlotCanvas(FigureCanvas):
 
         if color:
             # Update colors
-            edgeColor = lambda v, w: 'b' if (v, w) == self.focusEdge else ('r' if self.network[v][w]['resettingEnabled'] else 'black')
+            if not self.onlyNTF:
+                # Don't color resetting edges
+                edgeColor = lambda v, w: 'b' if (v, w) == self.focusEdge else 'black'
+            else:
+                # Color resetting edges
+                edgeColor = lambda v, w: 'b' if (v, w) == self.focusEdge else (
+                    'r' if self.network[v][w]['resettingEnabled'] else 'black')
             edgeSize = lambda v, w: self.edgeWidthSize if (v, w) != self.focusEdge else self.edgeWidthSize + 1
             boxSize = lambda v, w: 1 if (v, w) != self.focusEdge else 2
             collectionIndex = 0
