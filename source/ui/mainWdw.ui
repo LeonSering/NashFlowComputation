@@ -1410,8 +1410,8 @@
     <addaction name="actionNew_graph"/>
     <addaction name="actionLoad_graph"/>
     <addaction name="actionSave_graph"/>
-    <addaction name="actionLoad_NashFlow"/>
-    <addaction name="actionSave_NashFlow"/>
+    <addaction name="actionLoad_Nashflow"/>
+    <addaction name="actionSave_Nashflow"/>
     <addaction name="actionExit"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
@@ -1453,25 +1453,6 @@
     <string>Exit</string>
    </property>
   </action>
-  <action name="actionLoad_NashFlow">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="text">
-    <string>Load NashFlow</string>
-   </property>
-   <property name="visible">
-    <bool>false</bool>
-   </property>
-  </action>
-  <action name="actionSave_NashFlow">
-   <property name="text">
-    <string>Save NashFlow</string>
-   </property>
-   <property name="visible">
-    <bool>false</bool>
-   </property>
-  </action>
   <action name="actionOpen_manual">
    <property name="text">
     <string>Open manual</string>
@@ -1480,6 +1461,16 @@
   <action name="actionAbout">
    <property name="text">
     <string>About</string>
+   </property>
+  </action>
+  <action name="actionLoad_Nashflow">
+   <property name="text">
+    <string>Load Nashflow</string>
+   </property>
+  </action>
+  <action name="actionSave_Nashflow">
+   <property name="text">
+    <string>Save Nashflow</string>
    </property>
   </action>
  </widget>

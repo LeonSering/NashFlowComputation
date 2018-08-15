@@ -89,8 +89,8 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.actionLoad_graph.triggered.connect(self.load_graph)
         self.actionSave_graph.triggered.connect(self.save_graph)
         self.actionExit.triggered.connect(QtGui.QApplication.quit)
-        self.actionLoad_NashFlow.triggered.connect(self.load_nashflow)
-        self.actionSave_NashFlow.triggered.connect(self.save_nashflow)
+        self.actionLoad_Nashflow.triggered.connect(self.load_nashflow)
+        self.actionSave_Nashflow.triggered.connect(self.save_nashflow)
         self.actionOpen_manual.triggered.connect(self.show_help)
         self.intervalsListWidget.itemClicked.connect(self.update_ntf_display)
         self.generateAnimationPushButton.clicked.connect(self.generate_animation)
@@ -443,7 +443,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
     def load_nashflow(self):
         """Load NashFlow instance from '.nf' file"""
         dialog = QtGui.QFileDialog
-        fopen = dialog.getOpenFileName(self, "Select File", "", "nash flow files (*.nf)")
+        fopen = dialog.getOpenFileName(self, "Select File", self.defaultLoadSaveDir, "Nashflow files (*.nf)")
 
         if os.name != 'posix':
             fopen = fopen[0]
@@ -456,7 +456,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
             self.nashFlow = pickle.load(f)
         self.defaultLoadSaveDir = os.path.dirname(fopen)
         self.save_config()
-        self.output("Loading nash flow: " + str(fopen))
+        self.output("Loading Nashflow: " + str(fopen))
         self.re_init_nashflow_app()
         self.add_intervals_to_list()
 
@@ -465,7 +465,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
     def save_nashflow(self):
         """Save Nashflow instance to '.nf' file"""
         dialog = QtGui.QFileDialog
-        fsave = dialog.getSaveFileName(self, "Select File", "", "nash flow files (*.nf)")
+        fsave = dialog.getSaveFileName(self, "Select File", self.defaultLoadSaveDir, "Nashflow files (*.nf)")
 
         if os.name != 'posix':
             fsave = fsave[0]
@@ -477,7 +477,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
             fsave += ".nf"
         self.defaultLoadSaveDir = os.path.dirname(fsave)
         self.save_config()
-        self.output("Saving nash flow: " + str(fsave))
+        self.output("Saving Nashflow: " + str(fsave))
 
         # Save network instance to file
         with open(fsave, 'wb') as f:
@@ -862,9 +862,9 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
             self.currentTransitTimeLabel.setText("N/A")
         elif self.plotAnimationCanvas.focusEdge is not None:
             v, w = self.plotAnimationCanvas.focusEdge
-            self.currentFocusLabel.setText(str((self.network.node[v]['label'], self.network.node[w]['label'])))
-            self.currentCapacityLabel.setText(str(self.network[v][w]['capacity']))
-            self.currentTransitTimeLabel.setText(str(self.network[v][w]['transitTime']))
+            self.currentFocusLabel.setText(str((self.nashFlow.network.node[v]['label'], self.nashFlow.network.node[w]['label'])))
+            self.currentCapacityLabel.setText(str(self.nashFlow.network[v][w]['capacity']))
+            self.currentTransitTimeLabel.setText(str(self.nashFlow.network[v][w]['transitTime']))
         else:
             self.currentFocusLabel.setText("N/A")
             self.currentCapacityLabel.setText("N/A")
