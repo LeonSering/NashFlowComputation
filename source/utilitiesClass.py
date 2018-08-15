@@ -391,8 +391,6 @@ class Utilities:
             else:
                 edge_collection.autoscale()
 
-
-
         if G.is_directed() and arrows:
             box_collection = Utilities.get_boxes(edge_colors=edge_colors, edge_pos=box_pos)
             box_collection.set_zorder(1)  # edges go behind nodes

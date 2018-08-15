@@ -26,14 +26,14 @@ class PlotNTFCanvas(PlotCanvas):
             # Graph is not empty. Otherwise dont do stuff because the call was made by thinFlow_application initialization
             if not self.onlyNTF:
                 # We have a regular nashFlow instance
-                flowLabels = interface.nashFlow.flowIntervals[intervalID][2].NTFEdgeFlowDict
-                self.NTFNodeLabelDict = interface.nashFlow.flowIntervals[intervalID][2].NTFNodeLabelDict
-                self.NTFEdgeFlowDict = {edge: flowLabels[edge] for edge in graph.edges()}
+                flowIntervalInstance = interface.nashFlow.flowIntervals[intervalID][2]
             else:
                 # We just have a flowInterval instance
-                flowLabels = interface.interval_general.NTFEdgeFlowDict
-                self.NTFNodeLabelDict = interface.interval_general.NTFNodeLabelDict
-                self.NTFEdgeFlowDict = {edge: flowLabels[edge] for edge in graph.edges()}
+                flowIntervalInstance = interface.interval_general
+
+            self.NTFNodeLabelDict = flowIntervalInstance.NTFNodeLabelDict
+            self.NTFEdgeFlowDict = flowIntervalInstance.NTFEdgeFlowDict
+            self.resettingEdges = flowIntervalInstance.resettingEdges
 
         PlotCanvas.__init__(self, graph, interface, stretchFactor=stretchFactor)  # Call parents constructor
         self.network = self.network.copy() # Copy network to avoid modifying it in other Canvas when deleting/adding zero flow edges
@@ -115,6 +115,33 @@ class PlotNTFCanvas(PlotCanvas):
             self.network.remove_nodes_from(isolated_nodes)
 
         self.init_plot()
+
+    def edgeColor(self, v, w):
+        """
+        Function returning the color that should be used while drawing edges
+        :param v: tail node
+        :param w: head node
+        :return: Color string (e.g. 'b', 'black', 'red' et cetera)
+        """
+        resettingFlag = False
+        fullFlag = False
+        '''
+        if (v, w) in self.resettingEdges:
+            # Resetting edge
+            resettingFlag = True
+        if Utilities.is_geq_tol(self.NTFEdgeFlowDict[(v,w)], self.network[v][w]['capacity']):
+            fullFlag = True
+        if resettingFlag and fullFlag:
+            # Mix colors -> orange
+            return '#FF8000'
+        elif resettingFlag:
+            return 'red'
+        elif fullFlag:
+            return '#FFFF00'   # Yellow
+        '''
+        if (v, w) in self.resettingEdges:
+            return 'red'
+        return 'black'  # Edge should be black if neither resetting nor full
 
     def get_viewpoint(self):
         """Get the field of view setting"""

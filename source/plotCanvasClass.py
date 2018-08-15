@@ -10,7 +10,6 @@ import numpy as np
 import networkx as nx
 from math import sqrt
 from utilitiesClass import Utilities
-from utilitiesClass import Utilities
 matplotlib.use("Qt4Agg")
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.colors import colorConverter
@@ -301,6 +300,21 @@ class PlotCanvas(FigureCanvas):
             return nodeID
         return clickedNode
 
+    def edgeColor(self, v, w):
+        """
+        Function returning the color that should be used while drawing edges
+        :param v: tail node
+        :param w: head node
+        :return: Color string (e.g. 'b', 'black', 'red' et cetera)
+        """
+        if (v, w) == self.focusEdge:
+            return "b"  # Blue
+        elif self.onlyNTF:
+            # Color resetting edges (those that have been selected by the user to be as such) differently
+            if self.network[v][w]['resettingEnabled']:
+                return 'r'  # Red
+        return 'black'  # Don't color resetting edges, thus edge should be black
+
     def init_plot(self):
         """
         Update canvas to plot new graph
@@ -333,15 +347,7 @@ class PlotCanvas(FigureCanvas):
 
         # Plot Edges
         self.edgeCollections, self.boxCollections = [], []
-        if not self.onlyNTF:
-            # Don't color resetting edges
-            edgeColor = lambda v, w: 'b' if (v, w) == self.focusEdge else 'black'
-        else:
-            # Color resetting edges
-            edgeColor = lambda v, w: 'b' if (v, w) == self.focusEdge else (
-                'r' if self.network[v][w]['resettingEnabled'] else 'black')
-
-        edgeColorList = [edgeColor(v, w) for v, w in self.network.edges()]
+        edgeColorList = [self.edgeColor(v, w) for v, w in self.network.edges()]
         if edgeColorList:
             edgeCollection, boxCollection = self.draw_edges(self.network, pos=positions, ax=self.axes,
                                                             arrow=True,
@@ -539,19 +545,12 @@ class PlotCanvas(FigureCanvas):
 
         if color:
             # Update colors
-            if not self.onlyNTF:
-                # Don't color resetting edges
-                edgeColor = lambda v, w: 'b' if (v, w) == self.focusEdge else 'black'
-            else:
-                # Color resetting edges
-                edgeColor = lambda v, w: 'b' if (v, w) == self.focusEdge else (
-                    'r' if self.network[v][w]['resettingEnabled'] else 'black')
             edgeSize = lambda v, w: self.edgeWidthSize if (v, w) != self.focusEdge else self.edgeWidthSize + 1
             boxSize = lambda v, w: 1 if (v, w) != self.focusEdge else 2
             collectionIndex = 0
             for edges, edgeCollection in self.edgeCollections:
                 if edges:
-                    edgeColorList = [colorConverter.to_rgba(edgeColor(v, w), 1) for v, w in
+                    edgeColorList = [colorConverter.to_rgba(self.edgeColor(v, w), 1) for v, w in
                                      edges]
 
                     edgeCollection.set_color(edgeColorList)
