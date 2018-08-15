@@ -51,5 +51,7 @@ README
 *.xml
 *.cg
 *.iml
+*.tf
+*.nf
 
 
