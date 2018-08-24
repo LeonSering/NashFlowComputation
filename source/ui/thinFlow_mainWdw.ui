@@ -508,7 +508,15 @@
     <addaction name="actionSave_Thinflow"/>
     <addaction name="actionExit"/>
    </widget>
+   <widget class="QMenu" name="menuOptions">
+    <property name="title">
+     <string>Options</string>
+    </property>
+    <addaction name="actionOpen_NashFlowComputation"/>
+    <addaction name="actionMove_current_graph_to_NashFlowComputation"/>
+   </widget>
    <addaction name="menuFile"/>
+   <addaction name="menuOptions"/>
   </widget>
   <action name="actionNew_graph">
    <property name="text">
@@ -538,6 +546,16 @@
   <action name="actionSave_Thinflow">
    <property name="text">
     <string>Save Thinflow</string>
+   </property>
+  </action>
+  <action name="actionOpen_NashFlowComputation">
+   <property name="text">
+    <string>Open NashFlowComputation</string>
+   </property>
+  </action>
+  <action name="actionMove_current_graph_to_NashFlowComputation">
+   <property name="text">
+    <string>Move current graph to NashFlowComputation</string>
    </property>
   </action>
  </widget>

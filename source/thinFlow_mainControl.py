@@ -6,8 +6,15 @@
 # ===========================================================================
 
 if __name__ == '__main__':
+    import os
     import sys
     from source import thinFlow_application as application
+
+    cwd = os.getcwd()
+    if os.path.basename(cwd) != 'source':
+        # If working directory is not 'source', change it
+        newCwd = os.path.join(cwd, 'source')
+        os.chdir(newCwd)
 
     app = application.QtGui.QApplication(sys.argv)
     form = application.Interface()

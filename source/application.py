@@ -13,6 +13,9 @@ import threading
 import time
 import networkx as nx
 from warnings import filterwarnings
+import subprocess
+from tempfile import gettempdir
+import sys
 
 from nashFlowClass import NashFlow
 from plotAnimationCanvasClass import PlotAnimationCanvas
@@ -91,6 +94,8 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.actionExit.triggered.connect(QtGui.QApplication.quit)
         self.actionLoad_Nashflow.triggered.connect(self.load_nashflow)
         self.actionSave_Nashflow.triggered.connect(self.save_nashflow)
+        self.actionOpen_ThinFlowComputation.triggered.connect(self.open_tfc)
+        self.actionMove_graph_to_ThinFlowComputation.triggered.connect(self.move_to_tfc)
         self.actionOpen_manual.triggered.connect(self.show_help)
         self.intervalsListWidget.itemClicked.connect(self.update_ntf_display)
         self.generateAnimationPushButton.clicked.connect(self.generate_animation)
@@ -119,6 +124,15 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.animationStartLineEdit.returnPressed.connect(self.generate_animation)
         self.animationEndLineEdit.returnPressed.connect(self.generate_animation)
         self.setTimeLineEdit.returnPressed.connect(self.set_new_time_manually)
+
+
+        if len(sys.argv) >= 3:
+            # startup arguments have been specified
+            if sys.argv[1] == '-l':
+                # Load specified graph
+                self.load_graph(graphPath=sys.argv[2])
+                # Delete the temporary graph
+                os.remove(sys.argv[2])
 
     @staticmethod
     def init_graph():
@@ -395,45 +409,62 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.statAvgTimeLabel.setText(str(avgTime))
         self.statTotalTimeLabel.setText(str(totalTime))
 
-    def load_graph(self):
-        """Load CurrentGraph instance from '.cg' file"""
-        dialog = QtGui.QFileDialog
-        fopen = dialog.getOpenFileName(self, "Select File", self.defaultLoadSaveDir, "network files (*.cg)")
+    def load_graph(self, graphPath=None):
+        """
+        Load graph instance from '.cg' file
+        :param graphPath: If given, then function uses graphPath (must end in .cg) as path. Otherwise dialog gets opened
+        :return: 
+        """
+        if not graphPath:
+            dialog = QtGui.QFileDialog
+            fopen = dialog.getOpenFileName(self, "Select File", self.defaultLoadSaveDir, "network files (*.cg)")
 
-        if os.name != 'posix':  # For Windows
-            fopen = fopen[0]
-        if len(fopen) == 0:
-            return
-        fopen = str(fopen)
+            if os.name != 'posix':  # For Windows
+                fopen = fopen[0]
+            if len(fopen) == 0:
+                return
+            fopen = str(fopen)
+        else:
+            fopen = graphPath
 
         # Read file         
         with open(fopen, 'rb') as f:
             self.network = pickle.load(f)
-        self.defaultLoadSaveDir = os.path.dirname(fopen)
-        self.save_config()
+        if not graphPath:
+            self.defaultLoadSaveDir = os.path.dirname(fopen)
+            self.save_config()
 
         self.output("Loading graph: " + str(fopen))
         self.re_init_graph_creation_app(NoNewGraph=True)
 
         self.tabWidget.setCurrentIndex(0)
 
-    def save_graph(self):
-        """Save CurrentGraph instance to '.cg' file"""
+    def save_graph(self, graphPath=None):
+        """
+        Save graph instance to '.cg' file
+        :param graphPath: If given, then save graph at path graphPath. Else a dialog is opened
+        :return: 
+        """
         self.network.graph['inflowRate'] = float(self.inflowLineEdit.text())
 
-        dialog = QtGui.QFileDialog
-        fsave = dialog.getSaveFileName(self, "Select File", self.defaultLoadSaveDir, "network files (*.cg)")
+        if not graphPath:
+            dialog = QtGui.QFileDialog
+            fsave = dialog.getSaveFileName(self, "Select File", self.defaultLoadSaveDir, "network files (*.cg)")
 
-        if os.name != 'posix':
-            fsave = fsave[0]
-        if len(fsave) == 0:
-            return
-        fsave = str(fsave)
+            if os.name != 'posix':
+                fsave = fsave[0]
+            if len(fsave) == 0:
+                return
+            fsave = str(fsave)
+        else:
+            fsave = graphPath
 
         if not fsave.endswith('cg'):
             fsave += ".cg"
-        self.defaultLoadSaveDir = os.path.dirname(fsave)
-        self.save_config()
+
+        if not graphPath:
+            self.defaultLoadSaveDir = os.path.dirname(fsave)
+            self.save_config()
 
         self.output("Saving graph: " + str(fsave))
         # Save network instance to file
@@ -869,6 +900,37 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
             self.currentFocusLabel.setText("N/A")
             self.currentCapacityLabel.setText("N/A")
             self.currentTransitTimeLabel.setText("N/A")
+
+    def open_tfc(self, moveGraph=None):
+        """
+        Opens ThinFlowComputation Tool
+        :param moveGraph: network that should be moved, None if not specified
+        :return: 
+        """
+        if not moveGraph:
+            # Just open the application
+            cmd = ['python', 'source/thinFlow_mainControl.py']
+        else:
+            # Open the application with a certain graph
+            # Save the graph
+            tmpDir = gettempdir()
+            tmpFileName = Utilities.get_time()
+            tmpFilePath = os.path.join(tmpDir, tmpFileName)
+            self.save_graph(graphPath=tmpFilePath)
+            tmpFilePathArgument = tmpFilePath + '.cg'
+
+            cmd = ['python', 'source/thinFlow_mainControl.py', '-l', tmpFilePathArgument]
+
+        def open_tfc_thread():
+            self.proc = subprocess.Popen(cmd)
+            self.proc.communicate()
+
+        thread = threading.Thread(target=open_tfc_thread)
+        thread.start()
+
+
+    def move_to_tfc(self):
+        self.open_tfc(moveGraph=self.network)
 
     def change_no_flow_show_state(self):
         """Show/Hide edges without flow in each NTF Plot"""

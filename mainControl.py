@@ -6,9 +6,16 @@
 # ===========================================================================
 
 if __name__ == '__main__':
+    import os
     import sys
     from math import ceil
     from source import application
+
+    cwd = os.getcwd()
+    if os.path.basename(cwd) == 'source':
+        # If working directory is 'source', change it
+        newCwd = os.path.dirname(cwd)
+        os.chdir(newCwd)
 
 
     def onResize(event, widgetList, referenceSize):

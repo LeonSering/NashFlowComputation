@@ -10,12 +10,14 @@ from PyQt4 import QtGui, QtCore
 import ConfigParser
 import os
 import pickle
-import threading
-import time
+import sys
 from shutil import rmtree
 from copy import deepcopy
 import networkx as nx
 from warnings import filterwarnings
+from tempfile import gettempdir
+import subprocess
+import threading
 
 from plotCanvasClass import PlotCanvas
 from plotNTFCanvasClass import PlotNTFCanvas
@@ -82,6 +84,8 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
         self.actionExit.triggered.connect(QtGui.QApplication.quit)
         self.actionLoad_Thinflow.triggered.connect(self.load_thinflow)
         self.actionSave_Thinflow.triggered.connect(self.save_thinflow)
+        self.actionOpen_NashFlowComputation.triggered.connect(self.open_nfc)
+        self.actionMove_current_graph_to_NashFlowComputation.triggered.connect(self.move_to_nfc)
         # TO BE DONE LATER
         #self.actionOpen_manual.triggered.connect(self.show_help)
 
@@ -94,6 +98,14 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
         self.nodeNameLineEdit_general.returnPressed.connect(self.update_node)
         self.nodeXLineEdit_general.returnPressed.connect(self.update_node)
         self.nodeYLineEdit_general.returnPressed.connect(self.update_node)
+
+        if len(sys.argv) >= 3:
+            # startup arguments have been specified
+            if sys.argv[1] == '-l':
+                # Load specified graph
+                self.load_graph(graphPath=sys.argv[2])
+                # Delete the temporary graph
+                os.remove(sys.argv[2])
 
 
     def init_app(self): # former: init_graph_creation_app
@@ -486,16 +498,20 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
         if self.cleanUpEnabled:
             rmtree(self.interval_general.rootPath)
 
-    def load_graph(self):
+    def load_graph(self, graphPath=None):
         """Load graph instance from '.cg' file"""
-        dialog = QtGui.QFileDialog
-        fopen = dialog.getOpenFileName(self, "Select File", self.defaultLoadSaveDir, "network files (*.cg)")
 
-        if os.name != 'posix':  # For Windows
-            fopen = fopen[0]
-        if len(fopen) == 0:
-            return
-        fopen = str(fopen)
+        if not graphPath:
+            dialog = QtGui.QFileDialog
+            fopen = dialog.getOpenFileName(self, "Select File", self.defaultLoadSaveDir, "network files (*.cg)")
+
+            if os.name != 'posix':  # For Windows
+                fopen = fopen[0]
+            if len(fopen) == 0:
+                return
+            fopen = str(fopen)
+        else:
+            fopen = graphPath
 
         # Read file
         with open(fopen, 'rb') as f:
@@ -509,9 +525,9 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
             except KeyError:
                 self.network_general[v][w]['resettingEnabled'] = None
 
-
-        self.defaultLoadSaveDir = os.path.dirname(fopen)
-        self.save_config()
+        if not graphPath:
+            self.defaultLoadSaveDir = os.path.dirname(fopen)
+            self.save_config()
 
         self.re_init_app(NoNewGraph=True)
 
@@ -535,23 +551,32 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
 
         self.re_init_NTF_frame(newThinFlow=True)
 
-    def save_graph(self):
-        """Save CurrentGraph instance to '.cg' file"""
+    def save_graph(self, graphPath=None):
+        """
+        Save graph instance to '.cg' file
+        :param graphPath: If given, then save graph at path graphPath. Else a dialog is opened
+        :return: 
+        """
         self.network_general.graph['inflowRate'] = float(self.inflowLineEdit.text())
 
-        dialog = QtGui.QFileDialog
-        fsave = dialog.getSaveFileName(self, "Select File", self.defaultLoadSaveDir, "network files (*.cg)")
+        if not graphPath:
+            dialog = QtGui.QFileDialog
+            fsave = dialog.getSaveFileName(self, "Select File", self.defaultLoadSaveDir, "network files (*.cg)")
 
-        if os.name != 'posix':
-            fsave = fsave[0]
-        if len(fsave) == 0:
-            return
-        fsave = str(fsave)
+            if os.name != 'posix':
+                fsave = fsave[0]
+            if len(fsave) == 0:
+                return
+            fsave = str(fsave)
+        else:
+            fsave = graphPath
 
         if not fsave.endswith('cg'):
             fsave += ".cg"
-        self.defaultLoadSaveDir = os.path.dirname(fsave)
-        self.save_config()
+
+        if not graphPath:
+            self.defaultLoadSaveDir = os.path.dirname(fsave)
+            self.save_config()
 
         # Save network instance to file
         with open(fsave, 'wb') as f:
@@ -576,6 +601,39 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
         # Save network instance to file
         with open(fsave, 'wb') as f:
             pickle.dump(self.interval_general, f)
+
+
+    def open_nfc(self, moveGraph=None):
+        """
+        Opens NashFlowComputation Tool
+        :param moveGraph: network that should be moved, None if not specified
+        :return: 
+        """
+
+        if not moveGraph:
+            # Just open the application
+            cmd = ['python', '../mainControl.py']
+        else:
+            # Open the application with a certain graph
+            # Save the graph
+            tmpDir = gettempdir()
+            tmpFileName = Utilities.get_time()
+            tmpFilePath = os.path.join(tmpDir, tmpFileName)
+            self.save_graph(graphPath=tmpFilePath)
+            tmpFilePathArgument = tmpFilePath + '.cg'
+
+            cmd = ['python', '../mainControl.py', '-l', tmpFilePathArgument]
+
+        def open_nfc_thread():
+            self.proc = subprocess.Popen(cmd)
+            self.proc.communicate()
+
+        thread = threading.Thread(target=open_nfc_thread)
+        thread.start()
+
+
+    def move_to_nfc(self):
+        self.open_nfc(moveGraph=self.network_general)
 
     def compute_NTF(self):
         """Computes NTF in current tab"""
