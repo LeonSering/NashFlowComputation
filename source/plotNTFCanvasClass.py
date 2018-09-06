@@ -29,7 +29,7 @@ class PlotNTFCanvas(PlotCanvas):
                 flowIntervalInstance = interface.nashFlow.flowIntervals[intervalID][2]
             else:
                 # We just have a flowInterval instance
-                flowIntervalInstance = interface.interval_general
+                flowIntervalInstance = interface.interval_general   # Will cause problems later!
 
             self.NTFNodeLabelDict = flowIntervalInstance.NTFNodeLabelDict
             self.NTFEdgeFlowDict = flowIntervalInstance.NTFEdgeFlowDict

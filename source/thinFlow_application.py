@@ -45,8 +45,13 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
         self.plotCanvasStretchFactor = float(self.plotFrame_general.width()) / self.plotFrame_general.height()
         self.plotNTFCanvasStretchFactor = float(self.plotNTFFrame_general.width()) / self.plotNTFFrame_general.height()
 
-        # Init graph
-        self.network_general = app_Interface.init_graph()
+        self.tfTypeList = ['general', 'spillback']
+        self.currentTF = self.tfTypeList[self.tabWidget.currentIndex()]  # Currently selected tab information
+
+        # Init graphs
+        for tfType in self.tfTypeList:
+            self.sttr('network', tfType, app_Interface.init_graph())
+
         self.init_app()
         self.inflowLineEdit.setText('1')  # Default value
 
@@ -62,22 +67,33 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
 
         # Initializations
         self.load_config()  # Try to load configuration file
-        #self.tabWidget.setCurrentIndex(0)  # Show Graph Creation Tab # Not necessarily useful (could be done over config or startup)
 
         # Signal configuration
-        self.updateNodeButton_general.clicked.connect(self.update_node)
-        self.deleteNodeButton_general.clicked.connect(self.delete_node)
-        self.updateEdgeButton_general.clicked.connect(self.update_add_edge)
-        self.deleteEdgeButton_general.clicked.connect(self.delete_edge)
+        self.tabWidget.connect(self.tabWidget, QtCore.SIGNAL("currentChanged(int)"), self.tabSwitched)
+
+        for tfType in self.tfTypeList:
+            self.gttr('updateNodeButton', tfType).clicked.connect(self.update_node)
+            self.gttr('deleteNodeButton', tfType).clicked.connect(self.delete_node)
+            self.gttr('updateEdgeButton', tfType).clicked.connect(self.update_add_edge)
+            self.gttr('deleteEdgeButton', tfType).clicked.connect(self.delete_edge)
+            self.gttr('nodeSelectionListWidget', tfType).clicked.connect(self.update_focus_node)
+            self.gttr('edgeSelectionListWidget', tfType).clicked.connect(self.update_focus_edge)
+            self.gttr('computeThinFlowPushButton', tfType).clicked.connect(self.compute_NTF)
+            self.gttr('resettingSwitchButton', tfType).clicked.connect(self.change_resetting)
+
+            # Keyboard shortcuts
+            self.gttr('tailLineEdit', tfType).returnPressed.connect(self.update_add_edge)
+            self.gttr('headLineEdit', tfType).returnPressed.connect(self.update_add_edge)
+            self.gttr('capacityLineEdit', tfType).returnPressed.connect(self.update_add_edge)
+            self.gttr('nodeNameLineEdit', tfType).returnPressed.connect(self.update_node)
+            self.gttr('nodeXLineEdit', tfType).returnPressed.connect(self.update_node)
+            self.gttr('nodeYLineEdit', tfType).returnPressed.connect(self.update_node)
+
         self.outputDirectoryPushButton.clicked.connect(self.select_output_directory)
         self.scipPathPushButton.clicked.connect(self.select_scip_binary)
         self.cleanUpCheckBox.clicked.connect(self.change_cleanup_state)
         self.showEdgesWithoutFlowCheckBox.clicked.connect(self.change_no_flow_show_state)
-        self.nodeSelectionListWidget_general.itemClicked.connect(self.update_focus_node)
-        self.edgeSelectionListWidget_general.itemClicked.connect(self.update_focus_edge)
         self.activateTimeoutCheckBox.clicked.connect(self.change_timeout_state)
-        self.computeThinFlowPushButton_general.clicked.connect(self.compute_NTF)
-        self.resettingSwitchButton_general.clicked.connect(self.change_resetting)
         self.actionNew_graph.triggered.connect(self.re_init_app)
         self.actionLoad_graph.triggered.connect(self.load_graph)
         self.actionSave_graph.triggered.connect(self.save_graph)
@@ -89,15 +105,10 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
         # TO BE DONE LATER
         #self.actionOpen_manual.triggered.connect(self.show_help)
 
-        # Keyboard shortcuts
         QtGui.QShortcut(QtGui.QKeySequence(QtCore.Qt.Key_Delete), self).activated.connect(
             self.pressed_delete)  # Pressed Delete
-        self.tailLineEdit_general.returnPressed.connect(self.update_add_edge)
-        self.headLineEdit_general.returnPressed.connect(self.update_add_edge)
-        self.capacityLineEdit_general.returnPressed.connect(self.update_add_edge)
-        self.nodeNameLineEdit_general.returnPressed.connect(self.update_node)
-        self.nodeXLineEdit_general.returnPressed.connect(self.update_node)
-        self.nodeYLineEdit_general.returnPressed.connect(self.update_node)
+
+        self.tabWidget.setCurrentIndex(0)  # Show General Tab
 
         if len(sys.argv) >= 3:
             # startup arguments have been specified
@@ -107,65 +118,106 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
                 # Delete the temporary graph
                 os.remove(sys.argv[2])
 
+    def gttr(self, variable, tfType=None):
+        '''
+        :param variable: string/variable name, e.g. plotCanvas
+        :param tfType: dict to current thin flow type
+        :return: self.variable_tfType, e.g. self.plotCanvas_general or self.plotCanvas_spillback
+        '''
+        if not tfType:
+            tfType = self.currentTF
+        return getattr(self, variable + '_' + tfType)
+
+    def sttr(self, variable, tfType=None, value=None):
+        '''
+        Sets variable_tfType var to value
+        :param variable: string/variable name, e.g. plotCanvas
+        :param value: value to set variable to
+        :param tfType: dict to current thin flow type
+        '''
+        if not tfType:
+            tfType = self.currentTF
+        setattr(self, variable + '_' + tfType, value)
+
+    def tabSwitched(self, idx=None):
+        if idx is not None:
+            self.currentTF = self.tfTypeList[idx]
 
     def init_app(self): # former: init_graph_creation_app
-        """Initialization of Tab 0"""
-        # Configure plotFrame to display plots of graphs
-        self.plotFrameLayout_general = QtGui.QVBoxLayout()
-        self.plotFrame_general.setLayout(self.plotFrameLayout_general)
-        self.graphCreationCanvas_general = PlotCanvas(self.network_general, self, stretchFactor=1.57, onlyNTF=True)  # Initialize PlotCanvas
-        self.plotFrameLayout_general.addWidget(self.graphCreationCanvas_general)
+        """Initialization of Tabs"""
+        for tfType in self.tfTypeList:
+            # Configure plotFrame to display plots of graphs
+            self.sttr('plotFrameLayout', tfType, QtGui.QVBoxLayout())
+            self.gttr('plotFrame', tfType).setLayout(self.gttr('plotFrameLayout', tfType))
+            self.sttr('graphCreationCanvas', tfType, PlotCanvas(self.gttr('network', tfType), self, stretchFactor=1.57, onlyNTF=True))  # Initialize PlotCanvas
+            self.gttr('plotFrameLayout', tfType).addWidget(self.gttr('graphCreationCanvas', tfType))
+
+            # Configure plotNTFFrame
+            self.sttr('plotNTFFrameLayout', tfType, QtGui.QVBoxLayout())
+            self.gttr('plotNTFFrame', tfType).setLayout(self.gttr('plotNTFFrameLayout', tfType))
+
+            # Add empty graph to plotNTFCanvas to not destroy layout
+            self.sttr('plotNTFCanvas', tfType, PlotNTFCanvas(nx.DiGraph(), self, intervalID=None,
+                                                       stretchFactor=self.plotNTFCanvasStretchFactor,
+                                                       showNoFlowEdges=self.showEdgesWithoutFlowCheckBox.isChecked(),
+                                                       onlyNTF=True))
+            self.gttr('plotNTFFrameLayout', tfType).addWidget(self.gttr('plotNTFCanvas', tfType))
 
         self.re_init_node_list()
         self.re_init_edge_list()
 
-        # Configure plotNTFFrame
-        self.plotNTFFrameLayout_general = QtGui.QVBoxLayout()
-        self.plotNTFFrame_general.setLayout(self.plotNTFFrameLayout_general)
-        # Add empty graph to plotNTFCanvas to not destroy layout
-        self.plotNTFCanvas_general = PlotNTFCanvas(nx.DiGraph(), self, intervalID=None,
-                             stretchFactor=self.plotNTFCanvasStretchFactor,
-                             showNoFlowEdges=self.showEdgesWithoutFlowCheckBox.isChecked(), onlyNTF=True)
-        self.plotNTFFrameLayout_general.addWidget(self.plotNTFCanvas_general)
-
     def re_init_node_list(self):
         """Clear and fill node list"""
         self.nodeSelectionListWidget_general.clear()
-        self.nodeToListItem_general = dict()
-        for node in self.network_general.nodes():
-            self.add_node_to_list(node)
+        self.nodeSelectionListWidget_spillback.clear()
+        for tfType in self.tfTypeList:
+            self.sttr('nodeToListItem', tfType, dict())
+            for node in self.gttr('network', tfType).nodes():
+                self.add_node_to_list(node, tfType)
 
         self.nodeSelectionListWidget_general.sortItems()
+        self.nodeSelectionListWidget_spillback.sortItems()
 
     def re_init_edge_list(self):
         """Clear and fill edge list"""
         self.edgeSelectionListWidget_general.clear()
-        self.edgeToListItem_general = dict()
-        for edge in self.network_general.edges():
-            self.add_edge_to_list(edge)
+        self.edgeSelectionListWidget_spillback.clear()
+        for tfType in self.tfTypeList:
+            self.sttr('edgeToListItem', tfType, dict())
+            for edge in self.gttr('network', tfType).edges():
+                self.add_edge_to_list(edge, tfType)
 
         self.edgeSelectionListWidget_general.sortItems()
+        self.edgeSelectionListWidget_spillback.sortItems()
 
-    def add_node_to_list(self, node):
+    def add_node_to_list(self, node, tfType=None):
         """
         Add single node to list
-        :param node: node which will be added to ListWidget
+        :param node: node which will be added to ListWidget of tfType
+        :param tfType: dict containing information of current thinflowType
         """
-        nodeString = 'Node ' + str(node) + ': ' + self.network_general.node[node]['label']
-        item = QtGui.QListWidgetItem(nodeString)
-        self.nodeToListItem_general[node] = item
-        self.nodeSelectionListWidget_general.addItem(item)  # Add item to listWidget
+        if not tfType:
+            tfType = self.currentTF
 
-    def add_edge_to_list(self, edge):
+        nodeString = 'Node ' + str(node) + ': ' + self.gttr('network', tfType).node[node]['label']
+        item = QtGui.QListWidgetItem(nodeString)
+        self.gttr('nodeToListItem', tfType)[node] = item
+        self.gttr('nodeSelectionListWidget', tfType).addItem(item)   # Add item to listWidget
+
+    def add_edge_to_list(self, edge, tfType=None):
         """
         Add single edge to list
-        :param edge: edge which will be added to ListWidget
+        :param edge: edge which will be added to ListWidget of tfType
+        :param tfType: dict containing information of current thinflowType
         """
+        if not tfType:
+            tfType = self.currentTF
+
         v, w = edge
-        edgeString = 'Edge: ' + str((self.network_general.node[v]['label'], self.network_general.node[w]['label']))
+        edgeString = 'Edge: ' + str((self.gttr('network', tfType).node[v]['label'], self.gttr('network', tfType).node[w]['label']))
         item = QtGui.QListWidgetItem(edgeString)
-        self.edgeToListItem_general[edge] = item
-        self.edgeSelectionListWidget_general.addItem(item)  # Add item to listWidget
+        self.gttr('edgeToListItem')[edge] = item
+        self.gttr('edgeSelectionListWidget', tfType).addItem(item)
 
     def load_config(self):
         """Try to load the config file"""
@@ -207,83 +259,83 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
 
     def update_node(self):
         """Update attributes of focusNode"""
-        if self.graphCreationCanvas_general.focusNode is None:
+        if self.gttr('graphCreationCanvas').focusNode is None:
             return
 
-        nodeName = str(self.nodeNameLineEdit_general.text())
-        XPos = str(self.nodeXLineEdit_general.text())
-        YPos = str(self.nodeYLineEdit_general.text())
+        nodeName = str(self.gttr('nodeNameLineEdit').text())
+        XPos = str(self.gttr('nodeXLineEdit').text())
+        YPos = str(self.gttr('nodeYLineEdit').text())
         if len(nodeName) > 0 and len(XPos) > 0 and len(YPos) > 0:
-            vertex = self.graphCreationCanvas_general.focusNode
-            if nodeName != self.network_general.node[vertex]['label']:
-                self.network_general.node[vertex]['label'] = nodeName
-                item = self.nodeToListItem_general[vertex]
-                self.nodeSelectionListWidget_general.takeItem(self.nodeSelectionListWidget_general.row(item))  # Delete item
-                self.add_node_to_list(vertex)
-                self.nodeSelectionListWidget_general.sortItems()  # Re-sort
+            vertex = self.gttr('graphCreationCanvas').focusNode
+            if nodeName != self.gttr('network').node[vertex]['label']:
+                self.gttr('network').node[vertex]['label'] = nodeName
+                item = self.gttr('nodeToListItem')[vertex]
+                self.self.gttr('nodeSelectionListWidget').takeItem(self.gttr('nodeSelectionListWidget').row(item))  # Delete item
+                self.add_node_to_list(vertex, self.currentTF)
+                self.self.gttr('nodeSelectionListWidget').sortItems()  # Re-sort
 
-            movedBool = (self.network_general.node[vertex]['position'] != (float(XPos), float(YPos)))
-            self.network_general.node[vertex]['position'] = (float(XPos), float(YPos))
+            movedBool = (self.gttr('network').node[vertex]['position'] != (float(XPos), float(YPos)))
+            self.gttr('network').node[vertex]['position'] = (float(XPos), float(YPos))
 
-            self.graphCreationCanvas_general.update_nodes(moved=movedBool, color=True)  # Update UI
+            self.gttr('graphCreationCanvas').update_nodes(moved=movedBool, color=True)  # Update UI
             if movedBool:
-                self.graphCreationCanvas_general.update_edges(moved=movedBool)
+                self.gttr('graphCreationCanvas').update_edges(moved=movedBool)
 
     def delete_node(self):
         """Delete focusNode from network"""
-        vertex = self.graphCreationCanvas_general.focusNode
+        vertex = self.gttr('graphCreationCanvas').focusNode
         if vertex is None or vertex in ['s', 't']:
             return
 
-        if vertex in self.network_general:
-            item = self.nodeToListItem_general[vertex]
-            index = self.nodeSelectionListWidget_general.row(item)
-            self.nodeSelectionListWidget_general.takeItem(index)
+        if vertex in self.gttr('network'):
+            item = self.gttr('nodeToListItem')[vertex]
+            index = self.gttr('nodeSelectionListWidget').row(item)
+            self.gttr('nodeSelectionListWidget').takeItem(index)
 
-            for edge in self.network_general.edges():
+            for edge in self.gttr('network').edges():
                 if vertex in edge:
-                    item = self.edgeToListItem_general[edge]
-                    index = self.edgeSelectionListWidget_general.row(item)
-                    self.edgeSelectionListWidget_general.takeItem(index)
+                    item = self.gttr('edgeToListItem')[edge]
+                    index = self.gttr('edgeSelectionListWidget').row(item)
+                    self.gttr('edgeSelectionListWidget').takeItem(index)
 
-            self.graphCreationCanvas_general.update_nodes(removal=True, color=True)
-            numberOfEdges = self.network_general.number_of_edges()
-            self.network_general.remove_node(vertex)
+            self.gttr('graphCreationCanvas').update_nodes(removal=True, color=True)
+            numberOfEdges = self.gttr('network').number_of_edges()
+            self.gttr('network').remove_node(vertex)
 
-            removedEdgeBool = (numberOfEdges > self.network_general.number_of_edges())
-            self.graphCreationCanvas_general.focusNode = None
+            removedEdgeBool = (numberOfEdges > self.gttr('network').number_of_edges())
+            self.gttr('graphCreationCanvas').focusNode = None
 
             if removedEdgeBool:
-                self.graphCreationCanvas_general.update_edges(removal=True)
+                self.gttr('graphCreationCanvas').update_edges(removal=True)
 
             self.update_node_display()  # Update UI
 
     def update_node_display(self):
         """Update display of the properties of the currently focussed node self.graphCreationCanvas.focusNode, if existing"""
-        if self.graphCreationCanvas_general.focusNode is not None:
-            vertex = self.graphCreationCanvas_general.focusNode
-            self.nodeNameLineEdit_general.setText(self.network_general.node[vertex]['label'])
-            self.nodeXLineEdit_general.setText(str(round(self.network_general.node[vertex]['position'][0], 2)))
-            self.nodeYLineEdit_general.setText(str(round(self.network_general.node[vertex]['position'][1], 2)))
+        if self.gttr('graphCreationCanvas').focusNode is not None:
+            vertex = self.gttr('graphCreationCanvas').focusNode
+            self.gttr('nodeNameLineEdit').setText(self.gttr('network').node[vertex]['label'])
+            self.gttr('nodeXLineEdit').setText(str(round(self.gttr('network').node[vertex]['position'][0], 2)))
+            self.gttr('nodeYLineEdit').setText(str(round(self.gttr('network').node[vertex]['position'][1], 2)))
         else:
-            self.nodeNameLineEdit_general.setText("")
-            self.nodeXLineEdit_general.setText("")
-            self.nodeYLineEdit_general.setText("")
+            self.gttr('nodeNameLineEdit').setText("")
+            self.gttr('nodeXLineEdit').setText("")
+            self.gttr('nodeYLineEdit').setText("")
 
         self.setFocus()  # Focus has to leave LineEdits
 
     def update_edge_display(self):
         """Update display of the properties of the currently focussed edge focusEdge, if existing"""
-        edge = self.graphCreationCanvas_general.focusEdge
+        edge = self.gttr('graphCreationCanvas').focusEdge
         if edge is not None:
-            self.tailLineEdit_general.setText(self.network_general.node[edge[0]]['label'])
-            self.headLineEdit_general.setText(self.network_general.node[edge[1]]['label'])
-            self.capacityLineEdit_general.setText(
-                str(self.network_general[edge[0]][edge[1]]['capacity']))
+            self.gttr('tailLineEdit').setText(self.gttr('network').node[edge[0]]['label'])
+            self.gttr('headLineEdit').setText(self.gttr('network').node[edge[1]]['label'])
+            self.gttr('capacityLineEdit').setText(
+                str(self.gttr('network')[edge[0]][edge[1]]['capacity']))
         else:
-            self.tailLineEdit_general.setText("")
-            self.headLineEdit_general.setText("")
-            self.capacityLineEdit_general.setText("")
+            self.gttr('tailLineEdit').setText("")
+            self.gttr('headLineEdit').setText("")
+            self.gttr('capacityLineEdit').setText("")
 
         self.setFocus()  # Focus has to leave LineEdits
 
@@ -291,14 +343,14 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
 
     def update_add_edge(self):
         """Add an edge or update attributes of focusNode, if existing"""
-        if self.graphCreationCanvas_general.focusEdge is None:
+        if self.gttr('graphCreationCanvas').focusEdge is None:
             return
-        tailLabel = str(self.tailLineEdit_general.text())
-        headLabel = str(self.headLineEdit_general.text())
-        capacityText = float(self.capacityLineEdit_general.text())
+        tailLabel = str(self.gttr('tailLineEdit').text())
+        headLabel = str(self.gttr('headLineEdit').text())
+        capacityText = float(self.gttr('capacityLineEdit').text())
 
         # Work with actual node IDs, not labels
-        labels = nx.get_node_attributes(self.network_general, 'label')
+        labels = nx.get_node_attributes(self.gttr('network'), 'label')
         tail = labels.keys()[labels.values().index(tailLabel)]
         head = labels.keys()[labels.values().index(headLabel)]
 
@@ -306,36 +358,36 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
             # This is not allowed
             return
 
-        if self.network_general.has_edge(tail, head):
+        if self.gttr('network').has_edge(tail, head):
             # Update the edges attributes
-            self.network_general[tail][head]['capacity'] = capacityText
-            self.graphCreationCanvas_general.update_edges()
+            self.gttr('network')[tail][head]['capacity'] = capacityText
+            self.gttr('graphCreationCanvas').update_edges()
         else:
             # Add a new edge
-            self.network_general.add_edge(tail, head, capacity=capacityText, resettingEnabled=False)
-            self.graphCreationCanvas_general.focusEdge = (tail, head)
-            self.graphCreationCanvas_general.update_edges(added=True, color=True)
-            self.graphCreationCanvas_general.update_nodes(color=True)
+            self.gttr('network').add_edge(tail, head, capacity=capacityText, resettingEnabled=False)
+            self.gttr('graphCreationCanvas').focusEdge = (tail, head)
+            self.gttr('graphCreationCanvas').update_edges(added=True, color=True)
+            self.gttr('graphCreationCanvas').update_nodes(color=True)
             self.add_edge_to_list((tail, head))
-            self.edgeSelectionListWidget_general.sortItems()
+            self.gttr('edgeSelectionListWidget').sortItems()
 
         self.update_edge_display()  # Update UI
 
     def delete_edge(self):
         """Delete focusEdge from network"""
-        edge = self.graphCreationCanvas_general.focusEdge
+        edge = self.gttr('graphCreationCanvas').focusEdge
         if edge is None:
             return
 
-        if self.network_general.has_edge(edge[0], edge[1]):
-            item = self.edgeToListItem_general[edge]
-            index = self.edgeSelectionListWidget_general.row(item)
-            self.edgeSelectionListWidget_general.takeItem(index)
+        if self.gttr('network').has_edge(edge[0], edge[1]):
+            item = self.gttr('edgeToListItem')[edge]
+            index = self.gttr('edgeSelectionListWidget').row(item)
+            self.gttr('edgeSelectionListWidget').takeItem(index)
 
-            self.network_general.remove_edge(edge[0], edge[1])  # Deletion before update, as opposed to delete_node()
-            self.graphCreationCanvas_general.update_edges(removal=True)
+            self.gttr('network').remove_edge(edge[0], edge[1])  # Deletion before update, as opposed to delete_node()
+            self.gttr('graphCreationCanvas').update_edges(removal=True)
 
-            self.graphCreationCanvas_general.focusEdge = None
+            self.gttr('graphCreationCanvas').focusEdge = None
 
             self.update_edge_display()  # Update UI
 
@@ -385,13 +437,13 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
 
     def update_focus_node(self):
         """Select new focusNode"""
-        self.graphCreationCanvas_general.focusEdge = None
-        index = self.nodeSelectionListWidget_general.currentRow()
-        item = self.nodeSelectionListWidget_general.item(index)
-        node = self.nodeToListItem_general.keys()[self.nodeToListItem_general.values().index(item)]
-        self.graphCreationCanvas_general.focusNode = node
-        self.graphCreationCanvas_general.update_nodes(color=True)
-        self.graphCreationCanvas_general.update_edges(color=True)
+        self.gttr('graphCreationCanvas').focusEdge = None
+        index = self.gttr('nodeSelectionListWidget').currentRow()
+        item = self.gttr('nodeSelectionListWidget').item(index)
+        node = self.gttr('nodeToListItem').keys()[self.gttr('nodeToListItem').values().index(item)]
+        self.gttr('graphCreationCanvas').focusNode = node
+        self.gttr('graphCreationCanvas').update_nodes(color=True)
+        self.gttr('graphCreationCanvas').update_edges(color=True)
         self.update_node_display()
         self.update_edge_display()
 
@@ -399,13 +451,13 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
 
     def update_focus_edge(self):
         """Select new focusEdge"""
-        self.graphCreationCanvas_general.focusNode = None
-        index = self.edgeSelectionListWidget_general.currentRow()
-        item = self.edgeSelectionListWidget_general.item(index)
-        edge = self.edgeToListItem_general.keys()[self.edgeToListItem_general.values().index(item)]
-        self.graphCreationCanvas_general.focusEdge = edge
-        self.graphCreationCanvas_general.update_nodes(color=True)
-        self.graphCreationCanvas_general.update_edges(color=True)
+        self.gttr('graphCreationCanvas').focusNode = None
+        index = self.gttr('edgeSelectionListWidget').currentRow()
+        item = self.gttr('edgeSelectionListWidget').item(index)
+        edge = self.gttr('edgeToListItem').keys()[self.gttr('edgeToListItem').values().index(item)]
+        self.gttr('graphCreationCanvas').focusEdge = edge
+        self.gttr('graphCreationCanvas').update_nodes(color=True)
+        self.gttr('graphCreationCanvas').update_edges(color=True)
         self.update_node_display()
         self.update_edge_display()
 
@@ -415,29 +467,29 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
         "Adjustment of resettingSwitchButton in GUI"
         if edge is None:
             # Turn button off
-            self.resettingSwitchButton_general.setText("Off")
-            self.resettingSwitchButton_general.setEnabled(False)
+            self.gttr('resettingSwitchButton').setText("Off")
+            self.gttr('resettingSwitchButton').setEnabled(False)
         else:
             # Turn button on, adjust Label accordingly
-            resettingStatusBool = self.network_general[edge[0]][edge[1]]['resettingEnabled']
+            resettingStatusBool = self.gttr('network')[edge[0]][edge[1]]['resettingEnabled']
             resettingSwitchButtonLabel = "On" if resettingStatusBool else "Off"
-            self.resettingSwitchButton_general.setText(resettingSwitchButtonLabel)
-            self.resettingSwitchButton_general.setEnabled(True)
+            self.gttr('resettingSwitchButton').setText(resettingSwitchButtonLabel)
+            self.gttr('resettingSwitchButton').setEnabled(True)
 
     def re_init_NTF_frame(self, newThinFlow=False):
         """Reinits the NTF frame"""
         if not newThinFlow:
-            if self.plotNTFCanvas_general is not None:
-                self.plotNTFCanvas_general.setParent(None)
-            self.plotNTFCanvas_general = None
+            if self.gttr('plotNTFCanvas') is not None:
+                self.gttr('plotNTFCanvas').setParent(None)
+            self.sttr('plotNTFCanvas', tfType=self.currentTF, value=None)
         else:
             """Reinitialization of plotNTFCanvas with given thinflow"""
-            self.plotNTFCanvas_general.setParent(None)
-            self.plotNTFCanvas_general = PlotNTFCanvas(self.interval_general.network, self, intervalID=None,
-                                                       stretchFactor=self.plotNTFCanvasStretchFactor,
-                                                       showNoFlowEdges=self.showEdgesWithoutFlowCheckBox.isChecked(),
-                                                       onlyNTF=True)
-            self.plotNTFFrameLayout_general.addWidget(self.plotNTFCanvas_general)
+            self.gttr('plotNTFCanvas').setParent(None)
+            self.sttr('plotNTFCanvas', self.currentTF, PlotNTFCanvas(self.gttr('interval').network, self, intervalID=None,
+                                                                                   stretchFactor=self.plotNTFCanvasStretchFactor,
+                                                                                   showNoFlowEdges=self.showEdgesWithoutFlowCheckBox.isChecked(),
+                                                                                   onlyNTF=True))
+            self.gttr('plotNTFFrameLayout').addWidget(self.gttr('plotNTFCanvas'))
 
     def re_init_app(self, NoNewGraph=False):
         """
@@ -445,62 +497,60 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
         :param NoNewGraph: (bool) - specify whether a new graph should be initiated or the old one kept
         """
         if not NoNewGraph:
-            self.network_general = app_Interface.init_graph()  # Reinstantiation of the CurrentGraph
+            self.sttr('network', self.currentTF, app_Interface.init_graph())    # Reinstantiation of the CurrentGraph
 
         # Reinitialization of graphCreationCanvas
-        self.graphCreationCanvas_general.setParent(None)  # Drop graphCreationCanvas widget
-        self.graphCreationCanvas_general = PlotCanvas(self.network_general, self, self.plotCanvasStretchFactor, onlyNTF=True)
-        self.plotFrameLayout_general.addWidget(self.graphCreationCanvas_general)  # Add graphCreationCanvas-widget to application
+        self.gttr('graphCreationCanvas').setParent(None)  # Drop graphCreationCanvas widget
+        self.sttr('graphCreationCanvas', self.currentTF, PlotCanvas(self.gttr('network'), self, self.plotCanvasStretchFactor, onlyNTF=True))
+        self.gttr('plotFrameLayout').addWidget(self.gttr('graphCreationCanvas'))  # Add graphCreationCanvas-widget to application
 
         # Reinitialization of plotNTFCanvas
-        self.plotNTFCanvas_general.setParent(None)
-        self.plotNTFCanvas_general = PlotNTFCanvas(nx.DiGraph(), self, intervalID=None,
-                             stretchFactor=self.plotNTFCanvasStretchFactor,
-                             showNoFlowEdges=self.showEdgesWithoutFlowCheckBox.isChecked(), onlyNTF=True)
-        self.plotNTFFrameLayout_general.addWidget(self.plotNTFCanvas_general)
+        self.gttr('plotNTFCanvas').setParent(None)
+        self.sttr('plotNTFCanvas', self.currentTF, PlotNTFCanvas(nx.DiGraph(), self, intervalID=None,
+                                                                               stretchFactor=self.plotNTFCanvasStretchFactor,
+                                                                               showNoFlowEdges=self.showEdgesWithoutFlowCheckBox.isChecked(), onlyNTF=True))
+        self.gttr('plotNTFFrameLayout').addWidget(self.gttr('plotNTFCanvas'))
 
         # Update UI
         self.update_node_display()
         self.update_edge_display()
-        self.inflowLineEdit.setText(str(self.network_general.graph['inflowRate']))
+        self.inflowLineEdit.setText(str(self.gttr('network').graph['inflowRate']))
 
         self.re_init_node_list()
         self.re_init_edge_list()
 
-
-
     def change_resetting(self):
         """Changes the resettingEnabled status of an edge"""
-        edge = self.graphCreationCanvas_general.focusEdge
+        edge = self.gttr('graphCreationCanvas').focusEdge
         if edge is None:
             return
 
         # Change resettingEnabled Boolean
-        self.network_general[edge[0]][edge[1]]['resettingEnabled'] = not self.network_general[edge[0]][edge[1]]['resettingEnabled']
+        self.gttr('network')[edge[0]][edge[1]]['resettingEnabled'] = not self.gttr('network')[edge[0]][edge[1]]['resettingEnabled']
         self.adjust_resettingSwitchButton(edge) # Change button accordingly
 
         # Update display
-        self.graphCreationCanvas_general.update_edges(color=True)
+        self.gttr('graphCreationCanvas').update_edges(color=True)
 
     def change_no_flow_show_state(self):
         """Show/Hide edges without flow in each NTF Plot"""
-        self.plotNTFCanvas_general.change_edge_show_status(show=self.showEdgesWithoutFlowCheckBox.isChecked())
+        for tfType in self.tfTypeList:
+            self.gttr('plotNTFCanvas', tfType).change_edge_show_status(show=self.showEdgesWithoutFlowCheckBox.isChecked())
 
     def pressed_delete(self):
         """Slot for DEL Key"""
-        if self.graphCreationCanvas_general.focusNode is not None:
+        if self.gttr('graphCreationCanvas').focusNode is not None:
             self.delete_node()
-        elif self.graphCreationCanvas_general.focusEdge is not None:
+        elif self.gttr('graphCreationCanvas').focusEdge is not None:
             self.delete_edge()
 
     def cleanup(self):
         """Cleanup if activated. Note: In NFC this functionality is part of the nashFlow Class"""
         if self.cleanUpEnabled:
-            rmtree(self.interval_general.rootPath)
+            rmtree(self.gttr('interval').rootPath)
 
     def load_graph(self, graphPath=None):
         """Load graph instance from '.cg' file"""
-
         if not graphPath:
             dialog = QtGui.QFileDialog
             fopen = dialog.getOpenFileName(self, "Select File", self.defaultLoadSaveDir, "network files (*.cg)")
@@ -515,24 +565,34 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
 
         # Read file
         with open(fopen, 'rb') as f:
-            self.network_general = pickle.load(f)
+            network = pickle.load(f)
 
         # Make sure that each edge has the property 'resettingEnabled'
-        for edge in self.network_general.edges():
+        for edge in network.edges():
             v, w = edge
             try:
-                property = self.network_general[v][w]['resettingEnabled']
+                property = network[v][w]['resettingEnabled']
             except KeyError:
-                self.network_general[v][w]['resettingEnabled'] = None
+                network[v][w]['resettingEnabled'] = None
 
         if not graphPath:
             self.defaultLoadSaveDir = os.path.dirname(fopen)
             self.save_config()
 
+        try:
+            type = network.graph['type']  # Either general or spillback right now
+        except KeyError:
+            network.graph['type'] = 'general'
+
+        self.sttr('network', network['type'], network)
+        self.currentTF = network.graph['type']
+        self.tabWidget.setCurrentIndex(self.tfTypeList.index(network.graph['type']))
+
         self.re_init_app(NoNewGraph=True)
 
     def load_thinflow(self):
         """Load thinflow '.tf' file"""
+        # DOES NOT WORK RIGHT NOW
         dialog = QtGui.QFileDialog
         fopen = dialog.getOpenFileName(self, "Select File", self.defaultLoadSaveDir, "thinflow files (*.tf)")
 
@@ -557,7 +617,7 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
         :param graphPath: If given, then save graph at path graphPath. Else a dialog is opened
         :return: 
         """
-        self.network_general.graph['inflowRate'] = float(self.inflowLineEdit.text())
+        self.gttr('network').graph['inflowRate'] = float(self.inflowLineEdit.text())
 
         if not graphPath:
             dialog = QtGui.QFileDialog
@@ -578,12 +638,15 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
             self.defaultLoadSaveDir = os.path.dirname(fsave)
             self.save_config()
 
+        self.gttr('network').graph['type'] = self.currentTF
+
         # Save network instance to file
         with open(fsave, 'wb') as f:
-            pickle.dump(self.network_general, f)
+            pickle.dump(self.gttr('network'), f)
 
     def save_thinflow(self):
         """Save thinflow to '.tf' file"""
+        # DOES NOT WORK RIGHT NOW
         dialog = QtGui.QFileDialog
         fsave = dialog.getSaveFileName(self, "Select File", self.defaultLoadSaveDir, "thinflow files (*.tf)")
 
@@ -601,7 +664,6 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
         # Save network instance to file
         with open(fsave, 'wb') as f:
             pickle.dump(self.interval_general, f)
-
 
     def open_nfc(self, moveGraph=None):
         """
@@ -631,12 +693,14 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
         thread = threading.Thread(target=open_nfc_thread)
         thread.start()
 
-
     def move_to_nfc(self):
-        self.open_nfc(moveGraph=self.network_general)
+        self.open_nfc(moveGraph=self.gttr('network'))
 
     def compute_NTF(self):
         """Computes NTF in current tab"""
+
+        return # TO DO!!
+
 
         # Drop current NTF plot
         self.re_init_NTF_frame()

@@ -470,7 +470,7 @@ class Ui_MainWindow(object):
         self.menubar.addAction(self.menuHelp.menuAction())
 
         self.retranslateUi(MainWindow)
-        self.tabWidget.setCurrentIndex(1)
+        self.tabWidget.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
         MainWindow.setTabOrder(self.tabWidget, self.tailLineEdit)
         MainWindow.setTabOrder(self.tailLineEdit, self.headLineEdit)
@@ -542,7 +542,7 @@ class Ui_MainWindow(object):
         self.timeoutLineEdit.setText(_translate("MainWindow", "300", None))
         self.activateTimeoutCheckBox.setText(_translate("MainWindow", "Activate timeout", None))
         self.templateComboBox.setItemText(0, _translate("MainWindow", "1. Basic algorithm by Cominetti, Correa and Larré", None))
-        self.templateComboBox.setItemText(1, _translate("MainWindow", "2. Solve only LP/IP", None))
+        self.templateComboBox.setItemText(1, _translate("MainWindow", "2. Solve only one LP/IP", None))
         self.templateComboBox.setItemText(2, _translate("MainWindow", "3. Advanced algorithm", None))
         self.computeFlowPushButton.setText(_translate("MainWindow", "Compute Nashflow", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), _translate("MainWindow", "Create/Load Graph", None))
