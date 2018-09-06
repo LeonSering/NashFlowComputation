@@ -26,13 +26,14 @@ SIMILARITY_DIST = 9  # Maximal distance at which a click is recognized as a clic
 class PlotCanvas(FigureCanvas):
     """Class to plot networkx graphs in widgets and control click events"""
 
-    def __init__(self, graph, interface, stretchFactor=1.57, onlyNTF=False):
+    def __init__(self, graph, interface, stretchFactor=1.57, onlyNTF=False, type='general'):
         self.figure = matplotlib.figure.Figure()
         super(PlotCanvas, self).__init__(self.figure)  # Call parents constructor
         self.figure.patch.set_facecolor('lightgrey')
         self.network = graph
         self.interface = interface
         self.onlyNTF = onlyNTF # If this is true, then PlotCanvas belongs to Thinflow Computation App
+        self.type = type # 'general' or 'spillback'
 
         # Visualization Settings
         self.Xlim = (stretchFactor * (-100), stretchFactor * 100)
@@ -75,6 +76,10 @@ class PlotCanvas(FigureCanvas):
             return Utilities.join_intersect_dicts(nx.get_edge_attributes(self.network, 'capacity'),
                                                   nx.get_edge_attributes(self.network, 'transitTime'))  # Edge labels
         else:
+            if self.type == 'spillback':
+                return Utilities.join_intersect_dicts(nx.get_edge_attributes(self.network, 'capacity'),
+                                                      nx.get_edge_attributes(self.network,
+                                                                             'inflowBound'))  # Edge labels
             return nx.get_edge_attributes(self.network, 'capacity')
 
     def on_click(self, event):
@@ -169,7 +174,8 @@ class PlotCanvas(FigureCanvas):
                     # Add the corresponding edge, if valid
                     if not self.network.has_edge(self.selectedNode, clickedNode):
                         resettingEnabledBool = False if self.onlyNTF else None # Either 0 or 1. Activated only if onlyNTF
-                        self.network.add_edge(self.selectedNode, clickedNode, transitTime=1, capacity=1, resettingEnabled=resettingEnabledBool)
+                        self.network.add_edge(self.selectedNode, clickedNode, transitTime=1, capacity=1, inflowBound=1,
+                                              resettingEnabled=resettingEnabledBool)
 
                         self.focusEdge = (self.selectedNode, clickedNode)
                         self.focusNode = None
@@ -508,7 +514,10 @@ class PlotCanvas(FigureCanvas):
                 if not self.onlyNTF:
                     lbl = {self.focusEdge: (self.network[v][w]['capacity'], self.network[v][w]['transitTime'])}
                 else:
-                    lbl = {self.focusEdge: (self.network[v][w]['capacity'])}
+                    if self.type == 'general':
+                        lbl = {self.focusEdge: (self.network[v][w]['capacity'])}
+                    elif self.type == 'spillback':
+                        lbl = {self.focusEdge: (self.network[v][w]['capacity'], self.network[v][w]['inflowBound'])}
                 self.edgeLabelCollection.update(draw_networkx_edge_labels(self.network,
                                                                           pos={v: self.network.node[v]['position'],
                                                                                w: self.network.node[w]['position']},

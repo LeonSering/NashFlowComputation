@@ -89,6 +89,10 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
             self.gttr('nodeXLineEdit', tfType).returnPressed.connect(self.update_node)
             self.gttr('nodeYLineEdit', tfType).returnPressed.connect(self.update_node)
 
+        # Spillback-only signals
+        self.boundLineEdit_spillback.returnPressed.connect(self.update_add_edge)
+
+        # General signals
         self.outputDirectoryPushButton.clicked.connect(self.select_output_directory)
         self.scipPathPushButton.clicked.connect(self.select_scip_binary)
         self.cleanUpCheckBox.clicked.connect(self.change_cleanup_state)
@@ -149,7 +153,8 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
             # Configure plotFrame to display plots of graphs
             self.sttr('plotFrameLayout', tfType, QtGui.QVBoxLayout())
             self.gttr('plotFrame', tfType).setLayout(self.gttr('plotFrameLayout', tfType))
-            self.sttr('graphCreationCanvas', tfType, PlotCanvas(self.gttr('network', tfType), self, stretchFactor=1.57, onlyNTF=True))  # Initialize PlotCanvas
+            self.sttr('graphCreationCanvas', tfType, PlotCanvas(self.gttr('network', tfType), self,
+                                                                stretchFactor=1.57, onlyNTF=True, type=tfType))  # Initialize PlotCanvas
             self.gttr('plotFrameLayout', tfType).addWidget(self.gttr('graphCreationCanvas', tfType))
 
             # Configure plotNTFFrame
@@ -332,10 +337,18 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
             self.gttr('headLineEdit').setText(self.gttr('network').node[edge[1]]['label'])
             self.gttr('capacityLineEdit').setText(
                 str(self.gttr('network')[edge[0]][edge[1]]['capacity']))
+
+            if self.currentTF == 'spillback':
+                self.boundLineEdit_spillback.setText(str(self.gttr('network')[edge[0]][edge[1]]['inflowBound']))
+
         else:
             self.gttr('tailLineEdit').setText("")
             self.gttr('headLineEdit').setText("")
             self.gttr('capacityLineEdit').setText("")
+
+            if self.currentTF == 'spillback':
+                self.boundLineEdit_spillback.setText("")
+
 
         self.setFocus()  # Focus has to leave LineEdits
 
@@ -348,6 +361,7 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
         tailLabel = str(self.gttr('tailLineEdit').text())
         headLabel = str(self.gttr('headLineEdit').text())
         capacityText = float(self.gttr('capacityLineEdit').text())
+        boundText = float(self.boundLineEdit_spillback.text()) if self.currentTF == 'spillback' else None
 
         # Work with actual node IDs, not labels
         labels = nx.get_node_attributes(self.gttr('network'), 'label')
@@ -361,10 +375,15 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
         if self.gttr('network').has_edge(tail, head):
             # Update the edges attributes
             self.gttr('network')[tail][head]['capacity'] = capacityText
+            if boundText is not None:
+                self.gttr('network', 'spillback')[tail][head]['inflowBound'] = boundText
             self.gttr('graphCreationCanvas').update_edges()
         else:
             # Add a new edge
-            self.gttr('network').add_edge(tail, head, capacity=capacityText, resettingEnabled=False)
+            if boundText is not None:
+                self.gttr('network').add_edge(tail, head, capacity=capacityText, resettingEnabled=False)
+            else:
+                self.gttr('network').add_edge(tail, head, capacity=capacityText, inflowBound=boundText, resettingEnabled=False)
             self.gttr('graphCreationCanvas').focusEdge = (tail, head)
             self.gttr('graphCreationCanvas').update_edges(added=True, color=True)
             self.gttr('graphCreationCanvas').update_nodes(color=True)
@@ -501,7 +520,8 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
 
         # Reinitialization of graphCreationCanvas
         self.gttr('graphCreationCanvas').setParent(None)  # Drop graphCreationCanvas widget
-        self.sttr('graphCreationCanvas', self.currentTF, PlotCanvas(self.gttr('network'), self, self.plotCanvasStretchFactor, onlyNTF=True))
+        self.sttr('graphCreationCanvas', self.currentTF, PlotCanvas(self.gttr('network'), self, self.plotCanvasStretchFactor, onlyNTF=True,
+                                                                    type=self.currentTF))
         self.gttr('plotFrameLayout').addWidget(self.gttr('graphCreationCanvas'))  # Add graphCreationCanvas-widget to application
 
         # Reinitialization of plotNTFCanvas
