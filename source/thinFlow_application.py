@@ -616,7 +616,6 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
 
     def load_thinflow(self):
         """Load thinflow '.tf' file"""
-        # DOES NOT WORK RIGHT NOW
         dialog = QtGui.QFileDialog
         fopen = dialog.getOpenFileName(self, "Select File", self.defaultLoadSaveDir, "thinflow files (*.tf)")
 
@@ -628,7 +627,12 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
 
         # Read file
         with open(fopen, 'rb') as f:
-            self.interval_general = pickle.load(f)
+            interval = pickle.load(f)
+
+        tfType = 'spillback' if 'spillback' in interval.__class__.__name__ else 'general'
+        self.sttr('interval', tfType, interval)
+        self.currentTF = tfType
+        self.tabWidget.setCurrentIndex(self.tfTypeList.index(tfType))
 
         self.defaultLoadSaveDir = os.path.dirname(fopen)
         self.save_config()
@@ -670,7 +674,6 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
 
     def save_thinflow(self):
         """Save thinflow to '.tf' file"""
-        # DOES NOT WORK RIGHT NOW
         dialog = QtGui.QFileDialog
         fsave = dialog.getSaveFileName(self, "Select File", self.defaultLoadSaveDir, "thinflow files (*.tf)")
 
@@ -687,7 +690,7 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
 
         # Save network instance to file
         with open(fsave, 'wb') as f:
-            pickle.dump(self.interval_general, f)
+            pickle.dump(self.gttr('interval'), f)
 
     def open_nfc(self, moveGraph=None):
         """
