@@ -10,6 +10,7 @@ import numpy as np
 import networkx as nx
 from math import sqrt
 from utilitiesClass import Utilities
+
 matplotlib.use("Qt4Agg")
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.colors import colorConverter
@@ -22,7 +23,6 @@ SIMILARITY_DIST = 9  # Maximal distance at which a click is recognized as a clic
 # ======================================================================================================================
 
 
-
 class PlotCanvas(FigureCanvas):
     """Class to plot networkx graphs in widgets and control click events"""
 
@@ -32,8 +32,8 @@ class PlotCanvas(FigureCanvas):
         self.figure.patch.set_facecolor('lightgrey')
         self.network = graph
         self.interface = interface
-        self.onlyNTF = onlyNTF # If this is true, then PlotCanvas belongs to Thinflow Computation App
-        self.type = type # 'general' or 'spillback'
+        self.onlyNTF = onlyNTF  # If this is true, then PlotCanvas belongs to Thinflow Computation App
+        self.type = type  # 'general' or 'spillback'
 
         # Visualization Settings
         self.Xlim = (stretchFactor * (-100), stretchFactor * 100)
@@ -173,7 +173,7 @@ class PlotCanvas(FigureCanvas):
                 if self.selectedNode is not None and self.selectedNode != clickedNode:
                     # Add the corresponding edge, if valid
                     if not self.network.has_edge(self.selectedNode, clickedNode):
-                        resettingEnabledBool = False if self.onlyNTF else None # Either 0 or 1. Activated only if onlyNTF
+                        resettingEnabledBool = False if self.onlyNTF else None  # Either 0 or 1. Activated only if onlyNTF
                         self.network.add_edge(self.selectedNode, clickedNode, transitTime=1, capacity=1, inflowBound=1,
                                               resettingEnabled=resettingEnabledBool)
 

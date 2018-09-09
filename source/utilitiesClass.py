@@ -5,17 +5,19 @@
 # Description:  Class containing utility functions
 # ===========================================================================
 
+import matplotlib
 import os
 import time
+from matplotlib.collections import PatchCollection
+from matplotlib.patches import Rectangle, Circle
+
 import networkx as nx
-import matplotlib
-from matplotlib.patches import Rectangle, Circle, Polygon
-from matplotlib.collections import PatchCollection, CircleCollection
+
 matplotlib.use("Qt4Agg")
 import numpy as np
 import bisect
-# ======================================================================================================================
 
+# ======================================================================================================================
 
 
 TOL = 1e-3  # Tolerance
@@ -85,7 +87,7 @@ class Utilities:
         # transform data coordinate angle to screen coordinate angle
         xy = np.array(pos)
         trans_angle = axes.transData.transform_angles(np.array((angle,)),
-                                                    xy.reshape((1, 2)))[0]
+                                                      xy.reshape((1, 2)))[0]
         return trans_angle
 
     @staticmethod
@@ -152,9 +154,9 @@ class Utilities:
         """Round up to 10s"""
         return x if x % 10 == 0 else x + 10 - x % 10
 
-
     #   All following functions are modifications of networkx functions to draw different edge styles
     '''Modified function networkx.draw_networkx_edges'''
+
     @staticmethod
     def draw_edges(G, pos,
                    edgelist=None,
@@ -268,8 +270,8 @@ class Utilities:
 
                 a_pos.append(((xa, ya), (x2, y2)))
 
-                #r1 = matplotlib.patches.Rectangle((0, 0), 20, 40, color="blue", alpha=0.50)
-                #ax.add_patch(r1)
+                # r1 = matplotlib.patches.Rectangle((0, 0), 20, 40, color="blue", alpha=0.50)
+                # ax.add_patch(r1)
                 # MAYBE DRAW POLYGON INSTEAD OF RECTANGLE
 
             arrow_collection = LineCollection(a_pos,
@@ -286,20 +288,21 @@ class Utilities:
         return edgeCollection, arrow_collection
 
     '''Modified function networkx.draw_networkx_edges'''
+
     @staticmethod
     def draw_edges_with_boxes(G, pos,
-                   edgelist=None,
-                   width=1.0,
-                   edge_color='k',
-                   style='solid',
-                   alpha=1.0,
-                   edge_cmap=None,
-                   edge_vmin=None,
-                   edge_vmax=None,
-                   ax=None,
-                   arrows=True,
-                   label=None,
-                   **kwds):
+                              edgelist=None,
+                              width=1.0,
+                              edge_color='k',
+                              style='solid',
+                              alpha=1.0,
+                              edge_cmap=None,
+                              edge_vmin=None,
+                              edge_vmax=None,
+                              ax=None,
+                              arrows=True,
+                              label=None,
+                              **kwds):
         try:
             import matplotlib
             import matplotlib.pyplot as plt
@@ -324,14 +327,13 @@ class Utilities:
 
         # set edge positions
 
-
         box_pos = numpy.asarray([(pos[e[0]], pos[e[1]]) for e in edgelist])
         p = 0.25
         edge_pos = []
         for edge in edgelist:
             src, dst = np.array(pos[edge[0]]), np.array(pos[edge[1]])
             s = dst - src
-            src = src + p*s
+            src = src + p * s
             edge_pos.append((src, dst))
         edge_pos = numpy.asarray(edge_pos)
 
@@ -405,20 +407,21 @@ class Utilities:
         return edge_collection, box_collection
 
     '''Modified function networkx.draw_networkx_edges'''
+
     @staticmethod
     def draw_animation_edges(G, pos,
-                   edgelist=None,
-                   width=1.0,
-                   edge_color='k',
-                   style='solid',
-                   alpha=1.0,
-                   edge_cmap=None,
-                   edge_vmin=None,
-                   edge_vmax=None,
-                   ax=None,
-                   arrows=True,
-                   label=None,
-                   **kwds):
+                             edgelist=None,
+                             width=1.0,
+                             edge_color='k',
+                             style='solid',
+                             alpha=1.0,
+                             edge_cmap=None,
+                             edge_vmin=None,
+                             edge_vmax=None,
+                             ax=None,
+                             arrows=True,
+                             label=None,
+                             **kwds):
         try:
             import matplotlib
             import matplotlib.pyplot as plt
@@ -443,14 +446,13 @@ class Utilities:
 
         # set edge positions
 
-
         box_pos = numpy.asarray([(pos[e[0]], pos[e[1]]) for e in edgelist])
         p = 0.25
         edge_pos = []
         for edge in edgelist:
             src, dst = np.array(pos[edge[0]]), np.array(pos[edge[1]])
             s = dst - src
-            src = src + p*s
+            src = src + p * s
             edge_pos.append((src, dst))
         edge_pos = numpy.asarray(edge_pos)
 
@@ -512,7 +514,7 @@ class Utilities:
 
         tube_collection = LineCollection(edge_pos,
                                          colors=tuple([colorConverter.to_rgba('lightgrey', alpha)
-                                     for c in edge_color]),
+                                                       for c in edge_color]),
                                          linewidths=4,
                                          antialiaseds=(1,),
                                          linestyle=style,
@@ -541,8 +543,6 @@ class Utilities:
             else:
                 edge_collection.autoscale()
 
-
-
         if G.is_directed() and arrows:
             arrow_collection = Utilities.get_boxes(edge_colors=edge_colors, edge_pos=box_pos)
             arrow_collection.set_zorder(1)  # edges go behind nodes
@@ -552,8 +552,9 @@ class Utilities:
         return edge_collection, arrow_collection, tube_collection
 
     '''Modified function networkx.draw_networkx_edges'''
+
     @staticmethod
-    def get_boxes(edge_colors= None, edge_pos=None, width=1.0):
+    def get_boxes(edge_colors=None, edge_pos=None, width=1.0):
         import matplotlib.pyplot as plt
         import matplotlib.cbook as cb
         from matplotlib.colors import colorConverter
@@ -594,25 +595,26 @@ class Utilities:
                                            facecolors='none',
                                            antialiaseds=(1,),
                                            transOffset=ax.transData, )
-                                            # alpha=0.5)
+        # alpha=0.5)
         return arrow_collection
 
     '''Modified function networkx.draw_networkx_nodes'''
+
     @staticmethod
     def draw_nodes(G,
-                    pos,
-                    nodelist=None,
-                    node_size=300,
-                    node_color='r',
-                    node_shape='o',
-                    alpha=1.0,
-                    cmap=None,
-                    vmin=None,
-                    vmax=None,
-                    ax=None,
-                    linewidths=None,
-                    label=None,
-                    **kwds):
+                   pos,
+                   nodelist=None,
+                   node_size=300,
+                   node_color='r',
+                   node_shape='o',
+                   alpha=1.0,
+                   cmap=None,
+                   vmin=None,
+                   vmax=None,
+                   ax=None,
+                   linewidths=None,
+                   label=None,
+                   **kwds):
 
         try:
             import matplotlib.pyplot as plt
@@ -635,7 +637,7 @@ class Utilities:
         try:
             xy = numpy.asarray([pos[v] for v in nodelist])
         except KeyError as e:
-            raise nx.NetworkXError('Node %s has no position.'%e)
+            raise nx.NetworkXError('Node %s has no position.' % e)
         except ValueError:
             raise nx.NetworkXError('Bad value in node positions.')
 

@@ -92,7 +92,6 @@ class FlowInterval:
                     pid = int(line.split(None, 1)[0])
                     os.kill(pid, signal.SIGKILL)  # Kill SCIP process
 
-
     def compute_alpha(self, labelLowerBoundTimeDict):
         """
         Compute alpha respecting the conditions
@@ -100,8 +99,8 @@ class FlowInterval:
         """
         # Function term in conditions on alpha
         func = lambda v, w: (
-                                self.network[v][w]['transitTime'] + labelLowerBoundTimeDict[v] -
-                                labelLowerBoundTimeDict[w]) \
+                                    self.network[v][w]['transitTime'] + labelLowerBoundTimeDict[v] -
+                                    labelLowerBoundTimeDict[w]) \
                             / (self.NTFNodeLabelDict[w] - self.NTFNodeLabelDict[v])
 
         self.alpha = float('inf')
@@ -410,7 +409,8 @@ class FlowInterval:
         for v, w in self.shortestPathNetwork.edges():
             minimalCongestion = min(map(p, self.shortestPathNetwork.in_edges(w)))
             assert (
-                Utilities.is_eq_tol(self.NTFEdgeFlowDict[v, w], 0) or Utilities.is_eq_tol(p((v, w)), minimalCongestion))
+                    Utilities.is_eq_tol(self.NTFEdgeFlowDict[v, w], 0) or Utilities.is_eq_tol(p((v, w)),
+                                                                                              minimalCongestion))
 
         # Check if actually an s-t-flow
         for w in self.shortestPathNetwork:

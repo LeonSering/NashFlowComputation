@@ -9,6 +9,7 @@ from normalizedThinFlowClass import NormalizedThinFlow
 import os
 import re
 
+
 # ======================================================================================================================
 
 class NormalizedThinFlow_spillback(NormalizedThinFlow):
@@ -28,8 +29,9 @@ class NormalizedThinFlow_spillback(NormalizedThinFlow):
         :param scipFile: path to scip binary
         """
 
-        NormalizedThinFlow.__init__(self, shortestPathNetwork, id, resettingEdges, flowEdges, inflowRate, minCapacity, outputDirectory,
-                 templateFile, scipFile)
+        NormalizedThinFlow.__init__(self, shortestPathNetwork, id, resettingEdges, flowEdges, inflowRate, minCapacity,
+                                    outputDirectory,
+                                    templateFile, scipFile)
 
         self.minInflowBound = minInflowBound
 
@@ -50,7 +52,6 @@ class NormalizedThinFlow_spillback(NormalizedThinFlow):
 
         return labelDict, spillbackFactorDict, flowDict
 
-
     def write_zimpl_files(self):
         """Write the ZIMPL files"""
         with open(os.path.join(self.rootPath, 'nodes.txt'), 'w') as nodeWriter:
@@ -64,7 +65,8 @@ class NormalizedThinFlow_spillback(NormalizedThinFlow):
                 inflowBound = str(self.network[v][w]['inflowBound'])
                 isInE_0 = str(1) if edge in self.flowEdges else str(0)
                 isInE_Star = str(1) if edge in self.resettingEdges else str(0)
-                outputString = str(v) + ":" + str(w) + ":" + capacity + ":" + inflowBound + ":" + isInE_0 + ":" + isInE_Star + '\n'
+                outputString = str(v) + ":" + str(
+                    w) + ":" + capacity + ":" + inflowBound + ":" + isInE_0 + ":" + isInE_Star + '\n'
                 edgeWriter.write(outputString)
 
         with open(os.path.join(self.rootPath, 'other.txt'), 'w') as otherWriter:

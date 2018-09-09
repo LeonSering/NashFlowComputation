@@ -27,7 +27,6 @@ from application import Interface as app_Interface
 from flowIntervalClass import FlowInterval
 from flowIntervalClass_spillback import FlowInterval_spillback
 
-
 # =======================================================================================================================
 filterwarnings('ignore')  # For the moment: ignore warnings as pyplot.hold is deprecated
 QtCore.QCoreApplication.setAttribute(QtCore.Qt.AA_X11InitThreads)  # This is necessary if threads access the GUI
@@ -107,7 +106,7 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
         self.actionOpen_NashFlowComputation.triggered.connect(self.open_nfc)
         self.actionMove_current_graph_to_NashFlowComputation.triggered.connect(self.move_to_nfc)
         # TO BE DONE LATER
-        #self.actionOpen_manual.triggered.connect(self.show_help)
+        # self.actionOpen_manual.triggered.connect(self.show_help)
 
         QtGui.QShortcut(QtGui.QKeySequence(QtCore.Qt.Key_Delete), self).activated.connect(
             self.pressed_delete)  # Pressed Delete
@@ -123,22 +122,22 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
                 os.remove(sys.argv[2])
 
     def gttr(self, variable, tfType=None):
-        '''
+        """
         :param variable: string/variable name, e.g. plotCanvas
         :param tfType: dict to current thin flow type
         :return: self.variable_tfType, e.g. self.plotCanvas_general or self.plotCanvas_spillback
-        '''
+        """
         if not tfType:
             tfType = self.currentTF
         return getattr(self, variable + '_' + tfType)
 
     def sttr(self, variable, tfType=None, value=None):
-        '''
+        """
         Sets variable_tfType var to value
         :param variable: string/variable name, e.g. plotCanvas
         :param value: value to set variable to
         :param tfType: dict to current thin flow type
-        '''
+        """
         if not tfType:
             tfType = self.currentTF
         setattr(self, variable + '_' + tfType, value)
@@ -148,14 +147,15 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
         if idx is not None:
             self.currentTF = self.tfTypeList[idx]
 
-    def init_app(self): # former: init_graph_creation_app
+    def init_app(self):  # former: init_graph_creation_app
         """Initialization of Tabs"""
         for tfType in self.tfTypeList:
             # Configure plotFrame to display plots of graphs
             self.sttr('plotFrameLayout', tfType, QtGui.QVBoxLayout())
             self.gttr('plotFrame', tfType).setLayout(self.gttr('plotFrameLayout', tfType))
             self.sttr('graphCreationCanvas', tfType, PlotCanvas(self.gttr('network', tfType), self,
-                                                                stretchFactor=1.57, onlyNTF=True, type=tfType))  # Initialize PlotCanvas
+                                                                stretchFactor=1.57, onlyNTF=True,
+                                                                type=tfType))  # Initialize PlotCanvas
             self.gttr('plotFrameLayout', tfType).addWidget(self.gttr('graphCreationCanvas', tfType))
 
             # Configure plotNTFFrame
@@ -164,9 +164,9 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
 
             # Add empty graph to plotNTFCanvas to not destroy layout
             self.sttr('plotNTFCanvas', tfType, PlotNTFCanvas(nx.DiGraph(), self, intervalID=None,
-                                                       stretchFactor=self.plotNTFCanvasStretchFactor,
-                                                       showNoFlowEdges=self.showEdgesWithoutFlowCheckBox.isChecked(),
-                                                       onlyNTF=True))
+                                                             stretchFactor=self.plotNTFCanvasStretchFactor,
+                                                             showNoFlowEdges=self.showEdgesWithoutFlowCheckBox.isChecked(),
+                                                             onlyNTF=True))
             self.gttr('plotNTFFrameLayout', tfType).addWidget(self.gttr('plotNTFCanvas', tfType))
 
         self.re_init_node_list()
@@ -208,7 +208,7 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
         nodeString = 'Node ' + str(node) + ': ' + self.gttr('network', tfType).node[node]['label']
         item = QtGui.QListWidgetItem(nodeString)
         self.gttr('nodeToListItem', tfType)[node] = item
-        self.gttr('nodeSelectionListWidget', tfType).addItem(item)   # Add item to listWidget
+        self.gttr('nodeSelectionListWidget', tfType).addItem(item)  # Add item to listWidget
 
     def add_edge_to_list(self, edge, tfType=None):
         """
@@ -220,7 +220,8 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
             tfType = self.currentTF
 
         v, w = edge
-        edgeString = 'Edge: ' + str((self.gttr('network', tfType).node[v]['label'], self.gttr('network', tfType).node[w]['label']))
+        edgeString = 'Edge: ' + str(
+            (self.gttr('network', tfType).node[v]['label'], self.gttr('network', tfType).node[w]['label']))
         item = QtGui.QListWidgetItem(edgeString)
         self.gttr('edgeToListItem')[edge] = item
         self.gttr('edgeSelectionListWidget', tfType).addItem(item)
@@ -276,7 +277,8 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
             if nodeName != self.gttr('network').node[vertex]['label']:
                 self.gttr('network').node[vertex]['label'] = nodeName
                 item = self.gttr('nodeToListItem')[vertex]
-                self.self.gttr('nodeSelectionListWidget').takeItem(self.gttr('nodeSelectionListWidget').row(item))  # Delete item
+                self.self.gttr('nodeSelectionListWidget').takeItem(
+                    self.gttr('nodeSelectionListWidget').row(item))  # Delete item
                 self.add_node_to_list(vertex, self.currentTF)
                 self.self.gttr('nodeSelectionListWidget').sortItems()  # Re-sort
 
@@ -350,7 +352,6 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
             if self.currentTF == 'spillback':
                 self.boundLineEdit_spillback.setText("")
 
-
         self.setFocus()  # Focus has to leave LineEdits
 
         self.adjust_resettingSwitchButton(edge)
@@ -376,7 +377,6 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
             # Not allowed
             return
 
-
         if self.gttr('network').has_edge(tail, head):
             # Update the edges attributes
             self.gttr('network')[tail][head]['capacity'] = capacityText
@@ -388,7 +388,8 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
             if boundText is not None:
                 self.gttr('network').add_edge(tail, head, capacity=capacityText, resettingEnabled=False)
             else:
-                self.gttr('network').add_edge(tail, head, capacity=capacityText, inflowBound=boundText, resettingEnabled=False)
+                self.gttr('network').add_edge(tail, head, capacity=capacityText, inflowBound=boundText,
+                                              resettingEnabled=False)
             self.gttr('graphCreationCanvas').focusEdge = (tail, head)
             self.gttr('graphCreationCanvas').update_edges(added=True, color=True)
             self.gttr('graphCreationCanvas').update_nodes(color=True)
@@ -488,7 +489,7 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
         self.adjust_resettingSwitchButton(edge)
 
     def adjust_resettingSwitchButton(self, edge):
-        "Adjustment of resettingSwitchButton in GUI"
+        """Adjustment of resettingSwitchButton in GUI"""
         if edge is None:
             # Turn button off
             self.gttr('resettingSwitchButton').setText("Off")
@@ -509,10 +510,11 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
         else:
             """Reinitialization of plotNTFCanvas with given thinflow"""
             self.gttr('plotNTFCanvas').setParent(None)
-            self.sttr('plotNTFCanvas', self.currentTF, PlotNTFCanvas(self.gttr('interval').network, self, intervalID=None,
-                                                                                   stretchFactor=self.plotNTFCanvasStretchFactor,
-                                                                                   showNoFlowEdges=self.showEdgesWithoutFlowCheckBox.isChecked(),
-                                                                                   onlyNTF=True))
+            self.sttr('plotNTFCanvas', self.currentTF,
+                      PlotNTFCanvas(self.gttr('interval').network, self, intervalID=None,
+                                    stretchFactor=self.plotNTFCanvasStretchFactor,
+                                    showNoFlowEdges=self.showEdgesWithoutFlowCheckBox.isChecked(),
+                                    onlyNTF=True))
             self.gttr('plotNTFFrameLayout').addWidget(self.gttr('plotNTFCanvas'))
 
     def re_init_app(self, NoNewGraph=False):
@@ -521,19 +523,22 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
         :param NoNewGraph: (bool) - specify whether a new graph should be initiated or the old one kept
         """
         if not NoNewGraph:
-            self.sttr('network', self.currentTF, app_Interface.init_graph())    # Reinstantiation of the CurrentGraph
+            self.sttr('network', self.currentTF, app_Interface.init_graph())  # Reinstantiation of the CurrentGraph
 
         # Reinitialization of graphCreationCanvas
         self.gttr('graphCreationCanvas').setParent(None)  # Drop graphCreationCanvas widget
-        self.sttr('graphCreationCanvas', self.currentTF, PlotCanvas(self.gttr('network'), self, self.plotCanvasStretchFactor, onlyNTF=True,
-                                                                    type=self.currentTF))
-        self.gttr('plotFrameLayout').addWidget(self.gttr('graphCreationCanvas'))  # Add graphCreationCanvas-widget to application
+        self.sttr('graphCreationCanvas', self.currentTF,
+                  PlotCanvas(self.gttr('network'), self, self.plotCanvasStretchFactor, onlyNTF=True,
+                             type=self.currentTF))
+        self.gttr('plotFrameLayout').addWidget(
+            self.gttr('graphCreationCanvas'))  # Add graphCreationCanvas-widget to application
 
         # Reinitialization of plotNTFCanvas
         self.gttr('plotNTFCanvas').setParent(None)
         self.sttr('plotNTFCanvas', self.currentTF, PlotNTFCanvas(nx.DiGraph(), self, intervalID=None,
-                                                                               stretchFactor=self.plotNTFCanvasStretchFactor,
-                                                                               showNoFlowEdges=self.showEdgesWithoutFlowCheckBox.isChecked(), onlyNTF=True))
+                                                                 stretchFactor=self.plotNTFCanvasStretchFactor,
+                                                                 showNoFlowEdges=self.showEdgesWithoutFlowCheckBox.isChecked(),
+                                                                 onlyNTF=True))
         self.gttr('plotNTFFrameLayout').addWidget(self.gttr('plotNTFCanvas'))
 
         # Update UI
@@ -551,8 +556,9 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
             return
 
         # Change resettingEnabled Boolean
-        self.gttr('network')[edge[0]][edge[1]]['resettingEnabled'] = not self.gttr('network')[edge[0]][edge[1]]['resettingEnabled']
-        self.adjust_resettingSwitchButton(edge) # Change button accordingly
+        self.gttr('network')[edge[0]][edge[1]]['resettingEnabled'] = not self.gttr('network')[edge[0]][edge[1]][
+            'resettingEnabled']
+        self.adjust_resettingSwitchButton(edge)  # Change button accordingly
 
         # Update display
         self.gttr('graphCreationCanvas').update_edges(color=True)
@@ -560,7 +566,8 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
     def change_no_flow_show_state(self):
         """Show/Hide edges without flow in each NTF Plot"""
         for tfType in self.tfTypeList:
-            self.gttr('plotNTFCanvas', tfType).change_edge_show_status(show=self.showEdgesWithoutFlowCheckBox.isChecked())
+            self.gttr('plotNTFCanvas', tfType).change_edge_show_status(
+                show=self.showEdgesWithoutFlowCheckBox.isChecked())
 
     def pressed_delete(self):
         """Slot for DEL Key"""
@@ -734,7 +741,8 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
         if returnCode != 0:
             # Invalid input has been given
             # Spawn warning
-            QtGui.QMessageBox.question(QtGui.QWidget(), 'Abort: Input error', self.get_error_message(returnCode), QtGui.QMessageBox.Ok)
+            QtGui.QMessageBox.question(QtGui.QWidget(), 'Abort: Input error', self.get_error_message(returnCode),
+                                       QtGui.QMessageBox.Ok)
             return
 
         # Drop current NTF plot
@@ -750,10 +758,10 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
 
         if self.currentTF == 'general':
             templateFile = os.path.join(os.getcwd(), 'templates',
-                                             'algorithm_' + str(self.templateFile + 1) + '.zpl')
+                                        'algorithm_' + str(self.templateFile + 1) + '.zpl')
         elif self.currentTF == 'spillback':
             templateFile = os.path.join(os.getcwd(), 'templates',
-                                             'algorithm_spillback.zpl')
+                                        'algorithm_spillback.zpl')
         scipFile = self.scipFile
         timeout = float(self.timeoutLineEdit.text())
 
@@ -761,14 +769,17 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
 
         if self.currentTF == 'general':
             self.interval_general = FlowInterval(network, resettingEdges=resettingEdges, lowerBoundTime=lowerBoundTime,
-                                inflowRate=inflowRate, minCapacity=minCapacity, counter=counter,
-                                outputDirectory=rootPath, templateFile=templateFile, scipFile=scipFile,
-                                timeout=timeout)
+                                                 inflowRate=inflowRate, minCapacity=minCapacity, counter=counter,
+                                                 outputDirectory=rootPath, templateFile=templateFile, scipFile=scipFile,
+                                                 timeout=timeout)
         elif self.currentTF == 'spillback':
-            self.interval_spillback = FlowInterval_spillback(network, resettingEdges=resettingEdges, lowerBoundTime=lowerBoundTime,
-                         inflowRate=inflowRate, minCapacity=minCapacity, counter=counter,
-                         outputDirectory=rootPath, templateFile=templateFile, scipFile=scipFile,
-                         timeout=timeout)
+            self.interval_spillback = FlowInterval_spillback(network, resettingEdges=resettingEdges,
+                                                             lowerBoundTime=lowerBoundTime,
+                                                             inflowRate=inflowRate, minCapacity=minCapacity,
+                                                             counter=counter,
+                                                             outputDirectory=rootPath, templateFile=templateFile,
+                                                             scipFile=scipFile,
+                                                             timeout=timeout)
 
         # Set shortest path network manually to entire graph (is the deepcopy really needed?)
         interval = self.gttr('interval')
@@ -785,8 +796,9 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
             interval.get_ntf()
 
         self.sttr('plotNTFCanvas', self.currentTF, PlotNTFCanvas(interval.shortestPathNetwork, self, intervalID=None,
-                             stretchFactor=self.plotNTFCanvasStretchFactor,
-                             showNoFlowEdges=self.showEdgesWithoutFlowCheckBox.isChecked(), onlyNTF=True))
+                                                                 stretchFactor=self.plotNTFCanvasStretchFactor,
+                                                                 showNoFlowEdges=self.showEdgesWithoutFlowCheckBox.isChecked(),
+                                                                 onlyNTF=True))
 
         self.gttr('plotNTFFrameLayout').addWidget(self.gttr('plotNTFCanvas'))
         self.cleanup()
@@ -812,7 +824,7 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
                 m = min(nx.get_edge_attributes(network, 'inflowBound').values())
                 if m <= 0:
                     return 4
-            except:
+            except KeyError:
                 pass
 
         try:
@@ -828,19 +840,20 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
                     (v, w) = e
                     if network[v][w]['inflowBound'] < float(self.inflowLineEdit.text()):
                         return 6
-            except:
+            except KeyError:
                 pass
 
         return 0
 
-    def get_error_message(self, errorCode):
+    @staticmethod
+    def get_error_message(errorCode):
         errorDescription = {
-            1:"Source 's' should not have incoming edges.",
-            2:"Sink 't' should not have outgoing edges.",
-            3:"All nodes have to be reachable from 's'.",
-            4:"Edge capacities and inflow bounds have to be positive.",
-            5:"Network contains a cycle.",
-            6:"Inflow bounds of all outgoing edges from sink 's' have to be greater-or-equal than network inflow-rate."
+            1: "Source 's' should not have incoming edges.",
+            2: "Sink 't' should not have outgoing edges.",
+            3: "All nodes have to be reachable from 's'.",
+            4: "Edge capacities and inflow bounds have to be positive.",
+            5: "Network contains a cycle.",
+            6: "Inflow bounds of all outgoing edges from sink 's' have to be greater-or-equal than network inflow-rate."
         }
 
         return errorDescription[errorCode]

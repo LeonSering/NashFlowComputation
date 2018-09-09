@@ -60,7 +60,7 @@ class NashFlow:
         self.rootPath = os.path.join(self.outputDirectory, 'NashFlow-' + Utilities.get_time())
         Utilities.create_dir(self.rootPath)
 
-        self.flowIntervals = [] # List containing triplets of form (lowerBound, upperBound, FlowInterval-instance)
+        self.flowIntervals = []  # List containing triplets of form (lowerBound, upperBound, FlowInterval-instance)
         self.lowerBoundsToIntervalDict = OrderedDict()
         self.animationIntervals = {edge: [] for edge in self.network.edges()}
 
@@ -163,7 +163,7 @@ class NashFlow:
                 vLastTime = next(reversed(self.network[v][w]['cumulativeInflow']))
                 self.network[v][w]['cumulativeInflow'][vTimeUpper] = self.network[v][w]['cumulativeInflow'][
                                                                          vLastTime] + inflowVal * (
-                    vTimeUpper - vTimeLower)
+                                                                             vTimeUpper - vTimeLower)
 
             # Outflow changes
             wTimeLower, wTimeUpper = self.node_label(w, interval.lowerBoundTime), self.node_label(w,
@@ -178,14 +178,14 @@ class NashFlow:
                 wLastTime = next(reversed(self.network[v][w]['cumulativeOutflow']))
                 self.network[v][w]['cumulativeOutflow'][wTimeUpper] = self.network[v][w]['cumulativeOutflow'][
                                                                           wLastTime] + outflowVal * (
-                    wTimeUpper - wTimeLower)
+                                                                              wTimeUpper - wTimeLower)
 
             # Queue size changes
             if vTimeUpper < float('inf'):
                 lastQueueSizeTime = next(reversed(self.network[v][w]['queueSize']))
                 lastQueueSize = self.network[v][w]['queueSize'][lastQueueSizeTime]
                 self.network[v][w]['queueSize'][vTimeUpper] = max(0, lastQueueSize + (
-                    inflowVal - self.network[v][w]['capacity']) * (vTimeUpper - vTimeLower))
+                        inflowVal - self.network[v][w]['capacity']) * (vTimeUpper - vTimeLower))
 
             self.animationIntervals[(v, w)].append(((vTimeLower, vTimeUpper), (wTimeLower, wTimeUpper)))
 
@@ -206,7 +206,7 @@ class NashFlow:
         intervalLowerBoundTime = self.time_interval_correspondence(t)
         interval = self.lowerBoundsToIntervalDict[intervalLowerBoundTime]
         label = interval.shortestPathNetwork.node[v]['dist'] + (t - intervalLowerBoundTime) * \
-                                                               interval.NTFNodeLabelDict[v]
+                interval.NTFNodeLabelDict[v]
         return label
 
     def queue_size(self, v, w, t):

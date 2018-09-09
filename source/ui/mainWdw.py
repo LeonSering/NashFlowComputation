@@ -16,11 +16,14 @@ except AttributeError:
 
 try:
     _encoding = QtGui.QApplication.UnicodeUTF8
+
+
     def _translate(context, text, disambig):
         return QtGui.QApplication.translate(context, text, disambig, _encoding)
 except AttributeError:
     def _translate(context, text, disambig):
         return QtGui.QApplication.translate(context, text, disambig)
+
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -47,9 +50,9 @@ class Ui_MainWindow(object):
         self.groupBox = QtGui.QGroupBox(self.tab)
         self.groupBox.setGeometry(QtCore.QRect(860, 10, 131, 311))
         self.groupBox.setStyleSheet(_fromUtf8("QGroupBox { \n"
-"     border: 2px solid rgb(0, 0, 127); \n"
-"     border-radius: 1px; \n"
-" } "))
+                                              "     border: 2px solid rgb(0, 0, 127); \n"
+                                              "     border-radius: 1px; \n"
+                                              " } "))
         self.groupBox.setObjectName(_fromUtf8("groupBox"))
         self.label_4 = QtGui.QLabel(self.groupBox)
         self.label_4.setGeometry(QtCore.QRect(10, 70, 68, 21))
@@ -90,9 +93,9 @@ class Ui_MainWindow(object):
         self.groupBox_2 = QtGui.QGroupBox(self.tab)
         self.groupBox_2.setGeometry(QtCore.QRect(1000, 10, 131, 311))
         self.groupBox_2.setStyleSheet(_fromUtf8("QGroupBox { \n"
-"     border: 2px solid rgb(0, 0, 127); \n"
-"     border-radius: 1px; \n"
-" } "))
+                                                "     border: 2px solid rgb(0, 0, 127); \n"
+                                                "     border-radius: 1px; \n"
+                                                " } "))
         self.groupBox_2.setObjectName(_fromUtf8("groupBox_2"))
         self.label = QtGui.QLabel(self.groupBox_2)
         self.label.setGeometry(QtCore.QRect(10, 20, 68, 21))
@@ -127,9 +130,9 @@ class Ui_MainWindow(object):
         self.groupBox_3 = QtGui.QGroupBox(self.tab)
         self.groupBox_3.setGeometry(QtCore.QRect(10, 550, 1121, 181))
         self.groupBox_3.setStyleSheet(_fromUtf8("QGroupBox { \n"
-"     border: 2px solid rgb(0, 0, 127); \n"
-"     border-radius: 1px; \n"
-" } "))
+                                                "     border: 2px solid rgb(0, 0, 127); \n"
+                                                "     border-radius: 1px; \n"
+                                                " } "))
         self.groupBox_3.setObjectName(_fromUtf8("groupBox_3"))
         self.label_8 = QtGui.QLabel(self.groupBox_3)
         self.label_8.setGeometry(QtCore.QRect(950, 40, 91, 17))
@@ -207,9 +210,9 @@ class Ui_MainWindow(object):
         self.groupBox_5 = QtGui.QGroupBox(self.tab_2)
         self.groupBox_5.setGeometry(QtCore.QRect(670, 10, 461, 491))
         self.groupBox_5.setStyleSheet(_fromUtf8("QGroupBox { \n"
-"     border: 2px solid rgb(0, 0, 127); \n"
-"     border-radius: 1px; \n"
-" } "))
+                                                "     border: 2px solid rgb(0, 0, 127); \n"
+                                                "     border-radius: 1px; \n"
+                                                " } "))
         self.groupBox_5.setFlat(False)
         self.groupBox_5.setObjectName(_fromUtf8("groupBox_5"))
         self.plotDiagramFrame = QtGui.QFrame(self.groupBox_5)
@@ -240,9 +243,9 @@ class Ui_MainWindow(object):
         self.groupBox_4 = QtGui.QGroupBox(self.tab_2)
         self.groupBox_4.setGeometry(QtCore.QRect(0, 510, 851, 431))
         self.groupBox_4.setStyleSheet(_fromUtf8("QGroupBox { \n"
-"     border: 2px solid rgb(0, 0, 127); \n"
-"     border-radius: 1px; \n"
-" } "))
+                                                "     border: 2px solid rgb(0, 0, 127); \n"
+                                                "     border-radius: 1px; \n"
+                                                " } "))
         self.groupBox_4.setObjectName(_fromUtf8("groupBox_4"))
         self.plotNTFFrame = QtGui.QFrame(self.groupBox_4)
         self.plotNTFFrame.setGeometry(QtCore.QRect(10, 20, 631, 401))
@@ -262,9 +265,9 @@ class Ui_MainWindow(object):
         self.groupBox_7.setGeometry(QtCore.QRect(0, 10, 651, 491))
         self.groupBox_7.setAutoFillBackground(False)
         self.groupBox_7.setStyleSheet(_fromUtf8("QGroupBox { \n"
-"     border: 2px solid rgb(0, 0, 127); \n"
-"     border-radius: 1px; \n"
-" } "))
+                                                "     border: 2px solid rgb(0, 0, 127); \n"
+                                                "     border-radius: 1px; \n"
+                                                " } "))
         self.groupBox_7.setObjectName(_fromUtf8("groupBox_7"))
         self.plotAnimationFrame = QtGui.QFrame(self.groupBox_7)
         self.plotAnimationFrame.setGeometry(QtCore.QRect(10, 20, 630, 400))
@@ -333,9 +336,9 @@ class Ui_MainWindow(object):
         self.groupBox_6 = QtGui.QGroupBox(self.tab_2)
         self.groupBox_6.setGeometry(QtCore.QRect(860, 510, 271, 301))
         self.groupBox_6.setStyleSheet(_fromUtf8("QGroupBox { \n"
-"     border: 2px solid rgb(0, 0, 127); \n"
-"     border-radius: 1px; \n"
-" } "))
+                                                "     border: 2px solid rgb(0, 0, 127); \n"
+                                                "     border-radius: 1px; \n"
+                                                " } "))
         self.groupBox_6.setObjectName(_fromUtf8("groupBox_6"))
         self.label_21 = QtGui.QLabel(self.groupBox_6)
         self.label_21.setGeometry(QtCore.QRect(10, 40, 151, 17))
@@ -541,7 +544,9 @@ class Ui_MainWindow(object):
         self.timeoutLabel.setText(_translate("MainWindow", "Timeout (in s)", None))
         self.timeoutLineEdit.setText(_translate("MainWindow", "300", None))
         self.activateTimeoutCheckBox.setText(_translate("MainWindow", "Activate timeout", None))
-        self.templateComboBox.setItemText(0, _translate("MainWindow", "1. Basic algorithm by Cominetti, Correa and Larré", None))
+        self.templateComboBox.setItemText(0,
+                                          _translate("MainWindow", "1. Basic algorithm by Cominetti, Correa and Larré",
+                                                     None))
         self.templateComboBox.setItemText(1, _translate("MainWindow", "2. Solve only one LP/IP", None))
         self.templateComboBox.setItemText(2, _translate("MainWindow", "3. Advanced algorithm", None))
         self.computeFlowPushButton.setText(_translate("MainWindow", "Compute Nashflow", None))
@@ -587,7 +592,8 @@ class Ui_MainWindow(object):
         self.statTotalTimeLabel.setText(_translate("MainWindow", "N/A", None))
         self.statAvgTimeLabel.setText(_translate("MainWindow", "N/A", None))
         self.computeIntervalPushButton.setText(_translate("MainWindow", "Compute next interval", None))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), _translate("MainWindow", "Compute Nash flow", None))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2),
+                                  _translate("MainWindow", "Compute Nash flow", None))
         self.menuFile.setTitle(_translate("MainWindow", "File", None))
         self.menuHelp.setTitle(_translate("MainWindow", "Help", None))
         self.menuOptions.setTitle(_translate("MainWindow", "Options", None))
@@ -602,6 +608,8 @@ class Ui_MainWindow(object):
         self.actionLoad_Nashflow.setText(_translate("MainWindow", "Load Nashflow", None))
         self.actionSave_Nashflow.setText(_translate("MainWindow", "Save Nashflow", None))
         self.actionOpen_ThinFlowComputation.setText(_translate("MainWindow", "Open ThinFlowComputation", None))
-        self.actionMove_graph_to_ThinFlowComputation.setText(_translate("MainWindow", "Move current graph to ThinFlowComputation", None))
+        self.actionMove_graph_to_ThinFlowComputation.setText(
+            _translate("MainWindow", "Move current graph to ThinFlowComputation", None))
+
 
 import icons_rc

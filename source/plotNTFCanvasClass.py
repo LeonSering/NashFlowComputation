@@ -6,15 +6,16 @@
 # ===========================================================================
 
 import matplotlib.figure
+
 import networkx as nx
-from utilitiesClass import Utilities
+
 from plotCanvasClass import PlotCanvas
-from copy import deepcopy
+from utilitiesClass import Utilities
+
 matplotlib.use("Qt4Agg")
 
 
 # ======================================================================================================================
-
 
 
 class PlotNTFCanvas(PlotCanvas):
@@ -38,7 +39,7 @@ class PlotNTFCanvas(PlotCanvas):
             self.resettingEdges = flowIntervalInstance.resettingEdges
 
         PlotCanvas.__init__(self, graph, interface, stretchFactor=stretchFactor)  # Call parents constructor
-        self.network = self.network.copy() # Copy network to avoid modifying it in other Canvas when deleting/adding zero flow edges
+        self.network = self.network.copy()  # Copy network to avoid modifying it in other Canvas when deleting/adding zero flow edges
         self.originalNetwork = self.network.copy()
         if not showNoFlowEdges:
             self.change_edge_show_status(showNoFlowEdges)
@@ -48,8 +49,11 @@ class PlotNTFCanvas(PlotCanvas):
         if nx.number_of_nodes(self.network) == 0:
             return {}
         if self.onlyNTF and self.tfType == 'spillback':
-            return {node: (float("%.2f" % self.NTFNodeLabelDict[node]), float("%.2f" % self.NTFNodeSpillbackFactorDict[node])) for
-                    node in self.network.nodes()}
+            return {
+                node: (
+                    float("%.2f" % self.NTFNodeLabelDict[node]), float("%.2f" % self.NTFNodeSpillbackFactorDict[node]))
+                for
+                node in self.network.nodes()}
         else:
             return {node: "%.2f" % self.NTFNodeLabelDict[node] for
                     node in self.network.nodes()}
@@ -113,7 +117,7 @@ class PlotNTFCanvas(PlotCanvas):
         """
         if show:
             self.network = self.originalNetwork.copy()
-            #self.network = deepcopy(self.originalNetwork)
+            # self.network = deepcopy(self.originalNetwork)
         else:
             removedEdges = []
             for edge in self.network.edges():
@@ -154,7 +158,7 @@ class PlotNTFCanvas(PlotCanvas):
 
     def get_viewpoint(self):
         """Get the field of view setting"""
-        return (self.Xlim, self.Ylim, self.edgeWidthSize, self.nodeLabelFontSize, self.edgeLabelFontSize)
+        return self.Xlim, self.Ylim, self.edgeWidthSize, self.nodeLabelFontSize, self.edgeLabelFontSize
 
     def set_viewpoint(self, viewPoint=None):
         """Set the field of view settings"""
@@ -163,4 +167,3 @@ class PlotNTFCanvas(PlotCanvas):
 
         self.Xlim, self.Ylim, self.edgeWidthSize, self.nodeLabelFontSize, self.edgeLabelFontSize = viewPoint
         self.zoom(factor=None)
-

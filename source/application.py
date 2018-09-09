@@ -125,7 +125,6 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.animationEndLineEdit.returnPressed.connect(self.generate_animation)
         self.setTimeLineEdit.returnPressed.connect(self.set_new_time_manually)
 
-
         if len(sys.argv) >= 3:
             # startup arguments have been specified
             if sys.argv[1] == '-l':
@@ -417,6 +416,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         """
         if not graphPath:
             dialog = QtGui.QFileDialog
+            # noinspection PyCallByClass,PyCallByClass
             fopen = dialog.getOpenFileName(self, "Select File", self.defaultLoadSaveDir, "network files (*.cg)")
 
             if os.name != 'posix':  # For Windows
@@ -799,7 +799,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
             lastInflow = self.nashFlow.network[v][w]['inflow'][lastInflowInterval]
 
             val = max(0, lastQueueSize + (lastInflow - self.nashFlow.network[v][w]['capacity']) * (
-                upperBound - lastInflowInterval[0]))
+                    upperBound - lastInflowInterval[0]))
 
             queueXValues.append(upperBound)
             queueYValues.append(val)
@@ -893,7 +893,8 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
             self.currentTransitTimeLabel.setText("N/A")
         elif self.plotAnimationCanvas.focusEdge is not None:
             v, w = self.plotAnimationCanvas.focusEdge
-            self.currentFocusLabel.setText(str((self.nashFlow.network.node[v]['label'], self.nashFlow.network.node[w]['label'])))
+            self.currentFocusLabel.setText(
+                str((self.nashFlow.network.node[v]['label'], self.nashFlow.network.node[w]['label'])))
             self.currentCapacityLabel.setText(str(self.nashFlow.network[v][w]['capacity']))
             self.currentTransitTimeLabel.setText(str(self.nashFlow.network[v][w]['transitTime']))
         else:
@@ -927,7 +928,6 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
 
         thread = threading.Thread(target=open_tfc_thread)
         thread.start()
-
 
     def move_to_tfc(self):
         self.open_tfc(moveGraph=self.network)
@@ -1031,7 +1031,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
                     nextBound = get_next_bound(currentIntervalIndex)
 
                 if self.timeSlider.value >= 1 and lastTime != self.plotAnimationCanvas.get_time_from_tick(
-                                self.timeSlider.value() - 1):
+                        self.timeSlider.value() - 1):
                     # Necessary to check, as user could click somewhere on the slider
                     currentIntervalIndex = self.plotAnimationCanvas.get_flowinterval_index_from_tick(
                         self.timeSlider.value())
@@ -1070,6 +1070,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         logText = currentTime + " - " + txt
         self.logPlainTextEdit.appendPlainText(logText)
 
-    def show_help(self):
+    @staticmethod
+    def show_help():
         """Open thesis to display manual"""
         os.system('xdg-open documentation/thesis.pdf')

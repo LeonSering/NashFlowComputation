@@ -16,7 +16,6 @@ from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 # ======================================================================================================================
 
 
-
 class PlotValuesCanvas(FigureCanvas):
     def __init__(self, callback=None):
         self.figure = figure.Figure()

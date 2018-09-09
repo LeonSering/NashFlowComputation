@@ -14,6 +14,7 @@ from itertools import combinations
 
 TOL = 1e-8  # Tolerance
 
+
 class FlowInterval_spillback(FlowInterval):
     """FlowInterval class managing spillback flows"""
 
@@ -32,17 +33,16 @@ class FlowInterval_spillback(FlowInterval):
         :param timeout: seconds until timeout. Deactivated if equal to 0
         """
 
-
-        FlowInterval.__init__(self, network, resettingEdges, lowerBoundTime, inflowRate, minCapacity, counter, outputDirectory,
-                 templateFile, scipFile, timeout)
+        FlowInterval.__init__(self, network, resettingEdges, lowerBoundTime, inflowRate, minCapacity, counter,
+                              outputDirectory,
+                              templateFile, scipFile, timeout)
 
         self.NTFNodeSpillbackFactorDict = {node: 0 for node in self.network}
 
-        self.minInflowBound = min([self.network[v][w]['inflowBound'] for (v,w) in self.network.edges()])
+        self.minInflowBound = min([self.network[v][w]['inflowBound'] for (v, w) in self.network.edges()])
 
     def get_ntf(self):
         """Standard way to get sNTF. Uses preprocessing"""
-        graph = self.shortestPathNetwork
         self.counter = 0
         graph, removedVertices = self.preprocessing()
         resettingEdges = [edge for edge in graph.edges() if edge in self.resettingEdges]
@@ -52,7 +52,7 @@ class FlowInterval_spillback(FlowInterval):
         self.counter = 0
 
         self.backtrack_sNTF_search(remainingNodes=[v for v in graph.nodes() if v != 's'],
-                                        E_0=[], graph=graph, resettingEdges=resettingEdges)
+                                   E_0=[], graph=graph, resettingEdges=resettingEdges)
 
         labels, spillbackFactors, flow = self.NTF.get_labels_and_flow()
 
@@ -81,9 +81,11 @@ class FlowInterval_spillback(FlowInterval):
         if not remainingNodes:
             self.binaryVariableNumberList.append(len(E_0))
             self.NTF = NormalizedThinFlow_spillback(shortestPathNetwork=graph, id=self.counter,
-                                          resettingEdges=resettingEdges, flowEdges=E_0, inflowRate=self.inflowRate,
-                                          minCapacity=self.minCapacity, outputDirectory=self.rootPath,
-                                          templateFile=self.templateFile, scipFile=self.scipFile, minInflowBound=self.minInflowBound)
+                                                    resettingEdges=resettingEdges, flowEdges=E_0,
+                                                    inflowRate=self.inflowRate,
+                                                    minCapacity=self.minCapacity, outputDirectory=self.rootPath,
+                                                    templateFile=self.templateFile, scipFile=self.scipFile,
+                                                    minInflowBound=self.minInflowBound)
             self.NTF.run_order()
             self.numberOfSolvedIPs += 1
             if self.NTF.is_valid():
@@ -105,13 +107,12 @@ class FlowInterval_spillback(FlowInterval):
                 partE_0 = list(partE_0)
 
                 recursiveCall = self.backtrack_sNTF_search(remainingNodes=remainingNodes[1:], E_0=E_0 + partE_0,
-                                                                graph=graph, resettingEdges=resettingEdges)
+                                                           graph=graph, resettingEdges=resettingEdges)
                 if recursiveCall:
                     return True
             k += 1
 
         return False
-
 
     def postprocessing(self, labels, spillbackFactors, missingVertices):
         """Update node labels for all missing vertices"""
@@ -131,20 +132,19 @@ class FlowInterval_spillback(FlowInterval):
 
         return labels, spillbackFactors
 
-
-
     def assert_ntf(self):
         """Check if computed sNTF really is an sNTF"""
         # Works only on shortestPathNetwork
         for w in self.shortestPathNetwork:
             # Check if some spillback factor is not in ]0,1]
-            assert(0 < self.NTFNodeSpillbackFactorDict[w] and self.NTFNodeSpillbackFactorDict[w] <= 1)
+            assert (0 < self.NTFNodeSpillbackFactorDict[w] <= 1)
 
         p = lambda (v, w): max(
-            [self.NTFNodeLabelDict[v], self.NTFEdgeFlowDict[(v, w)] / (self.network[v][w]['capacity']*self.NTFNodeSpillbackFactorDict[w])]) \
+            [self.NTFNodeLabelDict[v],
+             self.NTFEdgeFlowDict[(v, w)] / (self.network[v][w]['capacity'] * self.NTFNodeSpillbackFactorDict[w])]) \
             if (v, w) not in self.resettingEdges \
-            else self.NTFEdgeFlowDict[(v, w)] / (self.network[v][w]['capacity']*self.NTFNodeSpillbackFactorDict[w])
-        xb = lambda (v, w): float(self.NTFEdgeFlowDict[(v,w)])/self.network[v][w]['inflowBound']
+            else self.NTFEdgeFlowDict[(v, w)] / (self.network[v][w]['capacity'] * self.NTFNodeSpillbackFactorDict[w])
+        xb = lambda (v, w): float(self.NTFEdgeFlowDict[(v, w)]) / self.network[v][w]['inflowBound']
 
         for w in self.shortestPathNetwork:
             if self.shortestPathNetwork.in_edges(w):
@@ -158,7 +158,8 @@ class FlowInterval_spillback(FlowInterval):
         for v, w in self.shortestPathNetwork.edges():
             minimalCongestion = min(map(p, self.shortestPathNetwork.in_edges(w)))
             assert (
-                Utilities.is_eq_tol(self.NTFEdgeFlowDict[v, w], 0) or Utilities.is_eq_tol(p((v, w)), minimalCongestion))
+                    Utilities.is_eq_tol(self.NTFEdgeFlowDict[v, w], 0) or Utilities.is_eq_tol(p((v, w)),
+                                                                                              minimalCongestion))
 
         # Check if actually an s-t-flow
         for w in self.shortestPathNetwork:
