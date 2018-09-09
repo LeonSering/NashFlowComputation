@@ -791,6 +791,7 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
         self.cleanup()
 
     def validate_thinflow_input(self, network):
+        """Checks whether network satisfies certain conditions, return respective error code if necessary"""
         if network.in_edges('s'):
             # Network may not contain edges going into s
             return 1
@@ -805,12 +806,13 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
             # Wrong capacity attribute
             return 4
 
-        try:
-            m = min(nx.get_edge_attributes(network, 'inflowBound').values())
-            if m <= 0:
-                return 4
-        except:
-            pass
+        if self.currentTF == 'spillback':
+            try:
+                m = min(nx.get_edge_attributes(network, 'inflowBound').values())
+                if m <= 0:
+                    return 4
+            except:
+                pass
 
         try:
             # Try to find a cycle in the network
@@ -819,13 +821,14 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
         except nx.exception.NetworkXNoCycle:
             pass
 
-        try:
-            for e in network.out_edges('s'):
-                (v, w) = e
-                if network[v][w]['inflowBound'] < float(self.inflowLineEdit.text()):
-                    return 6
-        except:
-            pass
+        if self.currentTF == 'spillback':
+            try:
+                for e in network.out_edges('s'):
+                    (v, w) = e
+                    if network[v][w]['inflowBound'] < float(self.inflowLineEdit.text()):
+                        return 6
+            except:
+                pass
 
         return 0
 
