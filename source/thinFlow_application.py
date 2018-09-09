@@ -144,6 +144,7 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
         setattr(self, variable + '_' + tfType, value)
 
     def tabSwitched(self, idx=None):
+        """Slot for tab switching"""
         if idx is not None:
             self.currentTF = self.tfTypeList[idx]
 

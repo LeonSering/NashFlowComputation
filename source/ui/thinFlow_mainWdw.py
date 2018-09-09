@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'thinFlow_mainWdw.ui'
 #
-# Created by: PyQt4 UI code generator 4.11.4
+# Created by: PyQt4 UI code generator 4.12.1
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -43,6 +43,7 @@ class Ui_MainWindow(object):
         self.tab_general = QtGui.QWidget()
         self.tab_general.setObjectName(_fromUtf8("tab_general"))
         self.gridLayout = QtGui.QGridLayout(self.tab_general)
+        self.gridLayout.setMargin(0)
         self.gridLayout.setObjectName(_fromUtf8("gridLayout"))
         self.groupBox_3 = QtGui.QGroupBox(self.tab_general)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Preferred)
@@ -200,6 +201,7 @@ class Ui_MainWindow(object):
         self.tab_spillback = QtGui.QWidget()
         self.tab_spillback.setObjectName(_fromUtf8("tab_spillback"))
         self.gridLayout_7 = QtGui.QGridLayout(self.tab_spillback)
+        self.gridLayout_7.setMargin(0)
         self.gridLayout_7.setObjectName(_fromUtf8("gridLayout_7"))
         self.plotNTFFrame_spillback = QtGui.QFrame(self.tab_spillback)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
@@ -523,8 +525,8 @@ class Ui_MainWindow(object):
         self.label_13.setText(_translate("MainWindow", "Head", None))
         self.label_15.setText(_translate("MainWindow", "Resetting", None))
         self.resettingSwitchButton_spillback.setText(_translate("MainWindow", "Off", None))
-        self.label_19.setText(_translate("MainWindow", "Inflow bound", None))
-        self.label_14.setText(_translate("MainWindow", "Outflow capacity", None))
+        self.label_19.setText(_translate("MainWindow", "Flow bound", None))
+        self.label_14.setText(_translate("MainWindow", "Capacity", None))
         self.updateEdgeButton_spillback.setText(_translate("MainWindow", "Add/Upd. edge", None))
         self.deleteEdgeButton_spillback.setText(_translate("MainWindow", "Delete edge", None))
         self.groupBox_5.setTitle(_translate("MainWindow", "Node", None))
