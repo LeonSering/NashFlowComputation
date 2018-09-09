@@ -25,7 +25,7 @@ from ui import thinFlow_mainWdw
 from utilitiesClass import Utilities
 from application import Interface as app_Interface
 from flowIntervalClass import FlowInterval
-
+from flowIntervalClass_spillback import FlowInterval_spillback
 
 
 # =======================================================================================================================
@@ -371,6 +371,10 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
         if capacityText <= 0:
             # This is not allowed
             return
+        if boundText is not None and boundText <= 0:
+            # Not allowed
+            return
+
 
         if self.gttr('network').has_edge(tail, head):
             # Update the edges attributes
@@ -604,7 +608,7 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
         except KeyError:
             network.graph['type'] = 'general'
 
-        self.sttr('network', network['type'], network)
+        self.sttr('network', network.graph['type'], network)
         self.currentTF = network.graph['type']
         self.tabWidget.setCurrentIndex(self.tfTypeList.index(network.graph['type']))
 
@@ -719,45 +723,117 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
     def compute_NTF(self):
         """Computes NTF in current tab"""
 
-        return # TO DO!!
+        network = self.gttr('network')
 
+        # Validate input
+        returnCode = self.validate_thinflow_input(network)
+        if returnCode != 0:
+            # Invalid input has been given
+            # Spawn warning
+            QtGui.QMessageBox.question(QtGui.QWidget(), 'Abort: Input error', self.get_error_message(returnCode), QtGui.QMessageBox.Ok)
+            return
 
         # Drop current NTF plot
         self.re_init_NTF_frame()
 
         # Get necessary data
-        resettingEdges = [edge for edge in self.network_general.edges() if self.network_general[edge[0]][edge[1]]['resettingEnabled']]
+        resettingEdges = [edge for edge in network.edges() if network[edge[0]][edge[1]]['resettingEnabled']]
         lowerBoundTime = 0  # No needed for different times as only one flowInterval is being computed
         inflowRate = float(self.inflowLineEdit.text())
-        minCapacity = Utilities.compute_min_capacity(self.network_general)
+        minCapacity = Utilities.compute_min_capacity(network)
         counter = "Standalone"
         rootPath = self.outputDirectory
-        templateFile = os.path.join(os.getcwd(), 'templates',
-                                         'algorithm_' + str(self.templateFile + 1) + '.zpl')
+
+        if self.currentTF == 'general':
+            templateFile = os.path.join(os.getcwd(), 'templates',
+                                             'algorithm_' + str(self.templateFile + 1) + '.zpl')
+        elif self.currentTF == 'spillback':
+            templateFile = os.path.join(os.getcwd(), 'templates',
+                                             'algorithm_spillback.zpl')
         scipFile = self.scipFile
         timeout = float(self.timeoutLineEdit.text())
 
         self.save_config()
 
-        self.interval_general = FlowInterval(self.network_general, resettingEdges=resettingEdges, lowerBoundTime=lowerBoundTime,
+        if self.currentTF == 'general':
+            self.interval_general = FlowInterval(network, resettingEdges=resettingEdges, lowerBoundTime=lowerBoundTime,
                                 inflowRate=inflowRate, minCapacity=minCapacity, counter=counter,
                                 outputDirectory=rootPath, templateFile=templateFile, scipFile=scipFile,
-                                timeout=timeout, )
+                                timeout=timeout)
+        elif self.currentTF == 'spillback':
+            self.interval_spillback = FlowInterval_spillback(network, resettingEdges=resettingEdges, lowerBoundTime=lowerBoundTime,
+                         inflowRate=inflowRate, minCapacity=minCapacity, counter=counter,
+                         outputDirectory=rootPath, templateFile=templateFile, scipFile=scipFile,
+                         timeout=timeout)
 
         # Set shortest path network manually to entire graph (is the deepcopy really needed?)
-        self.interval_general.shortestPathNetwork = deepcopy(self.network_general)
+        interval = self.gttr('interval')
+        interval.shortestPathNetwork = deepcopy(network)
 
         self.advancedAlgo = (templateFile == 2)  # If true, then advanced backtracking with preprocessing is performed
 
-        if self.advancedAlgo:
-            self.interval_general.get_ntf_advanced()
-        else:
-            self.interval_general.get_ntf()
+        if self.currentTF == 'general':
+            if self.advancedAlgo:
+                interval.get_ntf_advanced()
+            else:
+                interval.get_ntf()
+        elif self.currentTF == 'spillback':
+            interval.get_ntf()
 
-        self.plotNTFCanvas_general = PlotNTFCanvas(self.interval_general.shortestPathNetwork, self, intervalID=None,
+        self.sttr('plotNTFCanvas', self.currentTF, PlotNTFCanvas(interval.shortestPathNetwork, self, intervalID=None,
                              stretchFactor=self.plotNTFCanvasStretchFactor,
-                             showNoFlowEdges=self.showEdgesWithoutFlowCheckBox.isChecked(), onlyNTF=True)
+                             showNoFlowEdges=self.showEdgesWithoutFlowCheckBox.isChecked(), onlyNTF=True))
 
-        self.plotNTFFrameLayout_general.addWidget(self.plotNTFCanvas_general)
+        self.gttr('plotNTFFrameLayout').addWidget(self.gttr('plotNTFCanvas'))
         self.cleanup()
 
+    def validate_thinflow_input(self, network):
+        if network.in_edges('s'):
+            # Network may not contain edges going into s
+            return 1
+        elif network.out_edges('t'):
+            # Edges going out from t
+            return 2
+        for (v, d) in network.in_degree():
+            if d == 0 and v != 's':
+                # Non-reachable node found
+                return 3
+        if min(nx.get_edge_attributes(network, 'capacity').values()) <= 0:
+            # Wrong capacity attribute
+            return 4
+
+        try:
+            m = min(nx.get_edge_attributes(network, 'inflowBound').values())
+            if m <= 0:
+                return 4
+        except:
+            pass
+
+        try:
+            # Try to find a cycle in the network
+            nx.find_cycle(network)
+            return 5
+        except nx.exception.NetworkXNoCycle:
+            pass
+
+        try:
+            for e in network.out_edges('s'):
+                (v, w) = e
+                if network[v][w]['inflowBound'] < float(self.inflowLineEdit.text()):
+                    return 6
+        except:
+            pass
+
+        return 0
+
+    def get_error_message(self, errorCode):
+        errorDescription = {
+            1:"Source 's' should not have incoming edges.",
+            2:"Sink 't' should not have outgoing edges.",
+            3:"All nodes have to be reachable from 's'.",
+            4:"Edge capacities and inflow bounds have to be positive.",
+            5:"Network contains a cycle.",
+            6:"Inflow bounds of all outgoing edges from sink 's' have to be greater-or-equal than network inflow-rate."
+        }
+
+        return errorDescription[errorCode]

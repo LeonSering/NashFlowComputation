@@ -21,7 +21,7 @@ class PlotNTFCanvas(PlotCanvas):
     def __init__(self, graph, interface, intervalID, stretchFactor, showNoFlowEdges=True, onlyNTF=False):
         self.figure = matplotlib.figure.Figure()
         self.onlyNTF = onlyNTF  # If this is true, then PlotCanvas belongs to Thinflow Computation App
-
+        self.tfType = 'general'
         if nx.number_of_nodes(graph) != 0:
             # Graph is not empty. Otherwise dont do stuff because the call was made by thinFlow_application initialization
             if not self.onlyNTF:
@@ -29,10 +29,12 @@ class PlotNTFCanvas(PlotCanvas):
                 flowIntervalInstance = interface.nashFlow.flowIntervals[intervalID][2]
             else:
                 # We just have a flowInterval instance
-                flowIntervalInstance = interface.interval_general   # Will cause problems later!
-
+                self.tfType = interface.currentTF
+                flowIntervalInstance = interface.gttr('interval')
+                self.NTFNodeSpillbackFactorDict = flowIntervalInstance.NTFNodeSpillbackFactorDict if self.tfType == 'spillback' else None
             self.NTFNodeLabelDict = flowIntervalInstance.NTFNodeLabelDict
             self.NTFEdgeFlowDict = flowIntervalInstance.NTFEdgeFlowDict
+
             self.resettingEdges = flowIntervalInstance.resettingEdges
 
         PlotCanvas.__init__(self, graph, interface, stretchFactor=stretchFactor)  # Call parents constructor
@@ -43,7 +45,14 @@ class PlotNTFCanvas(PlotCanvas):
 
     def get_additional_node_labels(self):
         """Returns additional node labels"""
-        return {node: "%.2f" % self.NTFNodeLabelDict[node] for node in self.network.nodes()}
+        if nx.number_of_nodes(self.network) == 0:
+            return {}
+        if self.onlyNTF and self.tfType == 'spillback':
+            return {node: (float("%.2f" % self.NTFNodeLabelDict[node]), float("%.2f" % self.NTFNodeSpillbackFactorDict[node])) for
+                    node in self.network.nodes()}
+        else:
+            return {node: "%.2f" % self.NTFNodeLabelDict[node] for
+                    node in self.network.nodes()}
 
     def get_edge_labels(self):
         """Returns edge labels"""

@@ -60,6 +60,11 @@ class Utilities:
         return a - b + tol >= 0
 
     @staticmethod
+    def is_greater_tol(a, b, tol=TOL):
+        """Is greater to with tolerance"""
+        return a - tol - b > 0
+
+    @staticmethod
     def get_insertion_point_left(L, el):
         """Get insertion point of element el in list L"""
         return bisect.bisect_left(L, el)
