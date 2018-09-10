@@ -11,7 +11,7 @@ import subprocess
 from shutil import copy
 from utilitiesClass import Utilities
 
-
+PRINT_TO_CONSOLE = False
 # ======================================================================================================================
 
 class NormalizedThinFlow:
@@ -84,9 +84,13 @@ class NormalizedThinFlow:
     def start_process(self):
         """Start SCIP process"""
         cmd = [self.scipFile, '-f', self.templateFile, '-l', self.logFile]
-        devNull = open(os.devnull, 'w')  # SCIP saves logs itself, no need for stdout of process
-        self.proc = subprocess.Popen(cmd, stdout=devNull, stderr=devNull)
-        self.proc.communicate()
+        stdLocation = subprocess.PIPE if PRINT_TO_CONSOLE else open(os.devnull, 'w')
+        self.proc = subprocess.Popen(cmd, stdout=stdLocation, stderr=stdLocation)
+        stdOut, stdErr = self.proc.communicate()
+
+        if PRINT_TO_CONSOLE:
+            # Print stdout to terminal
+            print stdOut
 
     def write_zimpl_files(self):
         """Write the ZIMPL files"""
