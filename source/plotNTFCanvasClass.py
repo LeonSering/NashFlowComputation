@@ -33,6 +33,7 @@ class PlotNTFCanvas(PlotCanvas):
                 self.tfType = interface.currentTF
                 flowIntervalInstance = interface.gttr('interval')
                 self.NTFNodeSpillbackFactorDict = flowIntervalInstance.NTFNodeSpillbackFactorDict if self.tfType == 'spillback' else None
+                self.showSpillBackFactor = self.onlyNTF and self.tfType == 'spillback'
             self.NTFNodeLabelDict = flowIntervalInstance.NTFNodeLabelDict
             self.NTFEdgeFlowDict = flowIntervalInstance.NTFEdgeFlowDict
 
@@ -48,7 +49,7 @@ class PlotNTFCanvas(PlotCanvas):
         """Returns additional node labels"""
         if nx.number_of_nodes(self.network) == 0:
             return {}
-        if self.onlyNTF and self.tfType == 'spillback':
+        if self.showSpillBackFactor:
             return {
                 node: (
                     float("%.2f" % self.NTFNodeLabelDict[node]), float("%.2f" % self.NTFNodeSpillbackFactorDict[node]))
