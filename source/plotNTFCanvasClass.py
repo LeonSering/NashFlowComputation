@@ -28,12 +28,13 @@ class PlotNTFCanvas(PlotCanvas):
             if not self.onlyNTF:
                 # We have a regular nashFlow instance
                 flowIntervalInstance = interface.nashFlow.flowIntervals[intervalID][2]
+                self.showSpillBackFactor = False
             else:
                 # We just have a flowInterval instance
                 self.tfType = interface.currentTF
                 flowIntervalInstance = interface.gttr('interval')
                 self.NTFNodeSpillbackFactorDict = flowIntervalInstance.NTFNodeSpillbackFactorDict if self.tfType == 'spillback' else None
-                self.showSpillBackFactor = self.onlyNTF and self.tfType == 'spillback'
+                self.showSpillBackFactor = (self.onlyNTF and self.tfType == 'spillback')
             self.NTFNodeLabelDict = flowIntervalInstance.NTFNodeLabelDict
             self.NTFEdgeFlowDict = flowIntervalInstance.NTFEdgeFlowDict
 
