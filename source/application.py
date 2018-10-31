@@ -72,10 +72,12 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.init_app()
         self.load_config()  # Try to load configuration file
 
-        #self.tabWidget.setCurrentIndex(0)  # Show Graph Creation Tab
+        self.tabWidget.setCurrentIndex(0)  # Show General Tab
+        self.tabWidget_2.setCurrentIndex(0) # Show Graph creation Tab
 
         # Signal configuration
         self.tabWidget.connect(self.tabWidget, QtCore.SIGNAL("currentChanged(int)"), self.tabSwitched)
+
 
         for tfType in self.tfTypeList:
             self.gttr('updateNodeButton', tfType).clicked.connect(self.update_node)
@@ -84,19 +86,19 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
             self.gttr('deleteEdgeButton', tfType).clicked.connect(self.delete_edge)
             self.gttr('nodeSelectionListWidget', tfType).clicked.connect(self.update_focus_node)
             self.gttr('edgeSelectionListWidget', tfType).clicked.connect(self.update_focus_edge)
-            self.gttr('computeFlowPushButton', tfType).clicked.connect(self.compute_nash_flow)
-            self.gttr('exportDiagramPushButton', tfType).clicked.connect(self.export_diagram)
-            self.gttr('setTimePushButton', tfType).clicked.connect(self.set_new_time_manually)
-            self.gttr('showEdgesWithoutFlowCheckBox', tfType).clicked.connect(self.change_no_flow_show_state)
-            self.gttr('playPushButton', tfType).clicked.connect(self.play_animation)
-            self.gttr('pausePushButton', tfType).clicked.connect(self.pause_animation)
-            self.gttr('stopPushButton', tfType).clicked.connect(self.stop_animation)
-            self.gttr('computeIntervalPushButton', tfType).clicked.connect(self.compute_next_interval)
-            self.gttr('intervalsListWidget', tfType).clicked.connect(self.update_ntf_display)
-            self.gttr('generateAnimationPushButton', tfType).clicked.connect(self.generate_animation)
-            self.gttr('animationStartLineEdit', tfType).returnPressed.connect(self.generate_animation)
-            self.gttr('animationEndLineEdit', tfType).returnPressed.connect(self.generate_animation)
-            self.gttr('setTimeLineEdit', tfType).returnPressed.connect(self.set_new_time_manually)
+            #self.gttr('computeFlowPushButton', tfType).clicked.connect(self.compute_nash_flow)
+            #self.gttr('exportDiagramPushButton', tfType).clicked.connect(self.export_diagram)
+            #self.gttr('setTimePushButton', tfType).clicked.connect(self.set_new_time_manually)
+            #self.gttr('showEdgesWithoutFlowCheckBox', tfType).clicked.connect(self.change_no_flow_show_state)
+            #self.gttr('playPushButton', tfType).clicked.connect(self.play_animation)
+            #self.gttr('pausePushButton', tfType).clicked.connect(self.pause_animation)
+            #self.gttr('stopPushButton', tfType).clicked.connect(self.stop_animation)
+            #self.gttr('computeIntervalPushButton', tfType).clicked.connect(self.compute_next_interval)
+            #self.gttr('intervalsListWidget', tfType).clicked.connect(self.update_ntf_display)
+            #self.gttr('generateAnimationPushButton', tfType).clicked.connect(self.generate_animation)
+            #self.gttr('animationStartLineEdit', tfType).returnPressed.connect(self.generate_animation)
+            #self.gttr('animationEndLineEdit', tfType).returnPressed.connect(self.generate_animation)
+            #self.gttr('setTimeLineEdit', tfType).returnPressed.connect(self.set_new_time_manually)
 
             # Keyboard shortcuts
             self.gttr('tailLineEdit', tfType).returnPressed.connect(self.update_add_edge)
@@ -115,8 +117,8 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
             self.gttr('timeSlider', tfType).setTickInterval(1)
 
             # Slider signals
-            self.gttr('timeSlider', tfType).valueChanged.connect(self.slider_value_change)
-            self.gttr('timeSlider', tfType).sliderReleased.connect(self.slider_released)
+            #self.gttr('timeSlider', tfType).valueChanged.connect(self.slider_value_change)
+            #self.gttr('timeSlider', tfType).sliderReleased.connect(self.slider_released)
 
 
         # Spillback-only signals
@@ -126,7 +128,6 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.outputDirectoryPushButton.clicked.connect(self.select_output_directory)
         self.scipPathPushButton.clicked.connect(self.select_scip_binary)
         self.cleanUpCheckBox.clicked.connect(self.change_cleanup_state)
-        self.showEdgesWithoutFlowCheckBox.clicked.connect(self.change_no_flow_show_state)
         self.activateTimeoutCheckBox.clicked.connect(self.change_timeout_state)
         self.actionNew_graph.triggered.connect(self.re_init_app)
         self.actionLoad_graph.triggered.connect(self.load_graph)
@@ -196,7 +197,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
             self.sttr('plotFrameLayout', tfType, QtGui.QVBoxLayout())
             self.gttr('plotFrame', tfType).setLayout(self.gttr('plotFrameLayout', tfType))
             self.sttr('graphCreationCanvas', tfType, PlotCanvas(self.gttr('network', tfType), self,
-                                                                stretchFactor=1.57, onlyNTF=True,
+                                                                stretchFactor=1.57, onlyNTF=False,
                                                                 type=tfType))  # Initialize PlotCanvas
             self.gttr('plotFrameLayout', tfType).addWidget(self.gttr('graphCreationCanvas', tfType))
 
@@ -253,159 +254,181 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
 
     def update_node_display(self):
         """Update display of the properties of the currently focussed node self.graphCreationCanvas.focusNode, if existing"""
-        if self.graphCreationCanvas.focusNode is not None:
-            vertex = self.graphCreationCanvas.focusNode
-            self.nodeNameLineEdit.setText(self.network.node[vertex]['label'])
-            self.nodeXLineEdit.setText(str(round(self.network.node[vertex]['position'][0], 2)))
-            self.nodeYLineEdit.setText(str(round(self.network.node[vertex]['position'][1], 2)))
+        if self.gttr('graphCreationCanvas').focusNode is not None:
+            vertex = self.gttr('graphCreationCanvas').focusNode
+            self.gttr('nodeNameLineEdit').setText(self.gttr('network').node[vertex]['label'])
+            self.gttr('nodeXLineEdit').setText(str(round(self.gttr('network').node[vertex]['position'][0], 2)))
+            self.gttr('nodeYLineEdit').setText(str(round(self.gttr('network').node[vertex]['position'][1], 2)))
         else:
-            self.nodeNameLineEdit.setText("")
-            self.nodeXLineEdit.setText("")
-            self.nodeYLineEdit.setText("")
+            self.gttr('nodeNameLineEdit').setText("")
+            self.gttr('nodeXLineEdit').setText("")
+            self.gttr('nodeYLineEdit').setText("")
 
         self.setFocus()  # Focus has to leave LineEdits
 
     def update_node(self):
         """Update attributes of focusNode"""
-        if self.graphCreationCanvas.focusNode is None:
+        if self.gttr('graphCreationCanvas').focusNode is None:
             return
 
-        nodeName = str(self.nodeNameLineEdit.text())
-        XPos = str(self.nodeXLineEdit.text())
-        YPos = str(self.nodeYLineEdit.text())
+        nodeName = str(self.gttr('nodeNameLineEdit').text())
+        XPos = str(self.gttr('nodeXLineEdit').text())
+        YPos = str(self.gttr('nodeYLineEdit').text())
         if len(nodeName) > 0 and len(XPos) > 0 and len(YPos) > 0:
-            vertex = self.graphCreationCanvas.focusNode
-            if nodeName != self.network.node[vertex]['label']:
-                self.network.node[vertex]['label'] = nodeName
-                item = self.nodeToListItem[vertex]
-                self.nodeSelectionListWidget.takeItem(self.nodeSelectionListWidget.row(item))  # Delete item
-                self.add_node_to_list(vertex)
-                self.nodeSelectionListWidget.sortItems()  # Re-sort
+            vertex = self.gttr('graphCreationCanvas').focusNode
+            if nodeName != self.gttr('network').node[vertex]['label']:
+                self.gttr('network').node[vertex]['label'] = nodeName
+                item = self.gttr('nodeToListItem')[vertex]
+                self.gttr('nodeSelectionListWidget').takeItem(
+                    self.gttr('nodeSelectionListWidget').row(item))  # Delete item
+                self.add_node_to_list(vertex, self.currentTF)
+                self.gttr('nodeSelectionListWidget').sortItems()  # Re-sort
 
-            movedBool = (self.network.node[vertex]['position'] != (float(XPos), float(YPos)))
-            self.network.node[vertex]['position'] = (float(XPos), float(YPos))
+            movedBool = (self.gttr('network').node[vertex]['position'] != (float(XPos), float(YPos)))
+            self.gttr('network').node[vertex]['position'] = (float(XPos), float(YPos))
 
-            self.graphCreationCanvas.update_nodes(moved=movedBool, color=True)  # Update UI
+            self.gttr('graphCreationCanvas').update_nodes(moved=movedBool, color=True)  # Update UI
             if movedBool:
-                self.graphCreationCanvas.update_edges(moved=movedBool)
+                self.gttr('graphCreationCanvas').update_edges(moved=movedBool)
 
     def delete_node(self):
         """Delete focusNode from network"""
-        vertex = self.graphCreationCanvas.focusNode
+        vertex = self.gttr('graphCreationCanvas').focusNode
         if vertex is None or vertex in ['s', 't']:
             return
 
-        if vertex in self.network:
-            item = self.nodeToListItem[vertex]
-            index = self.nodeSelectionListWidget.row(item)
-            self.nodeSelectionListWidget.takeItem(index)
+        if vertex in self.gttr('network'):
+            item = self.gttr('nodeToListItem')[vertex]
+            index = self.gttr('nodeSelectionListWidget').row(item)
+            self.gttr('nodeSelectionListWidget').takeItem(index)
 
-            for edge in self.network.edges():
+            for edge in self.gttr('network').edges():
                 if vertex in edge:
-                    item = self.edgeToListItem[edge]
-                    index = self.edgeSelectionListWidget.row(item)
-                    self.edgeSelectionListWidget.takeItem(index)
+                    item = self.gttr('edgeToListItem')[edge]
+                    index = self.gttr('edgeSelectionListWidget').row(item)
+                    self.gttr('edgeSelectionListWidget').takeItem(index)
 
-            self.graphCreationCanvas.update_nodes(removal=True, color=True)
-            numberOfEdges = self.network.number_of_edges()
-            self.network.remove_node(vertex)
+            self.gttr('graphCreationCanvas').update_nodes(removal=True, color=True)
+            numberOfEdges = self.gttr('network').number_of_edges()
+            self.gttr('network').remove_node(vertex)
 
-            removedEdgeBool = (numberOfEdges > self.network.number_of_edges())
-            self.graphCreationCanvas.focusNode = None
+            removedEdgeBool = (numberOfEdges > self.gttr('network').number_of_edges())
+            self.gttr('graphCreationCanvas').focusNode = None
 
             if removedEdgeBool:
-                self.graphCreationCanvas.update_edges(removal=True)
+                self.gttr('graphCreationCanvas').update_edges(removal=True)
 
             self.update_node_display()  # Update UI
 
+
     def update_edge_display(self):
         """Update display of the properties of the currently focussed edge focusEdge, if existing"""
-        edge = self.graphCreationCanvas.focusEdge
+        edge = self.gttr('graphCreationCanvas').focusEdge
         if edge is not None:
-            self.tailLineEdit.setText(self.network.node[edge[0]]['label'])
-            self.headLineEdit.setText(self.network.node[edge[1]]['label'])
-            self.transitTimeLineEdit.setText(
-                str(self.network[edge[0]][edge[1]]['transitTime']))
-            self.capacityLineEdit.setText(
-                str(self.network[edge[0]][edge[1]]['capacity']))
+            self.gttr('tailLineEdit').setText(self.gttr('network').node[edge[0]]['label'])
+            self.gttr('headLineEdit').setText(self.gttr('network').node[edge[1]]['label'])
+            self.gttr('capacityLineEdit').setText(
+                str(self.gttr('network')[edge[0]][edge[1]]['capacity']))
+            self.gttr('transitTimeLineEdit').setText(
+                str(self.gttr('network')[edge[0]][edge[1]]['transitTime']))
+
+            if self.currentTF == 'spillback':
+                self.boundLineEdit_spillback.setText(str(self.gttr('network')[edge[0]][edge[1]]['inflowBound']))
+
         else:
-            self.tailLineEdit.setText("")
-            self.headLineEdit.setText("")
-            self.transitTimeLineEdit.setText("")
-            self.capacityLineEdit.setText("")
+            self.gttr('tailLineEdit').setText("")
+            self.gttr('headLineEdit').setText("")
+            self.gttr('capacityLineEdit').setText("")
+            self.gttr('transitTimeLineEdit').setText("")
+
+            if self.currentTF == 'spillback':
+                self.boundLineEdit_spillback.setText("")
 
         self.setFocus()  # Focus has to leave LineEdits
 
     def update_add_edge(self):
         """Add an edge or update attributes of focusNode, if existing"""
-        if self.graphCreationCanvas.focusEdge is None:
+        if self.gttr('graphCreationCanvas').focusEdge is None:
             return
-        tailLabel = str(self.tailLineEdit.text())
-        headLabel = str(self.headLineEdit.text())
-        transitText = float(self.transitTimeLineEdit.text())
-        capacityText = float(self.capacityLineEdit.text())
+        tailLabel = str(self.gttr('tailLineEdit').text())
+        headLabel = str(self.gttr('headLineEdit').text())
+        capacityText = float(self.gttr('capacityLineEdit').text())
+        transitText = float(self.gttr('transitTimeLineEdit').text())
+        boundText = float(self.boundLineEdit_spillback.text()) if self.currentTF == 'spillback' else None
 
         # Work with actual node IDs, not labels
-        labels = nx.get_node_attributes(self.network, 'label')
+        labels = nx.get_node_attributes(self.gttr('network'), 'label')
         tail = labels.keys()[labels.values().index(tailLabel)]
         head = labels.keys()[labels.values().index(headLabel)]
 
         if capacityText <= 0 or transitText < 0:
             # This is not allowed
             return
+        if boundText is not None and boundText <= 0:
+            # Not allowed
+            return
 
-        if self.network.has_edge(tail, head):
+        if self.gttr('network').has_edge(tail, head):
             # Update the edges attributes
-            self.network[tail][head]['transitTime'] = transitText
-            self.network[tail][head]['capacity'] = capacityText
-            self.graphCreationCanvas.update_edges()
+            self.gttr('network')[tail][head]['capacity'] = capacityText
+            self.gttr('network')[tail][head]['transitTime'] = transitText
+            if boundText is not None:
+                self.gttr('network', 'spillback')[tail][head]['inflowBound'] = boundText
+            self.gttr('graphCreationCanvas').update_edges()
         else:
             # Add a new edge
-            self.network.add_edge(tail, head, transitTime=transitText, capacity=capacityText)
-            self.graphCreationCanvas.focusEdge = (tail, head)
-            self.graphCreationCanvas.update_edges(added=True, color=True)
-            self.graphCreationCanvas.update_nodes(color=True)
+            if boundText is not None:
+                self.gttr('network').add_edge(tail, head, capacity=capacityText, transitTime=transitText, resettingEnabled=False)
+            else:
+                self.gttr('network').add_edge(tail, head, capacity=capacityText, transitTime=transitText, inflowBound=boundText,
+                                              resettingEnabled=False)
+            self.gttr('graphCreationCanvas').focusEdge = (tail, head)
+            self.gttr('graphCreationCanvas').update_edges(added=True, color=True)
+            self.gttr('graphCreationCanvas').update_nodes(color=True)
             self.add_edge_to_list((tail, head))
-            self.edgeSelectionListWidget.sortItems()
+            self.gttr('edgeSelectionListWidget').sortItems()
 
         self.update_edge_display()  # Update UI
 
     def delete_edge(self):
         """Delete focusEdge from network"""
-        edge = self.graphCreationCanvas.focusEdge
+        edge = self.gttr('graphCreationCanvas').focusEdge
         if edge is None:
             return
 
-        if self.network.has_edge(edge[0], edge[1]):
-            item = self.edgeToListItem[edge]
-            index = self.edgeSelectionListWidget.row(item)
-            self.edgeSelectionListWidget.takeItem(index)
+        if self.gttr('network').has_edge(edge[0], edge[1]):
+            item = self.gttr('edgeToListItem')[edge]
+            index = self.gttr('edgeSelectionListWidget').row(item)
+            self.gttr('edgeSelectionListWidget').takeItem(index)
 
-            self.network.remove_edge(edge[0], edge[1])  # Deletion before update, as opposed to delete_node()
-            self.graphCreationCanvas.update_edges(removal=True)
+            self.gttr('network').remove_edge(edge[0], edge[1])  # Deletion before update, as opposed to delete_node()
+            self.gttr('graphCreationCanvas').update_edges(removal=True)
 
-            self.graphCreationCanvas.focusEdge = None
+            self.gttr('graphCreationCanvas').focusEdge = None
 
             self.update_edge_display()  # Update UI
 
-    def re_init_graph_creation_app(self, NoNewGraph=False):
+    def re_init_app(self, NoNewGraph=False):
         """
-        Clears the graph creation tab for new graph creation
+        Clears the graph creation frame for new graph creation
         :param NoNewGraph: (bool) - specify whether a new graph should be initiated or the old one kept
         """
         if not NoNewGraph:
-            self.network = self.init_graph()  # Reinstantiation of the CurrentGraph
+            self.sttr('network', self.currentTF, app_Interface.init_graph())  # Reinstantiation of the CurrentGraph
             self.output("Clearing graph")
 
         # Reinitialization of graphCreationCanvas
-        self.graphCreationCanvas.setParent(None)  # Drop graphCreationCanvas widget
-        self.graphCreationCanvas = PlotCanvas(self.network, self, self.plotCanvasStretchFactor)
-        self.plotFrameLayout.addWidget(self.graphCreationCanvas)  # Add graphCreationCanvas-widget to application
+        self.gttr('graphCreationCanvas').setParent(None)  # Drop graphCreationCanvas widget
+        self.sttr('graphCreationCanvas', self.currentTF,
+                  PlotCanvas(self.gttr('network'), self, self.plotCanvasStretchFactor, onlyNTF=True,
+                             type=self.currentTF))
+        self.gttr('plotFrameLayout').addWidget(
+            self.gttr('graphCreationCanvas'))  # Add graphCreationCanvas-widget to application
 
         # Update UI
         self.update_node_display()
         self.update_edge_display()
-        self.inflowLineEdit.setText(str(self.network.graph['inflowRate']))
+        self.inflowLineEdit.setText(str(self.gttr('network').graph['inflowRate']))
 
         self.re_init_node_list()
         self.re_init_edge_list()
@@ -659,6 +682,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.output("Saving config: config.cfg")
 
     def compute_nash_flow(self, nextIntervalOnly=False):
+        return
         """
         Computes a nash flow
         :param nextIntervalOnly: If this is True, only one interval(i.e. the next one) is computed
@@ -876,13 +900,9 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
 
     def pressed_delete(self):
         """Slot for DEL Key"""
-        if self.tabWidget.currentIndex() != 0:
-            # Deletion only possible in graph creation mode (i.e. tab 0 is focussed)
-            return
-
-        if self.graphCreationCanvas.focusNode is not None:
+        if self.gttr('graphCreationCanvas').focusNode is not None:
             self.delete_node()
-        elif self.graphCreationCanvas.focusEdge is not None:
+        elif self.gttr('graphCreationCanvas').focusEdge is not None:
             self.delete_edge()
 
     def set_new_time_manually(self):
@@ -993,25 +1013,25 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
 
     def update_focus_node(self):
         """Select new focusNode"""
-        self.graphCreationCanvas.focusEdge = None
-        index = self.nodeSelectionListWidget.currentRow()
-        item = self.nodeSelectionListWidget.item(index)
-        node = self.nodeToListItem.keys()[self.nodeToListItem.values().index(item)]
-        self.graphCreationCanvas.focusNode = node
-        self.graphCreationCanvas.update_nodes(color=True)
-        self.graphCreationCanvas.update_edges(color=True)
+        self.gttr('graphCreationCanvas').focusEdge = None
+        index = self.gttr('nodeSelectionListWidget').currentRow()
+        item = self.gttr('nodeSelectionListWidget').item(index)
+        node = self.gttr('nodeToListItem').keys()[self.gttr('nodeToListItem').values().index(item)]
+        self.gttr('graphCreationCanvas').focusNode = node
+        self.gttr('graphCreationCanvas').update_nodes(color=True)
+        self.gttr('graphCreationCanvas').update_edges(color=True)
         self.update_node_display()
         self.update_edge_display()
 
     def update_focus_edge(self):
         """Select new focusEdge"""
-        self.graphCreationCanvas.focusNode = None
-        index = self.edgeSelectionListWidget.currentRow()
-        item = self.edgeSelectionListWidget.item(index)
-        edge = self.edgeToListItem.keys()[self.edgeToListItem.values().index(item)]
-        self.graphCreationCanvas.focusEdge = edge
-        self.graphCreationCanvas.update_nodes(color=True)
-        self.graphCreationCanvas.update_edges(color=True)
+        self.gttr('graphCreationCanvas').focusNode = None
+        index = self.gttr('edgeSelectionListWidget').currentRow()
+        item = self.gttr('edgeSelectionListWidget').item(index)
+        edge = self.gttr('edgeToListItem').keys()[self.gttr('edgeToListItem').values().index(item)]
+        self.gttr('graphCreationCanvas').focusEdge = edge
+        self.gttr('graphCreationCanvas').update_nodes(color=True)
+        self.gttr('graphCreationCanvas').update_edges(color=True)
         self.update_node_display()
         self.update_edge_display()
 
@@ -1131,7 +1151,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         """
         currentTime = Utilities.get_time_for_log()
         logText = currentTime + " - " + txt
-        self.logPlainTextEdit.appendPlainText(logText)
+        self.gttr('logPlainTextEdit').appendPlainText(logText)
 
     @staticmethod
     def show_help():
