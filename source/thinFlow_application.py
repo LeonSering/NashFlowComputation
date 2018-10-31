@@ -174,27 +174,21 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
 
     def re_init_node_list(self):
         """Clear and fill node list"""
-        self.nodeSelectionListWidget_general.clear()
-        self.nodeSelectionListWidget_spillback.clear()
         for tfType in self.tfTypeList:
+            self.gttr('nodeSelectionListWidget', tfType).clear()
             self.sttr('nodeToListItem', tfType, dict())
             for node in self.gttr('network', tfType).nodes():
                 self.add_node_to_list(node, tfType)
-
-        self.nodeSelectionListWidget_general.sortItems()
-        self.nodeSelectionListWidget_spillback.sortItems()
+            self.gttr('nodeSelectionListWidget', tfType).sortItems()
 
     def re_init_edge_list(self):
         """Clear and fill edge list"""
-        self.edgeSelectionListWidget_general.clear()
-        self.edgeSelectionListWidget_spillback.clear()
         for tfType in self.tfTypeList:
+            self.gttr('edgeSelectionListWidget', tfType).clear()
             self.sttr('edgeToListItem', tfType, dict())
             for edge in self.gttr('network', tfType).edges():
                 self.add_edge_to_list(edge, tfType)
-
-        self.edgeSelectionListWidget_general.sortItems()
-        self.edgeSelectionListWidget_spillback.sortItems()
+            self.gttr('edgeSelectionListWidget', tfType).sortItems()
 
     def add_node_to_list(self, node, tfType=None):
         """

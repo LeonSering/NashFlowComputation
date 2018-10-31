@@ -39,14 +39,22 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.setupUi(self)
 
         # Scaling factors of frames, to avoid distortion
-        self.plotCanvasStretchFactor = float(self.plotFrame.width()) / self.plotFrame.height()
+        self.plotCanvasStretchFactor = float(self.plotFrame_general.width()) / self.plotFrame_general.height()
         self.plotAnimationCanvasStretchFactor = float(
-            self.plotAnimationFrame.width()) / self.plotAnimationFrame.height()
-        self.plotNTFCanvasStretchFactor = float(self.plotNTFFrame.width()) / self.plotNTFFrame.height()
+            self.plotAnimationFrame_general.width()) / self.plotAnimationFrame_general.height()
+        self.plotNTFCanvasStretchFactor = float(self.plotNTFFrame_general.width()) / self.plotNTFFrame_general.height()
 
-        # Init graph
-        self.network = self.init_graph()
-        self.init_graph_creation_app()
+        #self.tfTypeList = ['general', 'spillback']
+        self.tfTypeList = ['general']   # Add spillback later when GUI done
+        self.currentTF = self.tfTypeList[self.tabWidget.currentIndex()]  # Currently selected tab information
+
+        # Init graphs and other config defaults
+        for tfType in self.tfTypeList:
+            self.sttr('network', tfType, self.init_graph())
+            self.sttr('animationLowerBound', tfType, 0)
+            self.sttr('animationUpperBound', tfType, 1)
+            self.sttr('animationRunning', tfType, False)
+
         self.inflowLineEdit.setText('1')  # Default value
 
         # Config defaults
@@ -58,37 +66,69 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.numberOfIntervals = -1
         self.cleanUpEnabled = True
 
-        self.animationLowerBound = 0
-        self.animationUpperBound = 1
-        self.animationRunning = False
-
         self.configFile = ConfigParser.RawConfigParser()  # This is the parser, not to confuse with the actual config.txt File, which cannot be specified
 
         # Initializations
-        self.init_nashflow_app()
+        self.init_app()
         self.load_config()  # Try to load configuration file
-        self.tabWidget.setCurrentIndex(0)  # Show Graph Creation Tab
+
+        #self.tabWidget.setCurrentIndex(0)  # Show Graph Creation Tab
 
         # Signal configuration
-        self.updateNodeButton.clicked.connect(self.update_node)
-        self.deleteNodeButton.clicked.connect(self.delete_node)
-        self.updateEdgeButton.clicked.connect(self.update_add_edge)
-        self.deleteEdgeButton.clicked.connect(self.delete_edge)
+        self.tabWidget.connect(self.tabWidget, QtCore.SIGNAL("currentChanged(int)"), self.tabSwitched)
+
+        for tfType in self.tfTypeList:
+            self.gttr('updateNodeButton', tfType).clicked.connect(self.update_node)
+            self.gttr('deleteNodeButton', tfType).clicked.connect(self.delete_node)
+            self.gttr('updateEdgeButton', tfType).clicked.connect(self.update_add_edge)
+            self.gttr('deleteEdgeButton', tfType).clicked.connect(self.delete_edge)
+            self.gttr('nodeSelectionListWidget', tfType).clicked.connect(self.update_focus_node)
+            self.gttr('edgeSelectionListWidget', tfType).clicked.connect(self.update_focus_edge)
+            self.gttr('computeFlowPushButton', tfType).clicked.connect(self.compute_nash_flow)
+            self.gttr('exportDiagramPushButton', tfType).clicked.connect(self.export_diagram)
+            self.gttr('setTimePushButton', tfType).clicked.connect(self.set_new_time_manually)
+            self.gttr('showEdgesWithoutFlowCheckBox', tfType).clicked.connect(self.change_no_flow_show_state)
+            self.gttr('playPushButton', tfType).clicked.connect(self.play_animation)
+            self.gttr('pausePushButton', tfType).clicked.connect(self.pause_animation)
+            self.gttr('stopPushButton', tfType).clicked.connect(self.stop_animation)
+            self.gttr('computeIntervalPushButton', tfType).clicked.connect(self.compute_next_interval)
+            self.gttr('intervalsListWidget', tfType).clicked.connect(self.update_ntf_display)
+            self.gttr('generateAnimationPushButton', tfType).clicked.connect(self.generate_animation)
+            self.gttr('animationStartLineEdit', tfType).returnPressed.connect(self.generate_animation)
+            self.gttr('animationEndLineEdit', tfType).returnPressed.connect(self.generate_animation)
+            self.gttr('setTimeLineEdit', tfType).returnPressed.connect(self.set_new_time_manually)
+
+            # Keyboard shortcuts
+            self.gttr('tailLineEdit', tfType).returnPressed.connect(self.update_add_edge)
+            self.gttr('headLineEdit', tfType).returnPressed.connect(self.update_add_edge)
+            self.gttr('capacityLineEdit', tfType).returnPressed.connect(self.update_add_edge)
+            self.gttr('transitTimeLineEdit', tfType).returnPressed.connect(self.update_add_edge)
+            self.gttr('nodeNameLineEdit', tfType).returnPressed.connect(self.update_node)
+            self.gttr('nodeXLineEdit', tfType).returnPressed.connect(self.update_node)
+            self.gttr('nodeYLineEdit', tfType).returnPressed.connect(self.update_node)
+
+            # Configure Slider
+            self.gttr('timeSlider', tfType).setMinimum(0)
+            self.gttr('timeSlider', tfType).setMaximum(99)
+            self.gttr('timeSlider', tfType).setValue(0)
+            self.gttr('timeSlider', tfType).setTickPosition(2) # Set ticks below horizontal slider
+            self.gttr('timeSlider', tfType).setTickInterval(1)
+
+            # Slider signals
+            self.gttr('timeSlider', tfType).valueChanged.connect(self.slider_value_change)
+            self.gttr('timeSlider', tfType).sliderReleased.connect(self.slider_released)
+
+
+        # Spillback-only signals
+        #self.boundLineEdit_spillback.returnPressed.connect(self.update_add_edge)
+
+        # General signals
         self.outputDirectoryPushButton.clicked.connect(self.select_output_directory)
         self.scipPathPushButton.clicked.connect(self.select_scip_binary)
-        self.computeFlowPushButton.clicked.connect(self.compute_nash_flow)
         self.cleanUpCheckBox.clicked.connect(self.change_cleanup_state)
-        self.exportDiagramPushButton.clicked.connect(self.export_diagram)
-        self.setTimePushButton.clicked.connect(self.set_new_time_manually)
         self.showEdgesWithoutFlowCheckBox.clicked.connect(self.change_no_flow_show_state)
-        self.nodeSelectionListWidget.itemClicked.connect(self.update_focus_node)
-        self.edgeSelectionListWidget.itemClicked.connect(self.update_focus_edge)
         self.activateTimeoutCheckBox.clicked.connect(self.change_timeout_state)
-        self.playPushButton.clicked.connect(self.play_animation)
-        self.pausePushButton.clicked.connect(self.pause_animation)
-        self.stopPushButton.clicked.connect(self.stop_animation)
-        self.computeIntervalPushButton.clicked.connect(self.compute_next_interval)
-        self.actionNew_graph.triggered.connect(self.re_init_graph_creation_app)
+        self.actionNew_graph.triggered.connect(self.re_init_app)
         self.actionLoad_graph.triggered.connect(self.load_graph)
         self.actionSave_graph.triggered.connect(self.save_graph)
         self.actionExit.triggered.connect(QtGui.QApplication.quit)
@@ -97,33 +137,10 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.actionOpen_ThinFlowComputation.triggered.connect(self.open_tfc)
         self.actionMove_graph_to_ThinFlowComputation.triggered.connect(self.move_to_tfc)
         self.actionOpen_manual.triggered.connect(self.show_help)
-        self.intervalsListWidget.itemClicked.connect(self.update_ntf_display)
-        self.generateAnimationPushButton.clicked.connect(self.generate_animation)
 
-        # Configure Slider
-        self.timeSlider.setMinimum(0)
-        self.timeSlider.setMaximum(99)
-        self.timeSlider.setValue(0)
-        self.timeSlider.setTickPosition(2)  # Set ticks below horizontal slider
-        self.timeSlider.setTickInterval(1)
-
-        # Slider signals
-        self.timeSlider.valueChanged.connect(self.slider_value_change)
-        self.timeSlider.sliderReleased.connect(self.slider_released)
-
-        # Keyboard shortcuts
+        # General shortcuts
         QtGui.QShortcut(QtGui.QKeySequence(QtCore.Qt.Key_Delete), self).activated.connect(
             self.pressed_delete)  # Pressed Delete
-        self.tailLineEdit.returnPressed.connect(self.update_add_edge)
-        self.headLineEdit.returnPressed.connect(self.update_add_edge)
-        self.capacityLineEdit.returnPressed.connect(self.update_add_edge)
-        self.transitTimeLineEdit.returnPressed.connect(self.update_add_edge)
-        self.nodeNameLineEdit.returnPressed.connect(self.update_node)
-        self.nodeXLineEdit.returnPressed.connect(self.update_node)
-        self.nodeYLineEdit.returnPressed.connect(self.update_node)
-        self.animationStartLineEdit.returnPressed.connect(self.generate_animation)
-        self.animationEndLineEdit.returnPressed.connect(self.generate_animation)
-        self.setTimeLineEdit.returnPressed.connect(self.set_new_time_manually)
 
         if len(sys.argv) >= 3:
             # startup arguments have been specified
@@ -132,6 +149,32 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
                 self.load_graph(graphPath=sys.argv[2])
                 # Delete the temporary graph
                 os.remove(sys.argv[2])
+
+    def gttr(self, variable, tfType=None):
+        """
+        :param variable: string/variable name, e.g. plotCanvas
+        :param tfType: dict to current thin flow type
+        :return: self.variable_tfType, e.g. self.plotCanvas_general or self.plotCanvas_spillback
+        """
+        if not tfType:
+            tfType = self.currentTF
+        return getattr(self, variable + '_' + tfType)
+
+    def sttr(self, variable, tfType=None, value=None):
+        """
+        Sets variable_tfType var to value
+        :param variable: string/variable name, e.g. plotCanvas
+        :param value: value to set variable to
+        :param tfType: dict to current thin flow type
+        """
+        if not tfType:
+            tfType = self.currentTF
+        setattr(self, variable + '_' + tfType, value)
+
+    def tabSwitched(self, idx=None):
+        """Slot for tab switching"""
+        if idx is not None:
+            self.currentTF = self.tfTypeList[idx]
 
     @staticmethod
     def init_graph():
@@ -146,35 +189,46 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         network.graph['inflowRate'] = 1  # Default inflowrate for new networks
         return network
 
-    def init_graph_creation_app(self):
-        """Initialization of Tab 0"""
-        # Configure plotFrame to display plots of graphs
-        self.plotFrameLayout = QtGui.QVBoxLayout()
-        self.plotFrame.setLayout(self.plotFrameLayout)
-        self.graphCreationCanvas = PlotCanvas(self.network, self)  # Initialize PlotCanvas
-        self.plotFrameLayout.addWidget(self.graphCreationCanvas)
+    def init_app(self):  # former: init_graph_creation_app
+        """Initialization of Tabs"""
+        for tfType in self.tfTypeList:
+            # Configure plotFrame to display plots of graphs
+            self.sttr('plotFrameLayout', tfType, QtGui.QVBoxLayout())
+            self.gttr('plotFrame', tfType).setLayout(self.gttr('plotFrameLayout', tfType))
+            self.sttr('graphCreationCanvas', tfType, PlotCanvas(self.gttr('network', tfType), self,
+                                                                stretchFactor=1.57, onlyNTF=True,
+                                                                type=tfType))  # Initialize PlotCanvas
+            self.gttr('plotFrameLayout', tfType).addWidget(self.gttr('graphCreationCanvas', tfType))
+
+            # Configure plotNTFFrame
+            self.sttr('plotNTFFrameLayout', tfType, QtGui.QVBoxLayout())
+            self.gttr('plotNTFFrame', tfType).setLayout(self.gttr('plotNTFFrameLayout', tfType))
+
+            '''
+            # Add empty graph to plotNTFCanvas to not destroy layout
+            self.sttr('plotNTFCanvas', tfType, PlotNTFCanvas(nx.DiGraph(), self, intervalID=None,
+                                                             stretchFactor=self.plotNTFCanvasStretchFactor,
+                                                             showNoFlowEdges=self.showEdgesWithoutFlowCheckBox.isChecked(),
+                                                             onlyNTF=True))
+             '''
+            self.sttr('plotNTFCanvas', tfType, None)
+            self.sttr('NTFPlotList', tfType, None)
+
+            #self.gttr('plotNTFFrameLayout', tfType).addWidget(self.gttr('plotNTFCanvas', tfType))
+
+            # Configure plotAnimationFrame to display animation
+            self.sttr('plotAnimationFrameLayout', tfType, QtGui.QVBoxLayout())
+            self.gttr('plotAnimationFrame', tfType).setLayout(self.gttr('plotAnimationFrameLayout', tfType))
+            self.sttr('plotAnimationCanvas', tfType, None)
+
+            # Configure plotDiagramFrame to display edge in- and outflow, queue-size and node labels
+            self.sttr('plotDiagramLayout', tfType, QtGui.QVBoxLayout())
+            self.gttr('plotDiagramFrame', tfType).setLayout(self.gttr('plotDiagramLayout', tfType))
+            self.sttr('plotDiagramCanvas', tfType, PlotValuesCanvas(callback=self.callback_plotvaluescanvas))
+            self.gttr('plotDiagramLayout', tfType).addWidget(self.gttr('plotDiagramCanvas', tfType))
 
         self.re_init_node_list()
         self.re_init_edge_list()
-
-    def init_nashflow_app(self):
-        """Initialization of Tab 1"""
-        # Configure plotNTFFrame to display plots of NTF
-        self.plotNTFFrameLayout = QtGui.QVBoxLayout()
-        self.plotNTFFrame.setLayout(self.plotNTFFrameLayout)
-        self.plotNTFCanvas = None
-        self.NTFPlotList = []
-
-        # Configure plotAnimationFrame to display animation
-        self.plotAnimationFrameLayout = QtGui.QVBoxLayout()
-        self.plotAnimationFrame.setLayout(self.plotAnimationFrameLayout)
-        self.plotAnimationCanvas = None
-
-        # Configure plotDiagramFrame to display edge in- and outflow, queue-size and node labels
-        self.plotDiagramLayout = QtGui.QVBoxLayout()
-        self.plotDiagramFrame.setLayout(self.plotDiagramLayout)
-        self.plotDiagramCanvas = PlotValuesCanvas(callback=self.callback_plotvaluescanvas)
-        self.plotDiagramLayout.addWidget(self.plotDiagramCanvas)
 
     def generate_animation(self):
         """Generates new animation"""
@@ -963,42 +1017,51 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
 
     def re_init_node_list(self):
         """Clear and fill node list"""
-        self.nodeSelectionListWidget.clear()
-        self.nodeToListItem = dict()
-        for node in self.network.nodes():
-            self.add_node_to_list(node)
-
-        self.nodeSelectionListWidget.sortItems()
+        for tfType in self.tfTypeList:
+            self.gttr('nodeSelectionListWidget', tfType).clear()
+            self.sttr('nodeToListItem', tfType, dict())
+            for node in self.gttr('network', tfType).nodes():
+                self.add_node_to_list(node, tfType)
+            self.gttr('nodeSelectionListWidget', tfType).sortItems()
 
     def re_init_edge_list(self):
         """Clear and fill edge list"""
-        self.edgeSelectionListWidget.clear()
-        self.edgeToListItem = dict()
-        for edge in self.network.edges():
-            self.add_edge_to_list(edge)
+        for tfType in self.tfTypeList:
+            self.gttr('edgeSelectionListWidget', tfType).clear()
+            self.sttr('edgeToListItem', tfType, dict())
+            for edge in self.gttr('network', tfType).edges():
+                self.add_edge_to_list(edge, tfType)
+            self.gttr('edgeSelectionListWidget', tfType).sortItems()
 
-        self.edgeSelectionListWidget.sortItems()
-
-    def add_node_to_list(self, node):
+    def add_node_to_list(self, node, tfType=None):
         """
         Add single node to list
-        :param node: node which will be added to ListWidget
+        :param node: node which will be added to ListWidget of tfType
+        :param tfType: dict containing information of current thinflowType
         """
-        nodeString = 'Node ' + str(node) + ': ' + self.network.node[node]['label']
-        item = QtGui.QListWidgetItem(nodeString)
-        self.nodeToListItem[node] = item
-        self.nodeSelectionListWidget.addItem(item)  # Add item to listWidget
+        if not tfType:
+            tfType = self.currentTF
 
-    def add_edge_to_list(self, edge):
+        nodeString = 'Node ' + str(node) + ': ' + self.gttr('network', tfType).node[node]['label']
+        item = QtGui.QListWidgetItem(nodeString)
+        self.gttr('nodeToListItem', tfType)[node] = item
+        self.gttr('nodeSelectionListWidget', tfType).addItem(item)  # Add item to listWidget
+
+    def add_edge_to_list(self, edge, tfType=None):
         """
         Add single edge to list
-        :param edge: edge which will be added to ListWidget
+        :param edge: edge which will be added to ListWidget of tfType
+        :param tfType: dict containing information of current thinflowType
         """
+        if not tfType:
+            tfType = self.currentTF
+
         v, w = edge
-        edgeString = 'Edge: ' + str((self.network.node[v]['label'], self.network.node[w]['label']))
+        edgeString = 'Edge: ' + str(
+            (self.gttr('network', tfType).node[v]['label'], self.gttr('network', tfType).node[w]['label']))
         item = QtGui.QListWidgetItem(edgeString)
-        self.edgeToListItem[edge] = item
-        self.edgeSelectionListWidget.addItem(item)  # Add item to listWidget
+        self.gttr('edgeToListItem')[edge] = item
+        self.gttr('edgeSelectionListWidget', tfType).addItem(item)
 
     def change_timeout_state(self):
         """Activate/Deactivate Timeout"""

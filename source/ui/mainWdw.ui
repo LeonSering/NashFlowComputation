@@ -54,7 +54,7 @@
                </widget>
               </item>
               <item row="1" column="0" colspan="2">
-               <widget class="QPushButton" name="computeThinFlowPushButton_general">
+               <widget class="QPushButton" name="computeNashFlowPushButton_general">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
                   <horstretch>0</horstretch>
@@ -128,7 +128,7 @@
                   </widget>
                  </item>
                  <item row="0" column="1">
-                  <widget class="QLineEdit" name="tailLineEdit_general_2"/>
+                  <widget class="QLineEdit" name="tailLineEdit_general"/>
                  </item>
                  <item row="1" column="0">
                   <widget class="QLabel" name="label_14">
@@ -138,7 +138,7 @@
                   </widget>
                  </item>
                  <item row="1" column="1">
-                  <widget class="QLineEdit" name="headLineEdit_general_2"/>
+                  <widget class="QLineEdit" name="headLineEdit_general"/>
                  </item>
                  <item row="2" column="0">
                   <widget class="QLabel" name="label_15">
@@ -148,7 +148,7 @@
                   </widget>
                  </item>
                  <item row="2" column="1">
-                  <widget class="QLineEdit" name="capacityLineEdit_general_2"/>
+                  <widget class="QLineEdit" name="capacityLineEdit_general"/>
                  </item>
                  <item row="3" column="0">
                   <widget class="QLabel" name="label_16">
@@ -158,12 +158,12 @@
                   </widget>
                  </item>
                  <item row="3" column="1">
-                  <widget class="QLineEdit" name="transitTimeLineEdit"/>
+                  <widget class="QLineEdit" name="transitTimeLineEdit_general"/>
                  </item>
                 </layout>
                </item>
                <item>
-                <widget class="QPushButton" name="updateEdgeButton_general_2">
+                <widget class="QPushButton" name="updateEdgeButton_general">
                  <property name="text">
                   <string>Add/Upd. edge</string>
                  </property>
@@ -179,7 +179,7 @@
                 </widget>
                </item>
                <item>
-                <widget class="QPushButton" name="deleteEdgeButton_general_2">
+                <widget class="QPushButton" name="deleteEdgeButton_general">
                  <property name="text">
                   <string>Delete edge</string>
                  </property>
@@ -225,7 +225,7 @@
                   </widget>
                  </item>
                  <item row="0" column="1">
-                  <widget class="QLineEdit" name="nodeNameLineEdit_general_2"/>
+                  <widget class="QLineEdit" name="nodeNameLineEdit_general"/>
                  </item>
                  <item row="1" column="0">
                   <widget class="QLabel" name="label_18">
@@ -242,15 +242,15 @@
                   </widget>
                  </item>
                  <item row="1" column="1">
-                  <widget class="QLineEdit" name="nodeXLineEdit_general_2"/>
+                  <widget class="QLineEdit" name="nodeXLineEdit_general"/>
                  </item>
                  <item row="2" column="1">
-                  <widget class="QLineEdit" name="nodeYLineEdit_general_2"/>
+                  <widget class="QLineEdit" name="nodeYLineEdit_general"/>
                  </item>
                 </layout>
                </item>
                <item row="3" column="0">
-                <widget class="QPushButton" name="deleteNodeButton_general_2">
+                <widget class="QPushButton" name="deleteNodeButton_general">
                  <property name="text">
                   <string>Delete node</string>
                  </property>
@@ -266,7 +266,7 @@
                 </widget>
                </item>
                <item row="2" column="0">
-                <widget class="QPushButton" name="updateNodeButton_general_2">
+                <widget class="QPushButton" name="updateNodeButton_general">
                  <property name="text">
                   <string>Update node</string>
                  </property>
@@ -333,12 +333,10 @@
              </widget>
             </item>
            </layout>
-           <zorder>groupBox</zorder>
            <zorder>plotFrame_general</zorder>
            <zorder>groupBox_3</zorder>
            <zorder>groupBox_2</zorder>
            <zorder>logPlainTextEdit_general</zorder>
-           <zorder>layoutWidget</zorder>
           </widget>
           <widget class="QWidget" name="tab_4">
            <attribute name="title">
@@ -380,7 +378,7 @@
                 </spacer>
                </item>
                <item>
-                <widget class="QFrame" name="plotAnimationFrame">
+                <widget class="QFrame" name="plotAnimationFrame_general">
                  <property name="sizePolicy">
                   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                    <horstretch>0</horstretch>
@@ -393,7 +391,7 @@
                 </widget>
                </item>
                <item>
-                <widget class="QSlider" name="timeSlider">
+                <widget class="QSlider" name="timeSlider_general">
                  <property name="orientation">
                   <enum>Qt::Horizontal</enum>
                  </property>
@@ -401,13 +399,6 @@
                </item>
                <item>
                 <layout class="QGridLayout" name="gridLayout_8">
-                 <item row="0" column="4">
-                  <widget class="QPushButton" name="generateAnimationPushButton">
-                   <property name="text">
-                    <string>Generate</string>
-                   </property>
-                  </widget>
-                 </item>
                  <item row="1" column="3">
                   <layout class="QHBoxLayout" name="horizontalLayout_5">
                    <item>
@@ -424,7 +415,7 @@
                     </spacer>
                    </item>
                    <item>
-                    <widget class="QPushButton" name="playPushButton">
+                    <widget class="QPushButton" name="playPushButton_general">
                      <property name="sizePolicy">
                       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                        <horstretch>0</horstretch>
@@ -441,7 +432,7 @@
                     </widget>
                    </item>
                    <item>
-                    <widget class="QPushButton" name="pausePushButton">
+                    <widget class="QPushButton" name="pausePushButton_general">
                      <property name="sizePolicy">
                       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                        <horstretch>0</horstretch>
@@ -458,7 +449,7 @@
                     </widget>
                    </item>
                    <item>
-                    <widget class="QPushButton" name="stopPushButton">
+                    <widget class="QPushButton" name="stopPushButton_general">
                      <property name="sizePolicy">
                       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                        <horstretch>0</horstretch>
@@ -486,7 +477,7 @@
                     </widget>
                    </item>
                    <item>
-                    <widget class="QLabel" name="currentFocusLabel">
+                    <widget class="QLabel" name="currentFocusLabel_general">
                      <property name="text">
                       <string>N/A</string>
                      </property>
@@ -500,7 +491,7 @@
                     </widget>
                    </item>
                    <item>
-                    <widget class="QLabel" name="currentCapacityLabel">
+                    <widget class="QLabel" name="currentCapacityLabel_general">
                      <property name="text">
                       <string>N/A</string>
                      </property>
@@ -514,7 +505,7 @@
                     </widget>
                    </item>
                    <item>
-                    <widget class="QLabel" name="currentTransitTimeLabel">
+                    <widget class="QLabel" name="currentTransitTimeLabel_general">
                      <property name="text">
                       <string>N/A</string>
                      </property>
@@ -532,7 +523,7 @@
                     </widget>
                    </item>
                    <item>
-                    <widget class="QLineEdit" name="animationStartLineEdit">
+                    <widget class="QLineEdit" name="animationStartLineEdit_general">
                      <property name="text">
                       <string/>
                      </property>
@@ -546,13 +537,20 @@
                     </widget>
                    </item>
                    <item>
-                    <widget class="QLineEdit" name="animationEndLineEdit">
+                    <widget class="QLineEdit" name="animationEndLineEdit_general">
                      <property name="text">
                       <string/>
                      </property>
                     </widget>
                    </item>
                   </layout>
+                 </item>
+                 <item row="0" column="3" colspan="2">
+                  <widget class="QPushButton" name="generateAnimationPushButton_general">
+                   <property name="text">
+                    <string>Generate</string>
+                   </property>
+                  </widget>
                  </item>
                 </layout>
                </item>
@@ -594,7 +592,7 @@
                 </spacer>
                </item>
                <item>
-                <widget class="QFrame" name="plotDiagramFrame">
+                <widget class="QFrame" name="plotDiagramFrame_general">
                  <property name="sizePolicy">
                   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                    <horstretch>0</horstretch>
@@ -609,7 +607,7 @@
                <item>
                 <layout class="QHBoxLayout" name="horizontalLayout">
                  <item>
-                  <widget class="QComboBox" name="exportComboBox">
+                  <widget class="QComboBox" name="exportComboBox_general">
                    <item>
                     <property name="text">
                      <string>Export as .PDF</string>
@@ -641,7 +639,7 @@
                   </widget>
                  </item>
                  <item>
-                  <widget class="QLabel" name="currentSliderTimeLabel">
+                  <widget class="QLabel" name="currentSliderTimeLabel_general">
                    <property name="sizePolicy">
                     <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                      <horstretch>1</horstretch>
@@ -654,7 +652,7 @@
                   </widget>
                  </item>
                  <item>
-                  <widget class="QLineEdit" name="setTimeLineEdit">
+                  <widget class="QLineEdit" name="setTimeLineEdit_general">
                    <property name="sizePolicy">
                     <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                      <horstretch>1</horstretch>
@@ -667,7 +665,7 @@
                   </widget>
                  </item>
                  <item>
-                  <widget class="QPushButton" name="setTimePushButton">
+                  <widget class="QPushButton" name="setTimePushButton_general">
                    <property name="sizePolicy">
                     <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                      <horstretch>0</horstretch>
@@ -719,7 +717,7 @@
                 </spacer>
                </item>
                <item row="1" column="0" rowspan="2">
-                <widget class="QFrame" name="plotNTFFrame">
+                <widget class="QFrame" name="plotNTFFrame_general">
                  <property name="sizePolicy">
                   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                    <horstretch>3</horstretch>
@@ -732,7 +730,7 @@
                 </widget>
                </item>
                <item row="3" column="0">
-                <widget class="QCheckBox" name="showEdgesWithoutFlowCheckBox">
+                <widget class="QCheckBox" name="showEdgesWithoutFlowCheckBox_general">
                  <property name="text">
                   <string>Show edges w/out flow</string>
                  </property>
@@ -742,7 +740,7 @@
                 </widget>
                </item>
                <item row="1" column="1" rowspan="2">
-                <widget class="QListWidget" name="intervalsListWidget">
+                <widget class="QListWidget" name="intervalsListWidget_general">
                  <property name="sizePolicy">
                   <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
                    <horstretch>1</horstretch>
@@ -761,7 +759,7 @@
                 </widget>
                </item>
                <item row="3" column="1">
-                <widget class="QPushButton" name="computeIntervalPushButton">
+                <widget class="QPushButton" name="computeIntervalPushButton_general">
                  <property name="sizePolicy">
                   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                    <horstretch>0</horstretch>
@@ -836,7 +834,7 @@
                   </widget>
                  </item>
                  <item row="1" column="1">
-                  <widget class="QLabel" name="statNumberOfNodesLabel">
+                  <widget class="QLabel" name="statNumberOfNodesLabel_general">
                    <property name="text">
                     <string>N/A</string>
                    </property>
@@ -931,49 +929,49 @@
                   </widget>
                  </item>
                  <item row="2" column="1">
-                  <widget class="QLabel" name="statNumberOfEdgesLabel">
+                  <widget class="QLabel" name="statNumberOfEdgesLabel_general">
                    <property name="text">
                     <string>N/A</string>
                    </property>
                   </widget>
                  </item>
                  <item row="4" column="1">
-                  <widget class="QLabel" name="statAvgDeletedNodesLabel">
+                  <widget class="QLabel" name="statAvgDeletedNodesLabel_general">
                    <property name="text">
                     <string>N/A</string>
                    </property>
                   </widget>
                  </item>
                  <item row="5" column="1">
-                  <widget class="QLabel" name="statAvgDeletedEdgesLabel">
+                  <widget class="QLabel" name="statAvgDeletedEdgesLabel_general">
                    <property name="text">
                     <string>N/A</string>
                    </property>
                   </widget>
                  </item>
                  <item row="7" column="1">
-                  <widget class="QLabel" name="statAvgSolvedIPsLabel">
+                  <widget class="QLabel" name="statAvgSolvedIPsLabel_general">
                    <property name="text">
                     <string>N/A</string>
                    </property>
                   </widget>
                  </item>
                  <item row="8" column="1">
-                  <widget class="QLabel" name="statTotalSolvedIPsLabel">
+                  <widget class="QLabel" name="statTotalSolvedIPsLabel_general">
                    <property name="text">
                     <string>N/A</string>
                    </property>
                   </widget>
                  </item>
                  <item row="10" column="1">
-                  <widget class="QLabel" name="statAvgTimeLabel">
+                  <widget class="QLabel" name="statAvgTimeLabel_general">
                    <property name="text">
                     <string>N/A</string>
                    </property>
                   </widget>
                  </item>
                  <item row="11" column="1">
-                  <widget class="QLabel" name="statTotalTimeLabel">
+                  <widget class="QLabel" name="statTotalTimeLabel_general">
                    <property name="text">
                     <string>N/A</string>
                    </property>
@@ -1154,7 +1152,6 @@
         </spacer>
        </item>
       </layout>
-      <zorder>tabWidget</zorder>
       <zorder>label_8</zorder>
       <zorder>label_9</zorder>
       <zorder>outputDirectoryLineEdit</zorder>
