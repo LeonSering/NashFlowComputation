@@ -27,7 +27,7 @@ class PlotNTFCanvas(PlotCanvas):
             # Graph is not empty. Otherwise dont do stuff because the call was made by thinFlow_application initialization
             if not self.onlyNTF:
                 # We have a regular nashFlow instance
-                flowIntervalInstance = interface.nashFlow.flowIntervals[intervalID][2]
+                flowIntervalInstance = interface.gttr('nashFlow').flowIntervals[intervalID][2]
                 self.showSpillBackFactor = False
             else:
                 # We just have a flowInterval instance
