@@ -139,9 +139,23 @@ class Utilities:
         return minimumCapacity
 
     @staticmethod
-    def join_intersect_dicts(dict1, dict2):
-        """Intersect two dict"""
-        return {key: (dict1[key], dict2[key]) for key in dict1 if key in dict2}
+    def join_intersect_dicts(dict1, dict2, *more_dicts):
+        """Intersect two or more dict"""
+        if len(more_dicts) == 0:
+            return {key: (dict1[key], dict2[key]) for key in dict1 if key in dict2}
+        else:
+            d = {}
+            for key in dict1:
+                l = [dict1[key]]
+                if key in dict2:
+                    l.append(dict2[key])
+                    for dAdditional in more_dicts:
+                        if key not in dAdditional:
+                            continue
+                        l.append(dAdditional[key])
+                    d[key] = tuple(l)
+            return d
+
 
     @staticmethod
     def add_and_round_up(x, n):

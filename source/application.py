@@ -44,8 +44,10 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
             self.plotAnimationFrame_general.width()) / self.plotAnimationFrame_general.height()
         self.plotNTFCanvasStretchFactor = float(self.plotNTFFrame_general.width()) / self.plotNTFFrame_general.height()
 
-        #self.tfTypeList = ['general', 'spillback']
-        self.tfTypeList = ['general']   # Add spillback later when GUI done
+        self.tfTypeList = ['general', 'spillback']
+        self.tabWidget_3.setCurrentIndex(0) # Note: This has to be done first, otherwise self.currentTF is wrong
+        self.tabWidget.setCurrentIndex(0)  # Show General Tab
+        self.tabWidget_2.setCurrentIndex(0) # Show Graph creation Tab
         self.currentTF = self.tfTypeList[self.tabWidget.currentIndex()]  # Currently selected tab information
 
         # Init graphs and other config defaults
@@ -59,7 +61,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
 
         # Config defaults
         self.outputDirectory = ''
-        self.templateFile = 0  # 0,1,2 for three algorithms from thesis
+        self.templateFile = 0  # 0,1,2 for three algorithms from thesis # TODO: Switch between Flow types?
         self.scipFile = ''
         self.timeoutActivated = False
         self.defaultLoadSaveDir = ''
@@ -72,13 +74,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.init_app()
         self.load_config()  # Try to load configuration file
 
-        self.tabWidget.setCurrentIndex(0)  # Show General Tab
-        self.tabWidget_2.setCurrentIndex(0) # Show Graph creation Tab
-
         # Signal configuration
-        self.tabWidget.connect(self.tabWidget, QtCore.SIGNAL("currentChanged(int)"), self.tabSwitched)
-
-
         for tfType in self.tfTypeList:
             self.gttr('updateNodeButton', tfType).clicked.connect(self.update_node)
             self.gttr('deleteNodeButton', tfType).clicked.connect(self.delete_node)
@@ -103,7 +99,6 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
             # Keyboard shortcuts
             self.gttr('tailLineEdit', tfType).returnPressed.connect(self.update_add_edge)
             self.gttr('headLineEdit', tfType).returnPressed.connect(self.update_add_edge)
-            self.gttr('capacityLineEdit', tfType).returnPressed.connect(self.update_add_edge)
             self.gttr('transitTimeLineEdit', tfType).returnPressed.connect(self.update_add_edge)
             self.gttr('nodeNameLineEdit', tfType).returnPressed.connect(self.update_node)
             self.gttr('nodeXLineEdit', tfType).returnPressed.connect(self.update_node)
@@ -120,11 +115,16 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
             self.gttr('timeSlider', tfType).valueChanged.connect(self.slider_value_change)
             self.gttr('timeSlider', tfType).sliderReleased.connect(self.slider_released)
 
+        # General-only signals
+        self.capacityLineEdit_general.returnPressed.connect(self.update_add_edge)
 
         # Spillback-only signals
-        #self.boundLineEdit_spillback.returnPressed.connect(self.update_add_edge)
+        self.inCapacityLineEdit_spillback.returnPressed.connect(self.update_add_edge)
+        self.outCapacityLineEdit_spillback.returnPressed.connect(self.update_add_edge)
+        self.storageLineEdit_spillback.returnPressed.connect(self.update_add_edge)
 
-        # General signals
+        # Non-assigned Signals
+        self.tabWidget.connect(self.tabWidget, QtCore.SIGNAL("currentChanged(int)"), self.tabSwitched)
         self.outputDirectoryPushButton.clicked.connect(self.select_output_directory)
         self.scipPathPushButton.clicked.connect(self.select_scip_binary)
         self.cleanUpCheckBox.clicked.connect(self.change_cleanup_state)
@@ -139,7 +139,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.actionMove_graph_to_ThinFlowComputation.triggered.connect(self.move_to_tfc)
         self.actionOpen_manual.triggered.connect(self.show_help)
 
-        # General shortcuts
+        # Non-assigned shortcuts
         QtGui.QShortcut(QtGui.QKeySequence(QtCore.Qt.Key_Delete), self).activated.connect(
             self.pressed_delete)  # Pressed Delete
 
@@ -327,22 +327,30 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         if edge is not None:
             self.gttr('tailLineEdit').setText(self.gttr('network').node[edge[0]]['label'])
             self.gttr('headLineEdit').setText(self.gttr('network').node[edge[1]]['label'])
-            self.gttr('capacityLineEdit').setText(
-                str(self.gttr('network')[edge[0]][edge[1]]['capacity']))
             self.gttr('transitTimeLineEdit').setText(
                 str(self.gttr('network')[edge[0]][edge[1]]['transitTime']))
 
-            if self.currentTF == 'spillback':
-                self.boundLineEdit_spillback.setText(str(self.gttr('network')[edge[0]][edge[1]]['inflowBound']))
-
+            if self.currentTF == 'general':
+                self.capacityLineEdit_general.setText(
+                str(self.gttr('network', 'general')[edge[0]][edge[1]]['capacity']))
+            elif self.currentTF == 'spillback':
+                self.inCapacityLineEdit_spillback.setText(
+                str(self.gttr('network', 'spillback')[edge[0]][edge[1]]['inCapacity']))
+                self.outCapacityLineEdit_spillback.setText(
+                str(self.gttr('network', 'spillback')[edge[0]][edge[1]]['outCapacity']))
+                self.storageLineEdit_spillback.setText(
+                str(self.gttr('network', 'spillback')[edge[0]][edge[1]]['storage']))
         else:
             self.gttr('tailLineEdit').setText("")
             self.gttr('headLineEdit').setText("")
-            self.gttr('capacityLineEdit').setText("")
             self.gttr('transitTimeLineEdit').setText("")
 
-            if self.currentTF == 'spillback':
-                self.boundLineEdit_spillback.setText("")
+            if self.currentTF == 'general':
+                self.capacityLineEdit_general.setText("")
+            elif self.currentTF == 'spillback':
+                self.inCapacityLineEdit_spillback.setText("")
+                self.outCapacityLineEdit_spillback.setText("")
+                self.storageLineEdit_spillback.setText("")
 
         self.setFocus()  # Focus has to leave LineEdits
 
@@ -350,38 +358,48 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         """Add an edge or update attributes of focusNode, if existing"""
         if self.gttr('graphCreationCanvas').focusEdge is None:
             return
+
         tailLabel = str(self.gttr('tailLineEdit').text())
         headLabel = str(self.gttr('headLineEdit').text())
-        capacityText = float(self.gttr('capacityLineEdit').text())
         transitText = float(self.gttr('transitTimeLineEdit').text())
-        boundText = float(self.boundLineEdit_spillback.text()) if self.currentTF == 'spillback' else None
+
+        if self.currentTF == 'general':
+            capacityText = float(self.capacityLineEdit_general.text())
+            if capacityText <= 0 or transitText < 0:
+                return
+        elif self.currentTF == 'spillback':
+            inCapacityText = float(self.inCapacityLineEdit_spillback.text())
+            outCapacityText = float(self.outCapacityLineEdit_spillback.text())
+            storageText = float(self.storageLineEdit_spillback.text())
+            if inCapacityText <= 0 or outCapacityText <= 0 or transitText < 0 or storageText <= 0:
+                return
+            elif tailLabel == 's' and storageText != float('inf'):
+                # This has to be satisfied
+                return
+
 
         # Work with actual node IDs, not labels
         labels = nx.get_node_attributes(self.gttr('network'), 'label')
         tail = labels.keys()[labels.values().index(tailLabel)]
         head = labels.keys()[labels.values().index(headLabel)]
 
-        if capacityText <= 0 or transitText < 0:
-            # This is not allowed
-            return
-        if boundText is not None and boundText <= 0:
-            # Not allowed
-            return
-
         if self.gttr('network').has_edge(tail, head):
             # Update the edges attributes
-            self.gttr('network')[tail][head]['capacity'] = capacityText
             self.gttr('network')[tail][head]['transitTime'] = transitText
-            if boundText is not None:
-                self.gttr('network', 'spillback')[tail][head]['inflowBound'] = boundText
+            if self.currentTF == 'general':
+                self.gttr('network')[tail][head]['capacity'] = capacityText
+            elif self.currentTF == 'spillback':
+                self.gttr('network')[tail][head]['inCapacity'] = inCapacityText
+                self.gttr('network')[tail][head]['outCapacity'] = outCapacityText
+                self.gttr('network')[tail][head]['storage'] = storageText
             self.gttr('graphCreationCanvas').update_edges()
         else:
             # Add a new edge
-            if boundText is not None:
-                self.gttr('network').add_edge(tail, head, capacity=capacityText, transitTime=transitText, resettingEnabled=False)
-            else:
-                self.gttr('network').add_edge(tail, head, capacity=capacityText, transitTime=transitText, inflowBound=boundText,
-                                              resettingEnabled=False)
+            if self.currentTF == 'general':
+                self.gttr('network').add_edge(tail, head, capacity=capacityText, transitTime=transitText)
+            elif self.currentTF == 'spillback':
+                self.gttr('network').add_edge(tail, head, inCapacity=inCapacityText, outCapacity=outCapacityText, storage=storageText, transitTime=transitText)
+
             self.gttr('graphCreationCanvas').focusEdge = (tail, head)
             self.gttr('graphCreationCanvas').update_edges(added=True, color=True)
             self.gttr('graphCreationCanvas').update_nodes(color=True)
@@ -1142,14 +1160,18 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
 
         self.gttr('timeSlider').setValue(0)
 
-    def output(self, txt):
+    def output(self, txt, streamTo=None):
         """
         Write to log
         :param txt: will be written to log
+        :param streamTo: tfType to which we output to
         """
         currentTime = Utilities.get_time_for_log()
         logText = currentTime + " - " + txt
-        self.gttr('logPlainTextEdit').appendPlainText(logText)
+        # TODO: Until we don't have a better solution, print everything to both logPlainTextEdits
+        #self.gttr('logPlainTextEdit', tfType=streamTo).appendPlainText(logText)
+        for tfType in self.tfTypeList:
+            self.gttr('logPlainTextEdit', tfType=tfType).appendPlainText(logText)
 
     @staticmethod
     def show_help():
