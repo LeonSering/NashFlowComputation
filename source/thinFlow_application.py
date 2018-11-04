@@ -746,7 +746,7 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
         resettingEdges = [edge for edge in network.edges() if network[edge[0]][edge[1]]['resettingEnabled']]
         lowerBoundTime = 0  # No needed for different times as only one flowInterval is being computed
         inflowRate = float(self.inflowLineEdit.text())
-        minCapacity = Utilities.compute_min_capacity(network)
+        minCapacity = Utilities.compute_min_attr_of_network(network)
         counter = "Standalone"
         rootPath = self.outputDirectory
 

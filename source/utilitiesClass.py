@@ -129,14 +129,18 @@ class Utilities:
         return shortestPathNetwork
 
     @staticmethod
-    def compute_min_capacity(network):
-        """Computes the minimal capacity of all edges"""
-        minimumCapacity = float('inf')
+    def compute_min_attr_of_network(network, attr='capacity'):
+        """
+        Computes the minimal attr of all edges
+        :param network: network with edge attribute attr
+        :param attr: string-name of the attribute accessible through network[v][w][attr]
+        :return: min(network[v][w][attr] | (v,w) in network.edges)
+        """
+        minAttr = float('inf')
         for edge in network.edges():
             v, w = edge[0], edge[1]
-            minimumCapacity = min([minimumCapacity, network[v][w]['capacity']])
-
-        return minimumCapacity
+            minAttr = min([minAttr, network[v][w][attr]])
+        return minAttr
 
     @staticmethod
     def join_intersect_dicts(dict1, dict2, *more_dicts):

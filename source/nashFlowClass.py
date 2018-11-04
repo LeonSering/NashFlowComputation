@@ -51,7 +51,7 @@ class NashFlow:
         self.infinityReached = False  # True if last interval has alpha = +inf
         self.timeout = timeout
 
-        self.minCapacity = Utilities.compute_min_capacity(self.network)
+        self.minCapacity = Utilities.compute_min_attr_of_network(self.network)
         self.counter = 0
         self.preprocessedNodes = 0
         self.preprocessedEdges = 0
@@ -208,81 +208,6 @@ class NashFlow:
         label = interval.shortestPathNetwork.node[v]['dist'] + (t - intervalLowerBoundTime) * \
                 interval.NTFNodeLabelDict[v]
         return label
-
-    def queue_size(self, v, w, t):
-        """
-        Returns the queue size of edge e = vw given a timepoint t
-        :param v: tail
-        :param w: head
-        :param t: timepoint
-        :return: z_{vw}(t)
-        """
-        return self.cumulative_inflow(v, w, t) - self.cumulative_outflow(v, w,
-                                                                         t + self.network[v][w]['transitTime'])
-
-    def queue_delay(self, v, w, t):
-        """
-        Returns the queue delay of edge e = vw given a timepoint time
-        :param v: tail
-        :param w: head
-        :param t: timepoint
-        :return: q_{vw}(time)
-        """
-        return self.queue_size(v, w, t) / float(self.network[v][w]['capacity'])
-
-    def cumulative_inflow(self, v, w, t):
-        """
-        Returns cumulative inflow of edge e=vw given time
-        :param v: tail
-        :param w: head
-        :param t: timepoint
-        :return: F^+_e(time)
-        """
-        if t <= TOL:
-            return 0
-
-        lastIntervalKey, lastIntervalValue = self.network[v][w]['inflow'].popitem(last=True)
-        self.network[v][w]['inflow'][lastIntervalKey] = lastIntervalValue
-
-        assert (Utilities.is_geq_tol(lastIntervalKey[1], t))
-
-        integral = 0
-        for lowerBound, upperBound in self.network[v][w]['inflow']:
-            intervalInflow = self.network[v][w]['inflow'][(lowerBound, upperBound)]
-            if t > upperBound + TOL:
-                integral += (upperBound - lowerBound) * intervalInflow
-            elif Utilities.is_geq_tol(t, lowerBound) and Utilities.is_geq_tol(upperBound, t):
-                integral += (t - lowerBound) * intervalInflow
-            else:
-                break
-        return integral
-
-    def cumulative_outflow(self, v, w, t):
-        """
-        Returns cumulative outflow of edge e=vw given time
-        :param v: tail
-        :param w: head
-        :param t: timepoint
-        :return: F^-_e(time)
-        """
-        if t <= TOL:
-            return 0
-
-        lastIntervalKey, lastIntervalValue = self.network[v][w]['outflow'].popitem(last=True)
-        self.network[v][w]['outflow'][lastIntervalKey] = lastIntervalValue
-
-        assert (Utilities.is_geq_tol(lastIntervalKey[1], t))
-
-        integral = 0
-        for lowerBound, upperBound in self.network[v][w]['outflow']:
-            intervalOutflow = self.network[v][w]['outflow'][(lowerBound, upperBound)]
-            if t > upperBound + TOL:
-                integral += (upperBound - lowerBound) * intervalOutflow
-            elif Utilities.is_geq_tol(t, lowerBound) and Utilities.is_geq_tol(upperBound, t):
-                integral += (t - lowerBound) * intervalOutflow
-            else:
-                break
-        return integral
 
     def time_interval_correspondence(self, t):
         """
