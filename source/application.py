@@ -18,6 +18,7 @@ from tempfile import gettempdir
 import sys
 
 from nashFlowClass import NashFlow
+from nashFlowClass_spillback import NashFlow_spillback
 from plotAnimationCanvasClass import PlotAnimationCanvas
 from plotCanvasClass import PlotCanvas
 from plotNTFCanvasClass import PlotNTFCanvas
@@ -710,7 +711,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
 
         # Get remaining settings
         self.numberOfIntervals = self.intervalsLineEdit.text()
-        self.templateFile = self.templateComboBox.currentIndex()
+        self.templateFile = self.templateComboBox.currentIndex()    # TODO: Does not work if different algorithm set
         inflowRate = float(self.inflowLineEdit.text())
 
         self.save_config()  # Save config-settings to file
@@ -721,9 +722,14 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
             numberString = str(self.numberOfIntervals) if float(self.numberOfIntervals) != -1 else "all"
             self.output("Starting computation of " + numberString + " flow intervals")
 
-            self.sttr('nashFlow', None, NashFlow(self.gttr('network'), float(inflowRate), float(self.numberOfIntervals),
-                                     self.outputDirectory,
-                                     self.templateFile, self.scipFile, self.cleanUpEnabled, timeout))
+            if self.currentTF == 'general':
+                self.sttr('nashFlow', None, NashFlow(self.gttr('network'), float(inflowRate), float(self.numberOfIntervals),
+                                         self.outputDirectory,
+                                         self.templateFile, self.scipFile, self.cleanUpEnabled, timeout))
+            elif self.currentTF == 'spillback':
+                self.sttr('nashFlow', None, NashFlow_spillback(self.gttr('network'), float(inflowRate), float(self.numberOfIntervals),
+                                         self.outputDirectory,
+                                         0, self.scipFile, self.cleanUpEnabled, timeout)) # TODO: self.templateFile replaced by 0
         else:
             self.output("Starting computation of next flow interval")
         self.gttr('nashFlow').run(nextIntervalOnly)

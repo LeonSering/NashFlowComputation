@@ -58,12 +58,17 @@ class Utilities:
 
     @staticmethod
     def is_geq_tol(a, b, tol=TOL):
-        """Is greater-equal to with tolerance"""
+        """Is greater-or-equal than with tolerance"""
         return a - b + tol >= 0
 
     @staticmethod
+    def is_leq_tol(a, b, tol=TOL):
+        """Is less-or-equal than with tolerance"""
+        return Utilities.is_geq_tol(b, a, tol)
+
+    @staticmethod
     def is_greater_tol(a, b, tol=TOL):
-        """Is greater to with tolerance"""
+        """Is greater than with tolerance"""
         return a - tol - b > 0
 
     @staticmethod

@@ -18,11 +18,12 @@ TOL = 1e-8  # Tolerance
 class FlowInterval_spillback(FlowInterval):
     """FlowInterval class managing spillback flows"""
 
-    def __init__(self, network, resettingEdges, lowerBoundTime, inflowRate, minCapacity, counter, outputDirectory,
-                 templateFile, scipFile, timeout):
+    def __init__(self, network, resettingEdges, fullEdges, lowerBoundTime, inflowRate, minCapacity, counter, outputDirectory,
+                 templateFile, scipFile, timeout, minInflowBound):
         """
         :param network: Networkx Digraph instance
         :param resettingEdges: list of resetting edges
+        :param fullEdges: list of full edges
         :param lowerBoundTime: \theta_k
         :param inflowRate: u_0
         :param minCapacity: minimum capacity of all edges in network
@@ -37,9 +38,9 @@ class FlowInterval_spillback(FlowInterval):
                               outputDirectory,
                               templateFile, scipFile, timeout)
 
+        self.fullEdges = fullEdges
         self.NTFNodeSpillbackFactorDict = {node: 0 for node in self.network}
-
-        self.minInflowBound = min([self.network[v][w]['inflowBound'] for (v, w) in self.network.edges()])
+        self.minInflowBound = minInflowBound
 
     def get_ntf(self):
         """Standard way to get sNTF. Uses preprocessing"""
@@ -177,3 +178,114 @@ class FlowInterval_spillback(FlowInterval):
                 assert (Utilities.is_eq_tol(m, self.inflowRate))
             else:
                 assert (Utilities.is_eq_tol(m, 0))
+
+    def outflow_time_interval(self, u, v, t):
+        """
+        :param u: tail of edge
+        :param v: head of edge
+        :param t: timepoint
+        :return: lowerBoundTime, upperBoundTime, j s.t. l_v(lowerBoundTime) <= t <= l_v(upperBoundTime) outflowBounds of [theta_j, theta_{j+1}[
+        """
+        j = 0
+        for lowerBoundTime, upperBoundTime in self.network[u][v]['outflow']:
+            if Utilities.is_geq_tol(t, lowerBoundTime) and Utilities.is_geq_tol(upperBoundTime, t):
+                return lowerBoundTime, upperBoundTime, j
+            j += 1
+
+    def compute_alpha(self, labelLowerBoundTimeDict):
+        """
+        Compute alpha respecting the conditions
+        :param labelLowerBoundTimeDict: Dict assigning lower bound times to nodes, i.e. v:l_v(\theta_k)
+        """
+        def get_max_alpha_conditions_2_3(u, v):
+            return (self.network[u][v]['transitTime'] + labelLowerBoundTimeDict[u] -
+                                 labelLowerBoundTimeDict[v]) \
+                                / (self.NTFNodeLabelDict[v] - self.NTFNodeLabelDict[u])
+
+        def get_max_alpha_condition_4(u, v):
+            pass
+
+        def get_max_alpha_condition_5(u, v):
+            """
+            :param u: tail of edge
+            :param v: head of edge
+            :return: maximal alpha <= self.alpha satisfying constraint (5) for e = (u,v)
+            """
+            l_u = self.NTFNodeLabelDict[u]
+            l_v = self.NTFNodeLabelDict[v]
+            x_e = self.NTFEdgeFlowDict[(u,v)]
+            sigma_e = self.network[u][v]['storage']
+            if Utilities.is_eq_tol(l_u, 0):
+                # Constraint satisfied for all alpha
+                return self.alpha
+            uTimeLower = labelLowerBoundTimeDict[u]
+            if self.lowerBoundTime == 0:
+                # No other intervals have been computed yet
+                vTimeLower = labelLowerBoundTimeDict[v]
+                v_u_diff = vTimeLower - uTimeLower
+                b = v_u_diff/l_u
+
+                if Utilities.is_greater_tol(b*x_e, sigma_e):
+                    # Edge becomes full before it even starts to push flow out again
+                    return min(sigma_e/x_e, self.alpha)
+                else:
+                    D = x_e - l_u*(x_e/l_v)
+                    if Utilities.is_leq_tol(D, 0):
+                        return self.alpha
+                    else:
+                        R = sigma_e - b*x_e
+                        return min(b + R/D, self.alpha)
+            else:
+                # There exist other intervals
+                _, _, j = self.outflow_time_interval(u, v, uTimeLower)
+                firstFlag = True
+                intervalList = self.network[v][v]['outflow'].items()[j:]
+                alpha = 0
+                R = sigma_e - self.network[u][v]['load'][uTimeLower]
+                for interval in intervalList:
+                    if alpha >= self.alpha:
+                        # We could go higher, but previously computed alpha restricts us
+                        return self.alpha
+
+                    intervalBounds, outflowVal_p = interval
+                    theta_p_lower, theta_p_upper = intervalBounds
+
+                    D = x_e - l_u * (outflowVal_p)
+                    if firstFlag:
+                        stepBound = (theta_p_upper - uTimeLower) / l_u
+                        firstFlag = False
+                    else:
+                        stepBound = (theta_p_upper - theta_p_lower) / l_u
+
+                    if not Utilities.is_leq_tol(D, 0) and Utilities.is_leq_tol(R / D, stepBound):
+                        return min(R/D, self.alpha)
+                    else:
+                        alphaStep = stepBound
+                        alpha += alphaStep
+
+                    R -= alphaStep*D
+
+                # Last interval should be checked as well
+                D = x_e - l_u * (x_e / l_v)
+                if Utilities.is_leq_tol(D, 0):
+                    return self.alpha
+                else:
+                    alphaStep = R/D
+                    alpha += alphaStep
+                    return min(alpha, self.alpha)
+
+        self.alpha = float('inf')
+        for u, v in self.network.edges():
+            e = (u, v)
+            if e not in self.shortestPathNetwork.edges():   # Condition (3) in paper
+                if self.NTFNodeLabelDict[v] - self.NTFNodeLabelDict[u] > TOL:
+                    self.alpha = min(self.alpha, get_max_alpha_conditions_2_3(u, v))
+            else:
+                if e in self.resettingEdges:    # Condition (2) in paper
+                    if self.NTFNodeLabelDict[u] - self.NTFNodeLabelDict[v] > TOL:
+                        self.alpha = min(self.alpha, get_max_alpha_conditions_2_3(u, v))
+                self.alpha = min(self.alpha, get_max_alpha_condition_5(u, v))   # Condition (5) in paper
+                if e in self.fullEdges:   # Condition (4) in paper
+                    self.alpha = min(self.alpha, get_max_alpha_condition_4(u, v))
+
+        self.upperBoundTime = self.lowerBoundTime + self.alpha  # Set theta_{k+1}

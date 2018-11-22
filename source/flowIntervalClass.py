@@ -108,10 +108,10 @@ class FlowInterval:
             e = (v, w)
             if e not in self.shortestPathNetwork.edges():
                 if self.NTFNodeLabelDict[w] - self.NTFNodeLabelDict[v] > TOL:
-                    self.alpha = min([self.alpha, func(v, w)])
+                    self.alpha = min(self.alpha, func(v, w))
             elif e in self.resettingEdges:
                 if self.NTFNodeLabelDict[v] - self.NTFNodeLabelDict[w] > TOL:
-                    self.alpha = min([self.alpha, func(v, w)])
+                    self.alpha = min(self.alpha, func(v, w))
 
         self.upperBoundTime = self.lowerBoundTime + self.alpha  # Set theta_{k+1}
 
