@@ -61,7 +61,7 @@ class NormalizedThinFlow_spillback(NormalizedThinFlow):
         with open(os.path.join(self.rootPath, 'edges.txt'), 'w') as edgeWriter:
             for edge in self.network.edges():
                 v, w = edge[0], edge[1]
-                capacity = str(self.network[v][w]['capacity'])
+                capacity = str(self.network[v][w]['outCapacity'])
                 inflowBound = str(self.network[v][w]['inflowBound'])
                 isInE_0 = str(1) if edge in self.flowEdges else str(0)
                 isInE_Star = str(1) if edge in self.resettingEdges else str(0)

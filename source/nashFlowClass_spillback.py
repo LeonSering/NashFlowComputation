@@ -41,7 +41,7 @@ class NashFlow_spillback(NashFlow):
 
         # Template File from /source/templates
         self.templateFile = os.path.join(os.getcwd(), 'source', 'templates',
-                                         'algorithm_spillback' + str(templateFile + 1) + '.zpl')
+                                         'algorithm_spillback_' + str(templateFile + 1) + '.zpl')
 
         self.scipFile = scipFile
         self.cleanUpBool = cleanUpBool
@@ -86,7 +86,6 @@ class NashFlow_spillback(NashFlow):
         if lowerBoundTime == 0:
             interval.shortestPathNetwork = Utilities.get_shortest_path_network(
                 self.network)  # Compute shortest path network
-            self.init_edge_properties()
         else:
             interval.shortestPathNetwork = Utilities.get_shortest_path_network(self.network, labels={
                 v: self.node_label(v, lowerBoundTime) for v in self.network})  # Compute shortest path network
@@ -105,6 +104,9 @@ class NashFlow_spillback(NashFlow):
         self.preprocessedNodes += interval.preprocessedNodes
         self.preprocessedEdges += interval.preprocessedEdges
         self.lowerBoundsToIntervalDict[lowerBoundTime] = interval
+
+        if lowerBoundTime == 0:
+            self.init_edge_properties()
 
         interval.compute_alpha({node: self.node_label(node, lowerBoundTime) for node in self.network}, self.outflowBoundInformationDict)
         self.flowIntervals.append((interval.lowerBoundTime, interval.upperBoundTime, interval))

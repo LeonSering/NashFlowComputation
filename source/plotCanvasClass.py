@@ -74,7 +74,7 @@ class PlotCanvas(FigureCanvas):
         """Returns dict of edge labels"""
         if not self.onlyNTF:
             if self.type == 'general':
-                return Utilities.join_intersect_dicts(nx.get_edge_attributes(self.network, 'capacity'),
+                return Utilities.join_intersect_dicts(nx.get_edge_attributes(self.network, 'outCapacity'),
                                                   nx.get_edge_attributes(self.network, 'transitTime'))  # Edge labels
             elif self.type == 'spillback':
                 return Utilities.join_intersect_dicts(nx.get_edge_attributes(self.network, 'inCapacity'),
@@ -83,10 +83,10 @@ class PlotCanvas(FigureCanvas):
                                                       nx.get_edge_attributes(self.network, 'transitTime'))  # Edge labels
         else:
             if self.type == 'spillback':
-                return Utilities.join_intersect_dicts(nx.get_edge_attributes(self.network, 'capacity'),
+                return Utilities.join_intersect_dicts(nx.get_edge_attributes(self.network, 'outCapacity'),
                                                       nx.get_edge_attributes(self.network,
                                                                              'inflowBound'))  # Edge labels
-            return nx.get_edge_attributes(self.network, 'capacity')
+            return nx.get_edge_attributes(self.network, 'outCapacity')
 
     def on_click(self, event):
         """
@@ -181,7 +181,7 @@ class PlotCanvas(FigureCanvas):
                     if not self.network.has_edge(self.selectedNode, clickedNode):
                         resettingEnabledBool = False if self.onlyNTF else None  # Either 0 or 1. Activated only if onlyNTF
                         if self.type == 'general':
-                            self.network.add_edge(self.selectedNode, clickedNode, transitTime=1, capacity=1)
+                            self.network.add_edge(self.selectedNode, clickedNode, transitTime=1, inCapacity=float('inf'), outCapacity=1, storage=float('inf'))
                         elif self.type == 'spillback':
                             storage = float('inf') if self.selectedNode == 's' else 2
                             self.network.add_edge(self.selectedNode, clickedNode, transitTime=1, inCapacity=1, outCapacity=1, storage=storage)
@@ -529,14 +529,14 @@ class PlotCanvas(FigureCanvas):
                 edgeLabelSize = int(round(self.edgeLabelFontSize))
                 if not self.onlyNTF:
                     if self.type == 'general':
-                        lbl = {self.focusEdge: (self.network[v][w]['capacity'], self.network[v][w]['transitTime'])}
+                        lbl = {self.focusEdge: (self.network[v][w]['outCapacity'], self.network[v][w]['transitTime'])}
                     elif self.type == 'spillback':
                         lbl = {self.focusEdge: (self.network[v][w]['inCapacity'], self.network[v][w]['outCapacity'], self.network[v][w]['transitTime'], self.network[v][w]['storage'])}
                 else:
                     if self.type == 'general':
-                        lbl = {self.focusEdge: (self.network[v][w]['capacity'])}
+                        lbl = {self.focusEdge: (self.network[v][w]['outCapacity'])}
                     elif self.type == 'spillback':
-                        lbl = {self.focusEdge: (self.network[v][w]['capacity'], self.network[v][w]['inflowBound'])}
+                        lbl = {self.focusEdge: (self.network[v][w]['outCapacity'], self.network[v][w]['inflowBound'])}
                 self.edgeLabelCollection.update(draw_networkx_edge_labels(self.network,
                                                                           pos={v: self.network.node[v]['position'],
                                                                                w: self.network.node[w]['position']},

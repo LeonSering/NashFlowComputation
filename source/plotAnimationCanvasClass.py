@@ -207,7 +207,7 @@ class PlotAnimationCanvas(PlotCanvas):
         self.edgeColoring[edge] = None
         v, w = edge
         time = self.timePoints[self.currentTimeIndex]
-        transitTime, capacity = self.network[v][w]['transitTime'], self.network[v][w]['capacity']
+        transitTime, capacity = self.network[v][w]['transitTime'], self.network[v][w]['outCapacity']
         maximumFlow = transitTime*capacity
 
         if maximumFlow == 0:

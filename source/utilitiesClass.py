@@ -123,7 +123,7 @@ class Utilities:
 
         for edge in shortestPathEdges:
             v, w = edge[0], edge[1]
-            shortestPathNetwork[v][w]['capacity'] = network[v][w]['capacity']
+            shortestPathNetwork[v][w]['outCapacity'] = network[v][w]['outCapacity']
             shortestPathNetwork[v][w]['transitTime'] = network[v][w]['transitTime']
 
         for w in shortestPathNetwork:
@@ -134,7 +134,7 @@ class Utilities:
         return shortestPathNetwork
 
     @staticmethod
-    def compute_min_attr_of_network(network, attr='capacity'):
+    def compute_min_attr_of_network(network, attr='outCapacity'):
         """
         Computes the minimal attr of all edges
         :param network: network with edge attribute attr

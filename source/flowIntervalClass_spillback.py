@@ -142,9 +142,9 @@ class FlowInterval_spillback(FlowInterval):
 
         p = lambda (v, w): max(
             [self.NTFNodeLabelDict[v],
-             self.NTFEdgeFlowDict[(v, w)] / (self.network[v][w]['capacity'] * self.NTFNodeSpillbackFactorDict[w])]) \
+             self.NTFEdgeFlowDict[(v, w)] / (self.network[v][w]['outCapacity'] * self.NTFNodeSpillbackFactorDict[w])]) \
             if (v, w) not in self.resettingEdges \
-            else self.NTFEdgeFlowDict[(v, w)] / (self.network[v][w]['capacity'] * self.NTFNodeSpillbackFactorDict[w])
+            else self.NTFEdgeFlowDict[(v, w)] / (self.network[v][w]['outCapacity'] * self.NTFNodeSpillbackFactorDict[w])
         xb = lambda (v, w): float(self.NTFEdgeFlowDict[(v, w)]) / self.network[v][w]['inflowBound']
 
         for w in self.shortestPathNetwork:
@@ -258,7 +258,7 @@ class FlowInterval_spillback(FlowInterval):
                         stepBound = (theta_p_upper - theta_p_lower) / l_u
 
                     if not Utilities.is_leq_tol(D, 0) and Utilities.is_leq_tol(R / D, stepBound):
-                        return min(R/D, self.alpha)
+                        return min(alpha + R/D, self.alpha)
                     else:
                         alphaStep = stepBound
                         alpha += alphaStep

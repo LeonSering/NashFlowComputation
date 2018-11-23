@@ -333,7 +333,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
 
             if self.currentTF == 'general':
                 self.capacityLineEdit_general.setText(
-                str(self.gttr('network', 'general')[edge[0]][edge[1]]['capacity']))
+                str(self.gttr('network', 'general')[edge[0]][edge[1]]['outCapacity']))
             elif self.currentTF == 'spillback':
                 self.inCapacityLineEdit_spillback.setText(
                 str(self.gttr('network', 'spillback')[edge[0]][edge[1]]['inCapacity']))
@@ -388,7 +388,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
             # Update the edges attributes
             self.gttr('network')[tail][head]['transitTime'] = transitText
             if self.currentTF == 'general':
-                self.gttr('network')[tail][head]['capacity'] = capacityText
+                self.gttr('network')[tail][head]['outCapacity'] = capacityText
             elif self.currentTF == 'spillback':
                 self.gttr('network')[tail][head]['inCapacity'] = inCapacityText
                 self.gttr('network')[tail][head]['outCapacity'] = outCapacityText
@@ -397,7 +397,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         else:
             # Add a new edge
             if self.currentTF == 'general':
-                self.gttr('network').add_edge(tail, head, capacity=capacityText, transitTime=transitText)
+                self.gttr('network').add_edge(tail, head, outCapacity=capacityText, transitTime=transitText, inCapacity=float('inf'), storage=float('inf'))
             elif self.currentTF == 'spillback':
                 self.gttr('network').add_edge(tail, head, inCapacity=inCapacityText, outCapacity=outCapacityText, storage=storageText, transitTime=transitText)
 
@@ -897,7 +897,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
             lastInflowInterval = next(reversed(self.gttr('nashFlow').network[v][w]['inflow']))
             lastInflow = self.gttr('nashFlow').network[v][w]['inflow'][lastInflowInterval]
 
-            val = max(0, lastQueueSize + (lastInflow - self.gttr('nashFlow').network[v][w]['capacity']) * (
+            val = max(0, lastQueueSize + (lastInflow - self.gttr('nashFlow').network[v][w]['outCapacity']) * (
                     upperBound - lastInflowInterval[0]))
 
             queueXValues.append(upperBound)
@@ -990,7 +990,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
             v, w = self.gttr('plotAnimationCanvas').focusEdge
             self.gttr('currentFocusLabel').setText(
                 str((self.gttr('nashFlow').network.node[v]['label'], self.gttr('nashFlow').network.node[w]['label'])))
-            self.gttr('currentCapacityLabel').setText(str(self.gttr('nashFlow').network[v][w]['capacity']))
+            self.gttr('currentCapacityLabel').setText(str(self.gttr('nashFlow').network[v][w]['outCapacity']))
             self.gttr('currentTransitTimeLabel').setText(str(self.gttr('nashFlow').network[v][w]['transitTime']))
         else:
             self.gttr('currentFocusLabel').setText("N/A")

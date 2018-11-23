@@ -198,7 +198,7 @@ class NashFlow:
                 lastQueueSizeTime = next(reversed(self.network[v][w]['queueSize']))
                 lastQueueSize = self.network[v][w]['queueSize'][lastQueueSizeTime]
                 self.network[v][w]['queueSize'][vTimeUpper] = max(0, lastQueueSize + (
-                        inflowVal - self.network[v][w]['capacity']) * (vTimeUpper - vTimeLower))
+                        inflowVal - self.network[v][w]['outCapacity']) * (vTimeUpper - vTimeLower))
 
             self.animationIntervals[(v, w)].append(((vTimeLower, vTimeUpper), (wTimeLower, wTimeUpper)))
 

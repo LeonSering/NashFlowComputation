@@ -101,7 +101,7 @@ class NormalizedThinFlow:
         with open(os.path.join(self.rootPath, 'edges.txt'), 'w') as edgeWriter:
             for edge in self.network.edges():
                 v, w = edge[0], edge[1]
-                capacity = str(self.network[v][w]['capacity'])
+                capacity = str(self.network[v][w]['outCapacity'])
                 isInE_0 = str(1) if edge in self.flowEdges else str(0)
                 isInE_Star = str(1) if edge in self.resettingEdges else str(0)
                 outputString = str(v) + ":" + str(w) + ":" + capacity + ":" + isInE_0 + ":" + isInE_Star + '\n'

@@ -399,9 +399,9 @@ class FlowInterval:
         """Check if computed NTF really is an NTF"""
         # Works only on shortest path network
         p = lambda (v, w): max(
-            [self.NTFNodeLabelDict[v], self.NTFEdgeFlowDict[(v, w)] / self.network[v][w]['capacity']]) \
+            [self.NTFNodeLabelDict[v], self.NTFEdgeFlowDict[(v, w)] / self.network[v][w]['outCapacity']]) \
             if (v, w) not in self.resettingEdges \
-            else self.NTFEdgeFlowDict[(v, w)] / self.network[v][w]['capacity']
+            else self.NTFEdgeFlowDict[(v, w)] / self.network[v][w]['outCapacity']
         for w in self.shortestPathNetwork:
             if self.shortestPathNetwork.in_edges(w):
                 minimalCongestion = min(map(p, self.shortestPathNetwork.in_edges(w)))

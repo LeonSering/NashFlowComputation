@@ -333,7 +333,7 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
             self.gttr('tailLineEdit').setText(self.gttr('network').node[edge[0]]['label'])
             self.gttr('headLineEdit').setText(self.gttr('network').node[edge[1]]['label'])
             self.gttr('capacityLineEdit').setText(
-                str(self.gttr('network')[edge[0]][edge[1]]['capacity']))
+                str(self.gttr('network')[edge[0]][edge[1]]['outCapacity']))
 
             if self.currentTF == 'spillback':
                 self.boundLineEdit_spillback.setText(str(self.gttr('network')[edge[0]][edge[1]]['inflowBound']))
@@ -373,7 +373,7 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
 
         if self.gttr('network').has_edge(tail, head):
             # Update the edges attributes
-            self.gttr('network')[tail][head]['capacity'] = capacityText
+            self.gttr('network')[tail][head]['outCapacity'] = capacityText
             if boundText is not None:
                 self.gttr('network', 'spillback')[tail][head]['inflowBound'] = boundText
             self.gttr('graphCreationCanvas').update_edges()
@@ -809,7 +809,7 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
             if d == 0 and v != 's':
                 # Non-reachable node found
                 return 3
-        if min(nx.get_edge_attributes(network, 'capacity').values()) <= 0:
+        if min(nx.get_edge_attributes(network, 'outCapacity').values()) <= 0:
             # Wrong capacity attribute
             return 4
 
