@@ -32,7 +32,7 @@
        </attribute>
        <layout class="QGridLayout" name="gridLayout">
         <item row="0" column="0">
-         <widget class="QTabWidget" name="tabWidget_2">
+         <widget class="QTabWidget" name="tabWidget_general">
           <property name="currentIndex">
            <number>0</number>
           </property>
@@ -994,7 +994,7 @@
        </attribute>
        <layout class="QGridLayout" name="gridLayout_15">
         <item row="0" column="0">
-         <widget class="QTabWidget" name="tabWidget_3">
+         <widget class="QTabWidget" name="tabWidget_spillback">
           <property name="currentIndex">
            <number>0</number>
           </property>

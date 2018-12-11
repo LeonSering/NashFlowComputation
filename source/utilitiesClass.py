@@ -125,6 +125,12 @@ class Utilities:
             v, w = edge[0], edge[1]
             shortestPathNetwork[v][w]['outCapacity'] = network[v][w]['outCapacity']
             shortestPathNetwork[v][w]['transitTime'] = network[v][w]['transitTime']
+            '''
+            try:
+                shortestPathNetwork[v][w]['inflowBound'] = network[v][w]['inflowBound'].items()[-1]
+            except KeyError:
+                continue
+            '''
 
         for w in shortestPathNetwork:
             shortestPathNetwork.node[w]['dist'] = labels[w]

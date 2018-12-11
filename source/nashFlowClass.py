@@ -235,14 +235,15 @@ class NashFlow:
         :param v: tail of edge
         :param w: head of edge
         :param t: time
-        :return: f_(v,w)^-(t), i.e. outflow rate of e=(v,w) at time t
+        :return: f_(v,w)^-(t), i.e. outflow rate of e=(v,w) at time t (picking the newest value
         """
         if Utilities.is_eq_tol(t,0):
             return 0
         for wTimeLower, wTimeUpper in self.network[v][w]['outflow']:
             if wTimeLower <= t <= wTimeUpper:
                 # t lies between l_w(theta_k) and l_w(theta_k+1)
-                return self.network[v][w]['outflow'][(wTimeLower, wTimeUpper)]
+                lastOutflow = self.network[v][w]['outflow'][(wTimeLower, wTimeUpper)]
+        return lastOutflow
 
 
     def get_stat_preprocessing(self):

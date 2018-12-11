@@ -46,14 +46,15 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.plotNTFCanvasStretchFactor = float(self.plotNTFFrame_general.width()) / self.plotNTFFrame_general.height()
 
         self.tfTypeList = ['general', 'spillback']
-        self.tabWidget_3.setCurrentIndex(0) # Note: This has to be done first, otherwise self.currentTF is wrong
+        self.gttr('tabWidget', 'spillback').setCurrentIndex(0) # Note: This has to be done first, otherwise self.currentTF is wrong
         self.tabWidget.setCurrentIndex(0)  # Show General Tab
-        self.tabWidget_2.setCurrentIndex(0) # Show Graph creation Tab
+        self.gttr('tabWidget', 'general').setCurrentIndex(0) # Show Graph creation Tab
         self.currentTF = self.tfTypeList[self.tabWidget.currentIndex()]  # Currently selected tab information
 
         # Init graphs and other config defaults
         for tfType in self.tfTypeList:
             self.sttr('network', tfType, self.init_graph())
+            self.gttr('network', tfType).graph['type'] = tfType
             self.sttr('animationLowerBound', tfType, 0)
             self.sttr('animationUpperBound', tfType, 1)
             self.sttr('animationRunning', tfType, False)
@@ -438,7 +439,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         # Reinitialization of graphCreationCanvas
         self.gttr('graphCreationCanvas').setParent(None)  # Drop graphCreationCanvas widget
         self.sttr('graphCreationCanvas', self.currentTF,
-                  PlotCanvas(self.gttr('network'), self, self.plotCanvasStretchFactor, onlyNTF=True,
+                  PlotCanvas(self.gttr('network'), self, self.plotCanvasStretchFactor, onlyNTF=False,
                              type=self.currentTF))
         self.gttr('plotFrameLayout').addWidget(
             self.gttr('graphCreationCanvas'))  # Add graphCreationCanvas-widget to application
@@ -509,7 +510,6 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         :param graphPath: If given, then function uses graphPath (must end in .cg) as path. Otherwise dialog gets opened
         :return: 
         """
-        #TO DO: Adapt to type of graph -> see thinFlow_application.py
         if not graphPath:
             dialog = QtGui.QFileDialog
             # noinspection PyCallByClass,PyCallByClass
@@ -525,15 +525,17 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
 
         # Read file         
         with open(fopen, 'rb') as f:
-            self.network = pickle.load(f)
+            network = pickle.load(f)
+            self.sttr('network', network.graph['type'], network)
+            self.tabWidget.setCurrentIndex(self.tfTypeList.index(network.graph['type']))
         if not graphPath:
             self.defaultLoadSaveDir = os.path.dirname(fopen)
             self.save_config()
 
         self.output("Loading graph: " + str(fopen))
-        self.re_init_graph_creation_app(NoNewGraph=True)
+        self.re_init_app(NoNewGraph=True)
 
-        self.tabWidget.setCurrentIndex(0)
+
 
     def save_graph(self, graphPath=None):
         """
@@ -541,7 +543,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         :param graphPath: If given, then save graph at path graphPath. Else a dialog is opened
         :return: 
         """
-        self.sttr('network'.graph['inflowRate'], None, float(self.inflowLineEdit.text()))
+        self.gttr('network').graph['inflowRate'] = float(self.inflowLineEdit.text())
 
         if not graphPath:
             dialog = QtGui.QFileDialog
@@ -706,6 +708,16 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         Computes a nash flow
         :param nextIntervalOnly: If this is True, only one interval(i.e. the next one) is computed
         """
+
+        # Validate input
+        returnCode = self.validate_input()
+        if returnCode != 0:
+            # Invalid input has been given
+            # Spawn warning
+            QtGui.QMessageBox.question(QtGui.QWidget(), 'Abort: Input error', self.get_error_message(returnCode),
+                                       QtGui.QMessageBox.Ok)
+            return
+
         # While computing it should not be possible to change showEdgesWithoutFlowCheckBox
         self.gttr('showEdgesWithoutFlowCheckBox').setEnabled(False)
 
@@ -715,7 +727,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         inflowRate = float(self.inflowLineEdit.text())
 
         self.save_config()  # Save config-settings to file
-        self.tabWidget_2.setCurrentIndex(1)  # Switch to next tab
+        self.gttr('tabWidget', 'spillback').setCurrentIndex(1)  # Switch to next tab
         timeout = -1 if not self.timeoutActivated else float(self.timeoutLineEdit.text())
 
         if not nextIntervalOnly:
@@ -1183,3 +1195,55 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
     def show_help():
         """Open thesis to display manual"""
         os.system('xdg-open documentation/thesis.pdf')
+
+    def validate_input(self):
+        """Checks whether network satisfies certain conditions, return respective error code if necessary"""
+        network = self.gttr('network')
+        if network.in_edges('s'):
+            # Network may not contain edges going into s
+            return 1
+        elif network.out_edges('t'):
+            # Edges going out from t
+            return 2
+        for (v, d) in network.in_degree():
+            if d == 0 and v != 's':
+                # Non-reachable node found
+                return 3
+        if min(nx.get_edge_attributes(network, 'outCapacity').values()) <= 0:
+            # Wrong capacity attribute
+            return 4
+
+        if self.currentTF == 'spillback':
+            if min(nx.get_edge_attributes(network, 'inCapacity').values()) <= 0:
+                return 4
+
+        try:
+            # Try to find a cycle in the network
+            nx.find_cycle(network)
+            return 5
+        except nx.exception.NetworkXNoCycle:
+            pass
+
+        if self.currentTF == 'spillback':
+            try:
+                for e in network.out_edges('s'):
+                    (v, w) = e
+                    if network[v][w]['inCapacity'] < float(self.inflowLineEdit.text()): #TODO: Should this be <= as in paper? Example from paper doesnt fulfil
+                        return 6
+            except KeyError:
+                pass
+
+        return 0
+
+    @staticmethod
+    def get_error_message(errorCode):
+        errorDescription = {
+            1: "Source 's' should not have incoming edges.",
+            2: "Sink 't' should not have outgoing edges.",
+            3: "All nodes have to be reachable from 's'.",
+            4: "Edge capacities.",
+            5: "Network contains a cycle.",
+            6: "Incapacities of all outgoing edges from sink 's' have to be greater than network inflow-rate."
+        }
+
+        return errorDescription[errorCode]

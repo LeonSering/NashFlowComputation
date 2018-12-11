@@ -75,20 +75,29 @@ class NashFlow_spillback(NashFlow):
         fullEdges = [(v, w) for v, w in self.network.edges() if
                           self.is_full(v,w,self.node_label(v, lowerBoundTime))] if lowerBoundTime > 0 else []
 
-        self.minInflowBound = min([self.network[v][w]['inflowBound'][self.node_label(v, lowerBoundTime)] for v,w in self.network.edges()]) if \
-                                lowerBoundTime > 0 else min([self.network[v][w]['inCapacity'] for v, w in self.network.edges()])
-
+        minInflowBound = None
         interval = FlowInterval_spillback(self.network, resettingEdges=resettingEdges, fullEdges=fullEdges, lowerBoundTime=lowerBoundTime,
                                 inflowRate=self.inflowRate, minCapacity=self.minOutCapacity, counter=self.counter,
                                 outputDirectory=self.rootPath, templateFile=self.templateFile, scipFile=self.scipFile,
-                                timeout=self.timeout, minInflowBound=self.minInflowBound)
+                                timeout=self.timeout, minInflowBound=minInflowBound)
 
         if lowerBoundTime == 0:
             interval.shortestPathNetwork = Utilities.get_shortest_path_network(
                 self.network)  # Compute shortest path network
+            for v, w in interval.shortestPathNetwork.edges():
+                interval.shortestPathNetwork[v][w]['inflowBound'] = self.network[v][w]['inCapacity']
         else:
             interval.shortestPathNetwork = Utilities.get_shortest_path_network(self.network, labels={
                 v: self.node_label(v, lowerBoundTime) for v in self.network})  # Compute shortest path network
+
+            for v, w in interval.shortestPathNetwork.edges():
+                vTimeLower = self.node_label(v, lowerBoundTime)
+                minimizer = self.get_outflow(v,w,vTimeLower) if (v,w) in fullEdges else float('inf')
+                interval.shortestPathNetwork[v][w]['inflowBound'] = min(minimizer, self.network[v][w]['inCapacity'])
+
+
+        minInflowBound = Utilities.compute_min_attr_of_network(interval.shortestPathNetwork, 'inflowBound')
+        interval.set_minInflowBound(minInflowBound)
 
         start = time.time()
         interval.get_ntf()
@@ -108,7 +117,7 @@ class NashFlow_spillback(NashFlow):
         if lowerBoundTime == 0:
             self.init_edge_properties()
 
-        interval.compute_alpha({node: self.node_label(node, lowerBoundTime) for node in self.network}, self.outflowBoundInformationDict)
+        interval.compute_alpha({node: self.node_label(node, lowerBoundTime) for node in self.network})
         self.flowIntervals.append((interval.lowerBoundTime, interval.upperBoundTime, interval))
 
         # Update in/out-flow rates
@@ -146,10 +155,6 @@ class NashFlow_spillback(NashFlow):
             self.network[v][w]['load'] = OrderedDict()
             self.network[v][w]['load'][0] = 0
             self.network[v][w]['load'][vTimeLower] = 0
-
-            self.network[v][w]['inflowBound'] = OrderedDict()
-            self.network[v][w]['inflowBound'][0] = self.network[v][w]['inCapacity']
-            self.network[v][w]['inflowBound'][vTimeLower] = self.network[v][w]['inCapacity']
 
     def update_edge_properties(self, lowerBoundTime, interval):
         """
@@ -197,6 +202,11 @@ class NashFlow_spillback(NashFlow):
 
             self.animationIntervals[(v, w)].append(((vTimeLower, vTimeUpper), (wTimeLower, wTimeUpper)))
 
+            if vTimeUpper <= wTimeUpper:
+                # Lies on shortest path
+                self.network[v][w]['load'][vTimeUpper] = self.arc_load(v, w, vTimeUpper)
+
+
 
     def get_cumulative_inflow(self, v, w, t):
         """
@@ -209,7 +219,7 @@ class NashFlow_spillback(NashFlow):
             return 0
         for timeInterval, inflowVal in self.network[v][w]['inflow'].items():
             vTimeLower, vTimeUpper = timeInterval
-            if vTimeLower <= time <= vTimeUpper:
+            if vTimeLower <= t <= vTimeUpper:
                 # This is the interval in which t lies
                 return self.network[v][w]['cumulativeInflow'][vTimeLower] + inflowVal*(t-vTimeLower)
 
@@ -224,7 +234,7 @@ class NashFlow_spillback(NashFlow):
             return 0
         for timeInterval, outflowVal in self.network[v][w]['outflow'].items():
             wTimeLower, wTimeUpper = timeInterval
-            if wTimeLower <= time <= wTimeUpper:
+            if wTimeLower <= t <= wTimeUpper:
                 # This is the interval in which t lies
                 return self.network[v][w]['cumulativeOutflow'][wTimeLower] + outflowVal*(t-wTimeLower)
 
@@ -245,4 +255,10 @@ class NashFlow_spillback(NashFlow):
         :param t: time
         :return: True if d_(v,w)(t) ~= storage(v,w)
         """
-        return Utilities.is_eq_tol(self.arc_load(v,w,t), self.network[v][w]['storage'])
+        #TODO: SHITTY WORKAROUND
+        try:
+            load = self.arc_load(v,w,t)
+            return Utilities.is_eq_tol(load, self.network[v][w]['storage'])
+        except TypeError:
+            return False
+
