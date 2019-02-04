@@ -159,7 +159,7 @@ class NashFlow:
 
                 self.network[v][w]['queueSize'] = OrderedDict()
                 self.network[v][w]['queueSize'][0] = 0
-                self.network[v][w]['queueSize'][vTimeLower] = 0
+                self.network[v][w]['queueSize'][vTimeLower + self.network[v][w]['transitTime']] = 0
 
         for v, w in self.network.edges():
 
@@ -197,7 +197,11 @@ class NashFlow:
             if vTimeUpper < float('inf'):
                 lastQueueSizeTime = next(reversed(self.network[v][w]['queueSize']))
                 lastQueueSize = self.network[v][w]['queueSize'][lastQueueSizeTime]
-                self.network[v][w]['queueSize'][vTimeUpper] = max(0, lastQueueSize + (
+                # Queue at beginning
+                #self.network[v][w]['queueSize'][vTimeUpper] = max(0, lastQueueSize + (
+                #        inflowVal - self.network[v][w]['outCapacity']) * (vTimeUpper - vTimeLower))
+                # Queue at end
+                self.network[v][w]['queueSize'][vTimeUpper + self.network[v][w]['transitTime']] = max(0, lastQueueSize + (
                         inflowVal - self.network[v][w]['outCapacity']) * (vTimeUpper - vTimeLower))
 
             self.animationIntervals[(v, w)].append(((vTimeLower, vTimeUpper), (wTimeLower, wTimeUpper)))
