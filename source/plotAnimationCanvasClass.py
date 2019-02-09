@@ -99,7 +99,8 @@ class PlotAnimationCanvas(PlotCanvas):
                     flowOnEntireEdge = max(0, max(0, inflow*(min(time, vTimeUpper)-vTimeLower))
                                                                  - max(0, outflow*(min(time, wTimeUpper)-wTimeLower)))
                     self.flowOnEntireEdge[edge][fk][time] = flowOnEntireEdge
-
+                    '''
+                    # Box at beginning
                     if wTimeLower - transitTime >= time or time >= wTimeUpper:
                         flowOnEdgeNotQueue = 0
                     elif wTimeLower - transitTime <= time <= wTimeLower:
@@ -108,9 +109,20 @@ class PlotAnimationCanvas(PlotCanvas):
                         flowOnEdgeNotQueue = outflow*transitTime
                     elif wTimeUpper - transitTime <= time <= wTimeUpper:
                         flowOnEdgeNotQueue = outflow*(wTimeUpper-time)
+                    '''
+                    # Box at end
+                    if not (vTimeLower <= time <= vTimeUpper + transitTime):
+                        flowOnEdgeNotQueue = 0
+                    elif time <= vTimeLower + transitTime:
+                        flowOnEdgeNotQueue = inflow*(time-vTimeLower)
+                    else:
+                        # vTimeLower + transitTime < time < vTimeUpper + transitTime holds
+                        flowOnEdgeNotQueue = inflow*transitTime
+
                     self.flowOnEdgeNotQueue[edge][fk][time] = flowOnEdgeNotQueue
 
-                    flowOnQueue = max(0, self.flowOnEntireEdge[edge][fk][time] - self.flowOnEdgeNotQueue[edge][fk][time])
+                    #flowOnQueue = max(0, self.flowOnEntireEdge[edge][fk][time] - self.flowOnEdgeNotQueue[edge][fk][time])  # Box at beginning
+                    flowOnQueue = max(0, flowOnEntireEdge-flowOnEdgeNotQueue)   # Box at end
 
                     self.flowOnQueue[edge][fk][time] = flowOnQueue
 
@@ -122,7 +134,6 @@ class PlotAnimationCanvas(PlotCanvas):
                     m += self.flowOnQueue[edge][fk][time]
 
                 self.maximalQueueSize = max(self.maximalQueueSize, m)
-
 
     def reset_bounds(self, lowerBound, upperBound):
         """
@@ -172,7 +183,6 @@ class PlotAnimationCanvas(PlotCanvas):
                 return index
         return -1
 
-
     def update_time_labels(self):
         """Update additional node labels"""
         nodeLabelSize = int(round(self.nodeLabelFontSize))
@@ -190,7 +200,7 @@ class PlotAnimationCanvas(PlotCanvas):
         for edge in self.network.edges():
             v,w = edge
             src, dst = self.network.node[v]['position'], self.network.node[w]['position']
-            self.draw_queue_color_box(edge, src, dst)
+            #self.draw_queue_color_box(edge, src, dst)
             self.draw_edge_colors(edge, src, dst)
         self.draw_idle()
 
@@ -208,22 +218,30 @@ class PlotAnimationCanvas(PlotCanvas):
         v, w = edge
         time = self.timePoints[self.currentTimeIndex]
         transitTime, capacity = self.network[v][w]['transitTime'], self.network[v][w]['outCapacity']
-        maximumFlow = transitTime*capacity
+        src = np.array(src)
+        dst = np.array(dst)
+        '''
+        # Box at beginning
+        maximumFlow = transitTime*capacity  # Box at beginning
 
         if maximumFlow == 0:
             return
 
         flowRatio = [
-            max(0, float(self.flowOnEdgeNotQueue[edge][fk][self.timePoints[self.currentTimeIndex]]) / maximumFlow)
+            max(0, float(self.flowOnEdgeNotQueue[edge][fk][time]) / maximumFlow)
             for fk in range(len(self.nashFlow.flowIntervals))]
+        
+        srcAfterBox = src + p*(dst - src) # Box at beginning
+        '''
 
-        src = np.array(src)
-        dst = np.array(dst)
-        srcAfterBox = src + p*(dst - src)
-        s = dst-srcAfterBox
+        dstBeforeBox = src + (1-p)*(dst - src)    # Box at the end
+        s = dstBeforeBox-src
         edge_pos = []
         edge_colors = []
+
         for fk in range(len(self.nashFlow.flowIntervals)):
+            '''
+            # Box at beginning
             if Utilities.is_eq_tol(flowRatio[fk], 0):
                 continue
             inflowInterval, outflowInterval = self.nashFlow.animationIntervals[edge][fk]
@@ -236,6 +254,26 @@ class PlotAnimationCanvas(PlotCanvas):
             end = srcAfterBox + endFac * s
             edge_pos.append((start, end))
             edge_colors.append(self.NTFColors[fk % len(self.NTFColors)])
+            '''
+
+            # Box at end
+            if Utilities.is_eq_tol(self.flowOnEdgeNotQueue[edge][fk][time], 0):
+                # No flow on edgeNotQueue at this time
+                continue
+            inflowInterval, outflowInterval = self.nashFlow.animationIntervals[edge][fk]
+            vTimeLower, vTimeUpper = inflowInterval
+
+            # These position factors are using that the amount on the edgeNotQueue has to be positive at this point
+            # This implies that vTimeLower <= time <= vTimeUpper + transitTime
+
+            startFac = float(time-vTimeUpper)/transitTime if time > vTimeUpper else 0
+            endFac = float(time-vTimeLower)/transitTime if time <= vTimeLower + transitTime else 1
+
+            start = src + startFac * s
+            end = src + endFac * s
+            edge_pos.append((start, end))
+            edge_colors.append(self.NTFColors[fk % len(self.NTFColors)])
+
 
         edge_pos = np.asarray(edge_pos)
 
@@ -253,7 +291,6 @@ class PlotAnimationCanvas(PlotCanvas):
         edgeCollection.set_zorder(1)
         self.edgeColoring[edge] = edgeCollection
         self.axes.add_collection(edgeCollection)
-
 
     def draw_queue_color_box(self, edge, src, dst, p=0.25, radius=7, lastProportion=1):
         """

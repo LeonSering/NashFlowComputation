@@ -350,7 +350,8 @@ class Utilities:
         for edge in edgelist:
             src, dst = np.array(pos[edge[0]]), np.array(pos[edge[1]])
             s = dst - src
-            src = src + p * s
+            #src = src + p * s  # Box at beginning
+            dst = src + (1-p) * s   # Box at the end
             edge_pos.append((src, dst))
         edge_pos = numpy.asarray(edge_pos)
 
