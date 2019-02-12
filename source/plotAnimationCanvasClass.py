@@ -117,7 +117,7 @@ class PlotAnimationCanvas(PlotCanvas):
                         flowOnEdgeNotQueue = inflow*(time-vTimeLower)
                     else:
                         # vTimeLower + transitTime < time < vTimeUpper + transitTime holds
-                        flowOnEdgeNotQueue = inflow*transitTime
+                        flowOnEdgeNotQueue = inflow*(transitTime - max(0, time-vTimeUpper))
 
                     self.flowOnEdgeNotQueue[edge][fk][time] = flowOnEdgeNotQueue
 
@@ -200,7 +200,7 @@ class PlotAnimationCanvas(PlotCanvas):
         for edge in self.network.edges():
             v,w = edge
             src, dst = self.network.node[v]['position'], self.network.node[w]['position']
-            #self.draw_queue_color_box(edge, src, dst)
+            self.draw_queue_color_box(edge, src, dst)
             self.draw_edge_colors(edge, src, dst)
         self.draw_idle()
 
@@ -319,15 +319,17 @@ class PlotAnimationCanvas(PlotCanvas):
         src = np.array(src)
         dst = np.array(dst)
         s = dst - src
+        # box_location = src  # Box at Beginning
+        box_location = src + (1 - p) * s  # Box at End
         angle = np.rad2deg(np.arctan2(s[1], s[0]))
-        t = matplotlib.transforms.Affine2D().rotate_deg_around(src[0], src[1], angle)
+        t = matplotlib.transforms.Affine2D().rotate_deg_around(box_location[0], box_location[1], angle)
         boxes = []
         for fk in range(len(self.nashFlow.flowIntervals)):
             if Utilities.is_eq_tol(flowRatio[fk], 0):
                 continue
 
             d = np.sqrt(np.sum(((dst - src) * p * lastProportion) ** 2))
-            rec = Rectangle(src - delta,
+            rec = Rectangle(box_location - delta,
                             width=d,
                             height=radius * 2,
                             transform=t,
@@ -338,7 +340,7 @@ class PlotAnimationCanvas(PlotCanvas):
 
             lastProportion -= (totalRatio * flowRatio[fk])
         d = np.sqrt(np.sum(((dst - src) * p * (1-totalRatio)) ** 2))
-        lastRec = Rectangle(src - delta,
+        lastRec = Rectangle(box_location - delta,
                             width=d,
                             height=radius * 2,
                             transform=t,
