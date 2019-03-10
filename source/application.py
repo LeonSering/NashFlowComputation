@@ -727,7 +727,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         inflowRate = float(self.inflowLineEdit.text())
 
         self.save_config()  # Save config-settings to file
-        self.gttr('tabWidget', 'spillback').setCurrentIndex(1)  # Switch to next tab
+        self.gttr('tabWidget').setCurrentIndex(1)  # Switch to next tab
         timeout = -1 if not self.timeoutActivated else float(self.timeoutLineEdit.text())
 
         if not nextIntervalOnly:
