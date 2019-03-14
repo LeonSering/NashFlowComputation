@@ -47,10 +47,20 @@ class PlotAnimationCanvas(PlotCanvas):
         self.flowOnQueue = {edge: {i: dict() for i in range(len(self.nashFlow.flowIntervals))} for edge in
                                  self.network.edges()}
 
-        self.maximalQueueSize = 0
+        self.maxWidthFlowSize = {}
+        for edge in self.network.edges():
+            v, w = edge
+            try:
+                referenceCapacity = self.network[v][w]['inCapacity']
+            except KeyError:
+                # General case
+                referenceCapacity = float('inf')
+            self.maxWidthFlowSize[edge] = referenceCapacity
 
-        self.boxColoring = {edge:None for edge in self.network.edges()}
-        self.edgeColoring = {edge:None for edge in self.network.edges()}
+        self.widthReferenceSize = {edge:{} for edge in self.network.edges()}
+
+        #self.boxColoring = {edge:None for edge in self.network.edges()}
+        self.edgeColoring = {edge:{} for edge in self.network.edges()}
         self.precompute_information()
 
         PlotCanvas.__init__(self, graph=self.network, interface=interface, stretchFactor=stretchFactor)  # Call parents constructor
@@ -60,7 +70,9 @@ class PlotAnimationCanvas(PlotCanvas):
         add_tuple_offset = lambda a: (a[0] + offset[0], a[1] + offset[1])
         self.movedPositions = {node: add_tuple_offset(positions[node]) for node in positions}
         self.edgeWidthSize = 6
-        self.tubeWidthSize = 0.6*14
+        self.tubeWidthFactor = 1
+        self.tubeWidthMaximum = 0.6 * 14 # This is the size of the flow
+        self.tubeWidthMinimum = 2
         self.zoom(factor=None)
 
     def precompute_information(self, timeList=None):
@@ -68,6 +80,9 @@ class PlotAnimationCanvas(PlotCanvas):
         Compute information needed for the animation
         :param timeList: list of times for which information is computed. If None, then self.timePoints is used
         """
+        self.maximalQueueSize = 0
+        self.maxInflowOnAllEdges = 0
+
         if not timeList:
             # Circumvent that default arguments are evaluated at function definition time
             timeList = self.timePoints
@@ -89,6 +104,7 @@ class PlotAnimationCanvas(PlotCanvas):
                 try:
                     inflow = self.network[v][w]['inflow'][inflowInterval]  # Could this lead to KeyError?
                     outflow = self.network[v][w]['outflow'][outflowInterval]
+                    self.maxInflowOnAllEdges = max(inflow, self.maxInflowOnAllEdges)
                 except:
                     raise KeyError("Label in corresponding NTF seems to be 0.")
                     inflow = 0
@@ -99,17 +115,7 @@ class PlotAnimationCanvas(PlotCanvas):
                     flowOnEntireEdge = max(0, max(0, inflow*(min(time, vTimeUpper)-vTimeLower))
                                                                  - max(0, outflow*(min(time, wTimeUpper)-wTimeLower)))
                     self.flowOnEntireEdge[edge][fk][time] = flowOnEntireEdge
-                    '''
-                    # Box at beginning
-                    if wTimeLower - transitTime >= time or time >= wTimeUpper:
-                        flowOnEdgeNotQueue = 0
-                    elif wTimeLower - transitTime <= time <= wTimeLower:
-                        flowOnEdgeNotQueue = outflow*(time - wTimeLower + transitTime)
-                    elif wTimeLower <= time <= wTimeUpper - transitTime:
-                        flowOnEdgeNotQueue = outflow*transitTime
-                    elif wTimeUpper - transitTime <= time <= wTimeUpper:
-                        flowOnEdgeNotQueue = outflow*(wTimeUpper-time)
-                    '''
+
                     # Box at end
                     if not (vTimeLower <= time <= vTimeUpper + transitTime):
                         flowOnEdgeNotQueue = 0
@@ -121,7 +127,6 @@ class PlotAnimationCanvas(PlotCanvas):
 
                     self.flowOnEdgeNotQueue[edge][fk][time] = flowOnEdgeNotQueue
 
-                    #flowOnQueue = max(0, self.flowOnEntireEdge[edge][fk][time] - self.flowOnEdgeNotQueue[edge][fk][time])  # Box at beginning
                     flowOnQueue = max(0, flowOnEntireEdge-flowOnEdgeNotQueue)   # Box at end
 
                     self.flowOnQueue[edge][fk][time] = flowOnQueue
@@ -134,6 +139,10 @@ class PlotAnimationCanvas(PlotCanvas):
                     m += self.flowOnQueue[edge][fk][time]
 
                 self.maximalQueueSize = max(self.maximalQueueSize, m)
+
+        for edge in self.network.edges():
+            if self.maxWidthFlowSize[edge] == float('inf'):
+                self.maxWidthFlowSize[edge] = self.maxInflowOnAllEdges + 1
 
     def reset_bounds(self, lowerBound, upperBound):
         """
@@ -212,9 +221,12 @@ class PlotAnimationCanvas(PlotCanvas):
         :param src: position of v
         :param dst: position of w
         """
-        if self.edgeColoring[edge] is not None:
-            self.edgeColoring[edge].remove()
-        self.edgeColoring[edge] = None
+        if self.edgeColoring[edge]:
+            for fk in self.edgeColoring[edge].keys():
+                self.edgeColoring[edge][fk].remove()
+        self.edgeColoring[edge].clear()
+        if self.widthReferenceSize[edge]:
+            self.widthReferenceSize[edge].clear()
         v, w = edge
         time = self.timePoints[self.currentTimeIndex]
         transitTime = self.network[v][w]['transitTime']
@@ -227,24 +239,15 @@ class PlotAnimationCanvas(PlotCanvas):
         if Utilities.is_eq_tol(totalFlowOnEdge, 0):
             return
 
-        # TODO MAXIMALEDGESIZE -> VERSCHIEDEN GRO?ER INFLOW IM GENERAL
-        # TODO self.network.graph['type'] can produce keyerror!
-        #maxWidth = self.network[v][w]['inCapacity'] if self.network.graph['type'] == 'spillback' else float('inf')
-        #maxWidth = maxWidth if maxWidth != float('inf') else self.maximalEdgeSize[edge] + 1
-        #maxWidth = maxWidth if maxWidth != float('inf') else self.maxInflowOnAllEdges + 1
-
-        edge_pos = []
-        edge_colors = []
 
         for fk in range(len(self.nashFlow.flowIntervals)):
-
-            # Box at end
             if Utilities.is_eq_tol(self.flowOnEdgeNotQueue[edge][fk][time], 0):
                 # No flow on edgeNotQueue at this time
                 continue
 
             inflowInterval, outflowInterval = self.nashFlow.animationIntervals[edge][fk]
             vTimeLower, vTimeUpper = inflowInterval
+            inflow = float(self.network[v][w]['inflow'][(vTimeLower, vTimeUpper)])
 
             # These position factors are using that the amount on the edgeNotQueue has to be positive at this point
             # This implies that vTimeLower <= time <= vTimeUpper + transitTime
@@ -255,25 +258,28 @@ class PlotAnimationCanvas(PlotCanvas):
             start = src + startFac * s
             end = src + endFac * s
 
-            edge_pos.append((start, end))
-            edge_colors.append(self.NTFColors[fk % len(self.NTFColors)])
+            edge_pos = np.asarray([(start, end)])
+            edge_color = tuple(colorConverter.to_rgba(self.NTFColors[fk % len(self.NTFColors)],
+                                                      alpha=1))
 
-        edge_pos = np.asarray(edge_pos)
+            widthRatioScale = min(1, inflow/self.maxWidthFlowSize[edge])
+            self.widthReferenceSize[edge][fk] = max(self.tubeWidthMaximum*widthRatioScale, self.tubeWidthMinimum)
 
-        edge_colors = tuple([colorConverter.to_rgba(c, alpha=1)
-                             for c in edge_colors])
+            edgeCollection = LineCollection(edge_pos,
+                                            colors=edge_color,
+                                            linewidths=self.tubeWidthFactor*self.widthReferenceSize[edge][fk],
+                                            antialiaseds=(1,),
+                                            transOffset=self.axes.transData,
+                                            alpha=1
+                                            )
 
-        edgeCollection = LineCollection(edge_pos,
-                                        colors=edge_colors,
-                                        linewidths=self.tubeWidthSize,
-                                        antialiaseds=(1,),
-                                        transOffset=self.axes.transData,
-                                        alpha=1
-                                        )
+            edgeCollection.set_zorder(1)
+            self.edgeColoring[edge][fk] = edgeCollection
+            self.axes.add_collection(edgeCollection)
 
-        edgeCollection.set_zorder(1)
-        self.edgeColoring[edge] = edgeCollection
-        self.axes.add_collection(edgeCollection)
+
+
+
 
     def draw_edge_colors_DEPRECATED(self, edge, src, dst, p=0.25):
         """
@@ -352,12 +358,12 @@ class PlotAnimationCanvas(PlotCanvas):
                              for c in edge_colors])
 
         edgeCollection = LineCollection(edge_pos,
-                                         colors=edge_colors,
-                                         linewidths=self.tubeWidthSize,
-                                         antialiaseds=(1,),
-                                         transOffset=self.axes.transData,
-                                         alpha = 1
-                                         )
+                                        colors=edge_colors,
+                                        linewidths=self.tubeWidthFactor,
+                                        antialiaseds=(1,),
+                                        transOffset=self.axes.transData,
+                                        alpha = 1
+                                        )
 
         edgeCollection.set_zorder(1)
         self.edgeColoring[edge] = edgeCollection
@@ -564,14 +570,14 @@ class PlotAnimationCanvas(PlotCanvas):
             edgeCollection.set_linewidth(self.edgeWidthSize)
 
         # Scale tubes
-        self.tubeWidthSize = smaller(self.tubeWidthSize)
-        self.tube_collection.set_linewidth(self.tubeWidthSize)
+        self.tubeWidthFactor = smaller(self.tubeWidthFactor)
+        #self.tube_collection.set_linewidth(self.tubeWidthSize)
 
         # Scale colored edges if existing
         for edge in self.network.edges():
-            colorEdgeCollection = self.edgeColoring[edge]
-            if colorEdgeCollection is not None:
-                colorEdgeCollection.set_linewidth(self.tubeWidthSize)
+            edgeCollection = self.edgeColoring[edge]
+            for fk, fkEdgeColoring in edgeCollection.items():
+                fkEdgeColoring.set_linewidth(self.tubeWidthFactor*self.widthReferenceSize[edge][fk])
 
         # Scale font size of node labels
         self.nodeLabelFontSize = smaller(self.nodeLabelFontSize)
