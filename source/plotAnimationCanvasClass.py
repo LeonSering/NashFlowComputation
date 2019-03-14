@@ -60,7 +60,7 @@ class PlotAnimationCanvas(PlotCanvas):
         add_tuple_offset = lambda a: (a[0] + offset[0], a[1] + offset[1])
         self.movedPositions = {node: add_tuple_offset(positions[node]) for node in positions}
         self.edgeWidthSize = 6
-        self.tubeWidthSize = 4
+        self.tubeWidthSize = 0.6*14
         self.zoom(factor=None)
 
     def precompute_information(self, timeList=None):
@@ -206,7 +206,74 @@ class PlotAnimationCanvas(PlotCanvas):
         self.draw_idle()
 
     def draw_flow(self, edge, src, dst):
-        pass
+        """
+        Draw flow animation
+        :param edge: edge = vw to draw
+        :param src: position of v
+        :param dst: position of w
+        """
+        if self.edgeColoring[edge] is not None:
+            self.edgeColoring[edge].remove()
+        self.edgeColoring[edge] = None
+        v, w = edge
+        time = self.timePoints[self.currentTimeIndex]
+        transitTime = self.network[v][w]['transitTime']
+        src = np.array(src)
+        dst = np.array(dst)
+        s = dst - src
+
+        flowOnEdgeList = [self.flowOnEntireEdge[edge][fk][time] for fk in range(len(self.nashFlow.flowIntervals))]
+        totalFlowOnEdge = sum(flowOnEdgeList)
+        if Utilities.is_eq_tol(totalFlowOnEdge, 0):
+            return
+
+        # TODO MAXIMALEDGESIZE -> VERSCHIEDEN GRO?ER INFLOW IM GENERAL
+        # TODO self.network.graph['type'] can produce keyerror!
+        #maxWidth = self.network[v][w]['inCapacity'] if self.network.graph['type'] == 'spillback' else float('inf')
+        #maxWidth = maxWidth if maxWidth != float('inf') else self.maximalEdgeSize[edge] + 1
+        #maxWidth = maxWidth if maxWidth != float('inf') else self.maxInflowOnAllEdges + 1
+
+        edge_pos = []
+        edge_colors = []
+
+        for fk in range(len(self.nashFlow.flowIntervals)):
+
+            # Box at end
+            if Utilities.is_eq_tol(self.flowOnEdgeNotQueue[edge][fk][time], 0):
+                # No flow on edgeNotQueue at this time
+                continue
+
+            inflowInterval, outflowInterval = self.nashFlow.animationIntervals[edge][fk]
+            vTimeLower, vTimeUpper = inflowInterval
+
+            # These position factors are using that the amount on the edgeNotQueue has to be positive at this point
+            # This implies that vTimeLower <= time <= vTimeUpper + transitTime
+
+            startFac = float(time - vTimeUpper) / transitTime if time > vTimeUpper else 0
+            endFac = float(time - vTimeLower) / transitTime if time <= vTimeLower + transitTime else 1
+
+            start = src + startFac * s
+            end = src + endFac * s
+
+            edge_pos.append((start, end))
+            edge_colors.append(self.NTFColors[fk % len(self.NTFColors)])
+
+        edge_pos = np.asarray(edge_pos)
+
+        edge_colors = tuple([colorConverter.to_rgba(c, alpha=1)
+                             for c in edge_colors])
+
+        edgeCollection = LineCollection(edge_pos,
+                                        colors=edge_colors,
+                                        linewidths=self.tubeWidthSize,
+                                        antialiaseds=(1,),
+                                        transOffset=self.axes.transData,
+                                        alpha=1
+                                        )
+
+        edgeCollection.set_zorder(1)
+        self.edgeColoring[edge] = edgeCollection
+        self.axes.add_collection(edgeCollection)
 
     def draw_edge_colors_DEPRECATED(self, edge, src, dst, p=0.25):
         """
