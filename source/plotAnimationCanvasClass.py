@@ -200,11 +200,15 @@ class PlotAnimationCanvas(PlotCanvas):
         for edge in self.network.edges():
             v,w = edge
             src, dst = self.network.node[v]['position'], self.network.node[w]['position']
-            self.draw_queue_color_box(edge, src, dst)
-            self.draw_edge_colors(edge, src, dst)
+            #self.draw_queue_color_box(edge, src, dst)
+            #self.draw_edge_colors(edge, src, dst)
+            self.draw_flow(edge, src, dst)
         self.draw_idle()
 
-    def draw_edge_colors(self, edge, src, dst, p=0.25):
+    def draw_flow(self, edge, src, dst):
+        pass
+
+    def draw_edge_colors_DEPRECATED(self, edge, src, dst, p=0.25):
         """
         Draw colors of flow animation
         :param edge: edge = vw to draw
@@ -292,7 +296,7 @@ class PlotAnimationCanvas(PlotCanvas):
         self.edgeColoring[edge] = edgeCollection
         self.axes.add_collection(edgeCollection)
 
-    def draw_queue_color_box(self, edge, src, dst, p=0.25, radius=7, lastProportion=1):
+    def draw_queue_color_box_DEPRECATED(self, edge, src, dst, p=0.25, radius=7, lastProportion=1):
         """
         Daw queue box with color of NTF
         :param edge: edge e=vw
@@ -355,7 +359,6 @@ class PlotAnimationCanvas(PlotCanvas):
                                         transOffset=self.axes.transData)
         self.boxColoring[edge] = boxCollection
         self.axes.add_collection(boxCollection)
-
 
     def get_additional_node_labels(self):
         """Return node label dict"""

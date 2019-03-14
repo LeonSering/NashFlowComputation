@@ -231,7 +231,8 @@ class Utilities:
             src, dst = np.array(pos[edge[0]]), np.array(pos[edge[1]])
             s = dst - src
             #src = src + p * s  # Box at beginning
-            dst = src + (1-p) * s   # Box at the end
+            #dst = src + (1-p) * s   # Box at the end
+            dst = src   # No edge at all
             edge_pos.append((src, dst))
         edge_pos = numpy.asarray(edge_pos)
 
@@ -351,7 +352,8 @@ class Utilities:
             src, dst = np.array(pos[edge[0]]), np.array(pos[edge[1]])
             s = dst - src
             #src = src + p * s  # Box at beginning
-            dst = src + (1-p) * s   # Box at the end
+            #dst = src + (1-p) * s   # Box at the end
+            dst = src   # No edge at all
             edge_pos.append((src, dst))
         edge_pos = numpy.asarray(edge_pos)
 
@@ -470,7 +472,8 @@ class Utilities:
 
         rectangles = []
         arrow_colors = edge_colors
-        p = 0.25  # 1/4 of edge should be the box
+        #p = 0.25  # 1/4 of edge should be the box
+        p = 1
         radius = 7
         for src, dst in edge_pos:
             src = np.array(src)
@@ -478,7 +481,8 @@ class Utilities:
             d = np.sqrt(np.sum(((dst - src) * p) ** 2))
             s = dst - src
             #box_location = src  # Box at Beginning
-            box_location = src + (1-p)*s  # Box at End
+            #box_location = src + (1-p)*s  # Box at End
+            box_location = src  # Entire edge is box
 
             if d == 0:  # source and target at same position
                 continue
