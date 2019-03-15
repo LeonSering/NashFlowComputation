@@ -164,7 +164,6 @@ class NashFlow_spillback(NashFlow):
         """
 
         for v, w in self.network.edges():
-
             # Inflow changes
             vTimeLower, vTimeUpper = self.node_label(v, interval.lowerBoundTime), self.node_label(v, interval.upperBoundTime)
             inflowChangeBool = Utilities.is_not_eq_tol(interval.NTFNodeLabelDict[v],0)  # Can we extend the inflow interval?
@@ -195,6 +194,7 @@ class NashFlow_spillback(NashFlow):
 
             # Queue size changes
             if vTimeUpper < float('inf'):
+                # TODO THIS COMPUTATION IS FLAWED
                 lastQueueSizeTime = next(reversed(self.network[v][w]['queueSize']))
                 lastQueueSize = self.network[v][w]['queueSize'][lastQueueSizeTime]
                 self.network[v][w]['queueSize'][vTimeUpper] = max(0, lastQueueSize + (

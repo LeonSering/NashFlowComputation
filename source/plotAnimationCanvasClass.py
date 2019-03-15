@@ -48,19 +48,24 @@ class PlotAnimationCanvas(PlotCanvas):
                                  self.network.edges()}
 
         self.maxWidthFlowSize = {}
+        self.maxOverflowStorage = {}
         for edge in self.network.edges():
             v, w = edge
             try:
                 referenceCapacity = self.network[v][w]['inCapacity']
+                referenceStorage = self.network[v][w]['storage']
             except KeyError:
                 # General case
                 referenceCapacity = float('inf')
+                referenceStorage = float('inf')
             self.maxWidthFlowSize[edge] = referenceCapacity
+            self.maxOverflowStorage[edge] = referenceStorage
 
         self.widthReferenceSize = {edge:{} for edge in self.network.edges()}
 
         #self.boxColoring = {edge:None for edge in self.network.edges()}
         self.edgeColoring = {edge:{} for edge in self.network.edges()}
+        self.visualQueueColoring = {edge:{} for edge in self.network.edges()}
         self.precompute_information()
 
         PlotCanvas.__init__(self, graph=self.network, interface=interface, stretchFactor=stretchFactor)  # Call parents constructor
@@ -80,8 +85,9 @@ class PlotAnimationCanvas(PlotCanvas):
         Compute information needed for the animation
         :param timeList: list of times for which information is computed. If None, then self.timePoints is used
         """
-        self.maximalQueueSize = 0
+        self.maxQueueSize = 0
         self.maxInflowOnAllEdges = 0
+        self.maxFlowOnEntireEdge = {edge:0 for edge in self.network.edges()}
 
         if not timeList:
             # Circumvent that default arguments are evaluated at function definition time
@@ -115,6 +121,7 @@ class PlotAnimationCanvas(PlotCanvas):
                     flowOnEntireEdge = max(0, max(0, inflow*(min(time, vTimeUpper)-vTimeLower))
                                                                  - max(0, outflow*(min(time, wTimeUpper)-wTimeLower)))
                     self.flowOnEntireEdge[edge][fk][time] = flowOnEntireEdge
+                    self.maxFlowOnEntireEdge[edge] = max(flowOnEntireEdge, self.maxFlowOnEntireEdge[edge])
 
                     # Box at end
                     if not (vTimeLower <= time <= vTimeUpper + transitTime):
@@ -138,11 +145,13 @@ class PlotAnimationCanvas(PlotCanvas):
                 for fk in range(len(self.nashFlow.flowIntervals)):
                     m += self.flowOnQueue[edge][fk][time]
 
-                self.maximalQueueSize = max(self.maximalQueueSize, m)
+                self.maxQueueSize = max(self.maxQueueSize, m)
 
         for edge in self.network.edges():
             if self.maxWidthFlowSize[edge] == float('inf'):
                 self.maxWidthFlowSize[edge] = self.maxInflowOnAllEdges + 1
+            if self.maxOverflowStorage[edge] == float('inf'):
+                self.maxOverflowStorage[edge] == self.maxFlowOnEntireEdge[edge] + 1
 
     def reset_bounds(self, lowerBound, upperBound):
         """
@@ -227,6 +236,9 @@ class PlotAnimationCanvas(PlotCanvas):
         self.edgeColoring[edge].clear()
         if self.widthReferenceSize[edge]:
             self.widthReferenceSize[edge].clear()
+        if self.visualQueueColoring[edge]:
+            self.visualQueueColoring.remove()
+
         v, w = edge
         time = self.timePoints[self.currentTimeIndex]
         transitTime = self.network[v][w]['transitTime']
@@ -239,7 +251,7 @@ class PlotAnimationCanvas(PlotCanvas):
         if Utilities.is_eq_tol(totalFlowOnEdge, 0):
             return
 
-
+        overflowBlocks = []
         for fk in range(len(self.nashFlow.flowIntervals)):
             if Utilities.is_eq_tol(self.flowOnEdgeNotQueue[edge][fk][time], 0):
                 # No flow on edgeNotQueue at this time
@@ -264,7 +276,7 @@ class PlotAnimationCanvas(PlotCanvas):
 
             widthRatioScale = min(1, inflow/self.maxWidthFlowSize[edge])
             self.widthReferenceSize[edge][fk] = max(self.tubeWidthMaximum*widthRatioScale, self.tubeWidthMinimum)
-
+            # Drawing of flow tubes
             edgeCollection = LineCollection(edge_pos,
                                             colors=edge_color,
                                             linewidths=self.tubeWidthFactor*self.widthReferenceSize[edge][fk],
@@ -277,161 +289,34 @@ class PlotAnimationCanvas(PlotCanvas):
             self.edgeColoring[edge][fk] = edgeCollection
             self.axes.add_collection(edgeCollection)
 
-
-
-
-
-    def draw_edge_colors_DEPRECATED(self, edge, src, dst, p=0.25):
-        """
-        Draw colors of flow animation
-        :param edge: edge = vw to draw
-        :param src: position of v
-        :param dst: position of w
-        :param p: length of box
-        """
-        if self.edgeColoring[edge] is not None:
-            self.edgeColoring[edge].remove()
-        self.edgeColoring[edge] = None
-        v, w = edge
-        time = self.timePoints[self.currentTimeIndex]
-        transitTime, capacity = self.network[v][w]['transitTime'], self.network[v][w]['outCapacity']
-        src = np.array(src)
-        dst = np.array(dst)
-        '''
-        # Box at beginning
-        maximumFlow = transitTime*capacity  # Box at beginning
-
-        if maximumFlow == 0:
-            return
-
-        flowRatio = [
-            max(0, float(self.flowOnEdgeNotQueue[edge][fk][time]) / maximumFlow)
-            for fk in range(len(self.nashFlow.flowIntervals))]
-        
-        srcAfterBox = src + p*(dst - src) # Box at beginning
-        '''
-
-        dstBeforeBox = src + (1-p)*(dst - src)    # Box at the end
-        s = dstBeforeBox-src
-        edge_pos = []
-        edge_colors = []
-
-        for fk in range(len(self.nashFlow.flowIntervals)):
+            # Drawing of overflow blocks
             '''
-            # Box at beginning
-            if Utilities.is_eq_tol(flowRatio[fk], 0):
-                continue
-            inflowInterval, outflowInterval = self.nashFlow.animationIntervals[edge][fk]
-            wTimeLower, wTimeUpper = outflowInterval
+            if not overflowBlocks:
+                if Utilities.is_eq_tol(self.flowOnQueue[edge][fk][time], 0):
+                    continue
+                else:
+                    # Draw first block
+                    blockSizeFactor = min(1, self.flowOnEntireEdge[edge][fk][time]/self.maxOverflowStorage[edge])
 
-            # These position factors are using that the amount on the edgeNotQueue has to be positive at this point
-            startFac = float(transitTime - (wTimeUpper-time))/transitTime if time >= wTimeUpper - transitTime else 0
-            endFac = float(transitTime-(wTimeLower-time))/transitTime if wTimeLower - transitTime <= time <= wTimeLower else 1
-            start = srcAfterBox + startFac * s
-            end = srcAfterBox + endFac * s
-            edge_pos.append((start, end))
-            edge_colors.append(self.NTFColors[fk % len(self.NTFColors)])
+                    block = Rectangle(start - delta,
+                                    width=d,
+                                    height=14,
+                                    transform=t,
+                                    facecolor=self.NTFColors[fk % len(self.NTFColors)],
+                                    linewidth=None,
+                                    alpha=1)
+                    overflowBlocks.append(block)
+            else:
+                pass
             '''
 
-            # Box at end
-            if Utilities.is_eq_tol(self.flowOnEdgeNotQueue[edge][fk][time], 0):
-                # No flow on edgeNotQueue at this time
-                continue
-            inflowInterval, outflowInterval = self.nashFlow.animationIntervals[edge][fk]
-            vTimeLower, vTimeUpper = inflowInterval
-
-            # These position factors are using that the amount on the edgeNotQueue has to be positive at this point
-            # This implies that vTimeLower <= time <= vTimeUpper + transitTime
-
-            startFac = float(time-vTimeUpper)/transitTime if time > vTimeUpper else 0
-            endFac = float(time-vTimeLower)/transitTime if time <= vTimeLower + transitTime else 1
-
-            start = src + startFac * s
-            end = src + endFac * s
-            edge_pos.append((start, end))
-            edge_colors.append(self.NTFColors[fk % len(self.NTFColors)])
-
-
-        edge_pos = np.asarray(edge_pos)
-
-        edge_colors = tuple([colorConverter.to_rgba(c, alpha=1)
-                             for c in edge_colors])
-
-        edgeCollection = LineCollection(edge_pos,
-                                        colors=edge_colors,
-                                        linewidths=self.tubeWidthFactor,
-                                        antialiaseds=(1,),
-                                        transOffset=self.axes.transData,
-                                        alpha = 1
-                                        )
-
-        edgeCollection.set_zorder(1)
-        self.edgeColoring[edge] = edgeCollection
-        self.axes.add_collection(edgeCollection)
-
-    def draw_queue_color_box_DEPRECATED(self, edge, src, dst, p=0.25, radius=7, lastProportion=1):
-        """
-        Daw queue box with color of NTF
-        :param edge: edge e=vw
-        :param src: position of v
-        :param dst: position of w
-        :param p: length of box
-        :param radius: radius/height of box
-        :param lastProportion: start
-        """
-        if self.boxColoring[edge] is not None:
-            self.boxColoring[edge].remove()
-        self.boxColoring[edge] = None
-
-        totalFlowOnQueue = sum(self.flowOnQueue[edge][fk][self.timePoints[self.currentTimeIndex]] for fk in range(len(self.nashFlow.flowIntervals)))
-
-        if Utilities.is_eq_tol(totalFlowOnQueue, 0) or Utilities.is_eq_tol(self.maximalQueueSize, 0):
-            return
-
-        flowRatio = [max(0, float(self.flowOnQueue[edge][fk][self.timePoints[self.currentTimeIndex]])/totalFlowOnQueue)
-                      for fk in range(len(self.nashFlow.flowIntervals))]
-        totalRatio = totalFlowOnQueue/float(self.maximalQueueSize)
-
-        delta = np.array([0, radius])
-        src = np.array(src)
-        dst = np.array(dst)
-        s = dst - src
-        # box_location = src  # Box at Beginning
-        box_location = src + (1 - p) * s  # Box at End
-        angle = np.rad2deg(np.arctan2(s[1], s[0]))
-        t = matplotlib.transforms.Affine2D().rotate_deg_around(box_location[0], box_location[1], angle)
-        boxes = []
-        for fk in range(len(self.nashFlow.flowIntervals)):
-            if Utilities.is_eq_tol(flowRatio[fk], 0):
-                continue
-
-            d = np.sqrt(np.sum(((dst - src) * p * lastProportion) ** 2))
-            rec = Rectangle(box_location - delta,
-                            width=d,
-                            height=radius * 2,
-                            transform=t,
-                            facecolor=self.NTFColors[fk % len(self.NTFColors)],
-                            linewidth=int(lastProportion),
-                            alpha=1)
-            boxes.append(rec)
-
-            lastProportion -= (totalRatio * flowRatio[fk])
-        d = np.sqrt(np.sum(((dst - src) * p * (1-totalRatio)) ** 2))
-        lastRec = Rectangle(box_location - delta,
-                            width=d,
-                            height=radius * 2,
-                            transform=t,
-                            facecolor='lightgrey',
-                            linewidth=0,
-                            alpha=1)
-        boxes.append(lastRec)
-
-        boxCollection = PatchCollection(boxes,
-                                        match_original=True,
-                                        antialiaseds=(1,),
-                                        transOffset=self.axes.transData)
-        self.boxColoring[edge] = boxCollection
-        self.axes.add_collection(boxCollection)
+        if overflowBlocks:
+            overflowBlockCollection = PatchCollection(boxes,
+                                            match_original=True,
+                                            antialiaseds=(1,),
+                                            transOffset=self.axes.transData)
+            self.visualQueueColoring[edge] = overflowBlockCollection
+            self.axes.add_collection(overflowBlockCollection)
 
     def get_additional_node_labels(self):
         """Return node label dict"""

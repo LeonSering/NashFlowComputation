@@ -195,6 +195,7 @@ class NashFlow:
 
             # Queue size changes
             if vTimeUpper < float('inf'):
+                # TODO THIS COMPUTATION IS FLAWED
                 lastQueueSizeTime = next(reversed(self.network[v][w]['queueSize']))
                 lastQueueSize = self.network[v][w]['queueSize'][lastQueueSizeTime]
                 # Queue at beginning

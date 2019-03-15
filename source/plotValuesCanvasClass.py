@@ -30,7 +30,9 @@ class PlotValuesCanvas(FigureCanvas):
         self.verticalLinePos = 0
         self.verticalLineColor = 'grey'
         self.verticalLineWidth = 0.5
-
+        self.storageHLine = None
+        self.storageHLineColor = 'black'
+        self.storageHLineWidth = 0.8
         self.callback = callback
 
         self.visibleBool = False
@@ -43,7 +45,7 @@ class PlotValuesCanvas(FigureCanvas):
             "pgf.texsystem": "pdflatex"}
         matplotlib.rcParams.update(pgf_with_pdflatex)
 
-    def update_plot(self, lowerBound, upperBound, labels, xValues, yValues, *additional_values):
+    def update_plot(self, lowerBound, upperBound, labels, xValues, yValues, storage=None, *additional_values):
         """
         Update the plot
         :param lowerBound: lower bound for X range
@@ -58,6 +60,7 @@ class PlotValuesCanvas(FigureCanvas):
         self.plots = []
         self.hLines = []
         self.hLinesLabels = []
+        self.storageHLine = None
 
         axes = self.figure.add_subplot(111)
 
@@ -73,6 +76,10 @@ class PlotValuesCanvas(FigureCanvas):
 
         axes.set_xlim(lowerBound, upperBound)
         axes.set_ylim(max(0, yMin), int(max(1, yMax) * 1.5))
+
+        if storage is not None and axes.get_ylim()[0] <= storage <= axes.get_ylim()[1]:
+            # Add the storage line
+            self.add_storage_hline_to_plot(storage)
 
         if lowerBound <= self.verticalLinePos <= upperBound:
             self.verticalLine = axes.axvline(self.verticalLinePos, linewidth=self.verticalLineWidth)
@@ -93,9 +100,8 @@ class PlotValuesCanvas(FigureCanvas):
         self.hLinesLabels = []
         self.draw_idle()
 
-        if self.verticalLine is not None:
-            # self.verticalLine is automatically removed by self.figure.clf()
-            self.verticalLine = None
+        self.verticalLine = None    # self.verticalLine is automatically removed by self.figure.clf()
+        self.storageHLine = None
 
         self.visibleBool = False
 
@@ -154,6 +160,12 @@ class PlotValuesCanvas(FigureCanvas):
             for label in self.hLinesLabels:
                 label.set_visible(True)
         self.draw_idle()
+
+    def add_storage_hline_to_plot(self, storage):
+        """Add storage horizontal line to the plot"""
+        axes = self.figure.gca()
+        self.storageHLine = axes.axhline(y=storage, linewidth=self.storageHLineWidth)
+        self.storageHLine.set_color(self.storageHLineColor)
 
     def add_hline_to_plots(self):
         """Add horizontal lines to intersect vertical line"""

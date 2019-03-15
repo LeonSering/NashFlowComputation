@@ -870,7 +870,6 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         if upperBound > xValues[-1] and self.gttr('nashFlow').flowIntervals[-1][1] == float('inf'):
             xValues.append(upperBound)
             yValues.append(self.gttr('nashFlow').node_label(v, upperBound))
-
         self.gttr('plotDiagramCanvas').update_plot(lowerBound, upperBound, ["Earliest arrival time"], xValues, yValues)
 
     def update_edge_diagrams(self):
@@ -915,9 +914,15 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
             queueXValues.append(upperBound)
             queueYValues.append(val)
 
+        # Display storage horizontal line
+        if self.currentTF == 'general' or self.gttr('network')[v][w]['storage'] == float('inf'):
+            storage = None
+        else:
+            storage = self.gttr('network')[v][w]['storage']
+
         self.gttr('plotDiagramCanvas').update_plot(lowerBound, upperBound,
                                            ["Cumulative Inflow", "Cumulative Outflow", "Queue size"], inflowXValues,
-                                           inflowYValues, (outflowXValues, outflowYValues),
+                                           inflowYValues, storage, (outflowXValues, outflowYValues),
                                            (queueXValues, queueYValues))
 
     def update_diagrams(self):
