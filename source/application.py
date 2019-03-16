@@ -914,6 +914,38 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
             queueXValues.append(upperBound)
             queueYValues.append(val)
 
+        # Compute load=cumInflow - cumOutflow diagram
+        # Interpolate values
+        mRange = min(inflowXValues[-1], outflowXValues[-1])
+        xUnion = list(set(inflowXValues).union(set(outflowXValues)))
+        xUnion.sort()
+        loadXValues = [x for x in xUnion if x <= mRange]
+        loadYValues = []
+        for x in loadXValues:
+            # Compute inflow y
+            for j in range(len(inflowXValues)-1):
+                if inflowXValues[j] <= x <= inflowXValues[j+1]:
+                    if x == inflowXValues[j+1]:
+                        y_i = inflowYValues[j+1]
+                        break
+                    else:
+                        m = float(inflowYValues[j+1]-inflowYValues[j])/(inflowXValues[j+1]-inflowXValues[j])
+                        y_i = inflowYValues[j] + (x-inflowXValues[j])*m
+                        break
+            # Compute outflow y
+            for j in range(len(outflowXValues)-1):
+                if outflowXValues[j] <= x <= outflowXValues[j+1]:
+                    if x == outflowXValues[j+1]:
+                        y_o = outflowYValues[j+1]
+                        break
+                    else:
+                        m = float(outflowYValues[j+1]-outflowYValues[j])/(outflowXValues[j+1]-outflowXValues[j])
+                        y_o = outflowYValues[j] + (x-outflowXValues[j])*m
+                        break
+            y = y_i - y_o
+            loadYValues.append(y)
+
+
         # Display storage horizontal line
         if self.currentTF == 'general' or self.gttr('network')[v][w]['storage'] == float('inf'):
             storage = None
@@ -921,9 +953,9 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
             storage = self.gttr('network')[v][w]['storage']
 
         self.gttr('plotDiagramCanvas').update_plot(lowerBound, upperBound,
-                                           ["Cumulative Inflow", "Cumulative Outflow", "Queue size"], inflowXValues,
+                                           ["Cumulative Inflow", "Cumulative Outflow", "Queue size", "Load"], inflowXValues,
                                            inflowYValues, storage, (outflowXValues, outflowYValues),
-                                           (queueXValues, queueYValues))
+                                           (queueXValues, queueYValues), (loadXValues, loadYValues))
 
     def update_diagrams(self):
         """Update diagrams of focusEdge or focusNode, depending on whats selected"""

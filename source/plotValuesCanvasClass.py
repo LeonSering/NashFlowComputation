@@ -25,7 +25,7 @@ class PlotValuesCanvas(FigureCanvas):
         self.plots = []
         self.hLines = []
         self.hLinesLabels = []
-        self.additionalColors = ['green', 'red', 'blue']
+        self.additionalColors = ['green', 'red', 'blue', 'orange']
         self.verticalLine = None
         self.verticalLinePos = 0
         self.verticalLineColor = 'grey'
