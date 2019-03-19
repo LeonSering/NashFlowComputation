@@ -145,6 +145,10 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         QtGui.QShortcut(QtGui.QKeySequence(QtCore.Qt.Key_Delete), self).activated.connect(
             self.pressed_delete)  # Pressed Delete
 
+        # Statusbar
+        self.statusBarLabel = QtGui.QLabel()
+        self.statusBar.addWidget(self.statusBarLabel)
+
         if len(sys.argv) >= 3:
             # startup arguments have been specified
             if sys.argv[1] == '-l':
@@ -152,6 +156,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
                 self.load_graph(graphPath=sys.argv[2])
                 # Delete the temporary graph
                 os.remove(sys.argv[2])
+
 
     def gttr(self, variable, tfType=None):
         """
@@ -491,18 +496,28 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.sttr('plotDiagramCanvas', None, PlotValuesCanvas(callback=self.callback_plotvaluescanvas))
         self.gttr('plotDiagramLayout').addWidget(self.gttr('plotDiagramCanvas'))
 
-        # Display statistics
-        self.gttr('statNumberOfNodesLabel').setText(str(self.gttr('nashFlow').network.number_of_nodes()))
-        self.gttr('statNumberOfEdgesLabel').setText(str(self.gttr('nashFlow').network.number_of_edges()))
-        avgNodes, avgEdges = self.gttr('nashFlow').get_stat_preprocessing()
-        self.gttr('statAvgDeletedNodesLabel').setText(str(avgNodes))
-        self.gttr('statAvgDeletedEdgesLabel').setText(str(avgEdges))
+        self.display_statistics()
+
+    def display_statistics(self):
+        """Display statistics"""
+        nF = self.gttr('nashFlow')
+        avgNodes, avgEdges = nF.get_stat_preprocessing()
         avgIPs, totalIPs = self.gttr('nashFlow').get_stat_solved_IPs()
-        self.gttr('statAvgSolvedIPsLabel').setText(str(avgIPs))
-        self.gttr('statTotalSolvedIPsLabel').setText(str(totalIPs))
         avgTime, totalTime = self.gttr('nashFlow').get_stat_time()
-        self.gttr('statAvgTimeLabel').setText(str(avgTime))
-        self.gttr('statTotalTimeLabel').setText(str(totalTime))
+
+        nNodesStr = "#Nodes: " + str(nF.network.number_of_nodes())
+        nEdgesStr = "#Edges: " + str(nF.network.number_of_edges())
+        avgNodesStr = "Avg. #Deleted Nodes: " + str(avgNodes)
+        avgEdgesStr = "Avg. #Deleted Edges: " + str(avgEdges)
+        avgIPStr = "Avg. #IPs/Interval: " + str(avgIPs)
+        totalIPStr = "Total #IPs: " + str(totalIPs)
+        avgTimeStr = "Avg. Time/Interval: " + str(avgTime)
+        totalTimeStr = "Total time: " + str(totalTime)
+
+        stringList = [nNodesStr, nEdgesStr, avgNodesStr, avgEdgesStr, avgIPStr, totalIPStr, avgTimeStr, totalTimeStr]
+        statStr = "   |   ".join(stringList)
+        self.statusBarLabel.setText(statStr)
+
 
     def load_graph(self, graphPath=None):
         """
