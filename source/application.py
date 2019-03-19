@@ -93,9 +93,6 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
             self.gttr('stopPushButton', tfType).clicked.connect(self.stop_animation)
             self.gttr('computeIntervalPushButton', tfType).clicked.connect(self.compute_next_interval)
             self.gttr('intervalsListWidget', tfType).clicked.connect(self.update_ntf_display)
-            self.gttr('generateAnimationPushButton', tfType).clicked.connect(self.generate_animation)
-            self.gttr('animationStartLineEdit', tfType).returnPressed.connect(self.generate_animation)
-            self.gttr('animationEndLineEdit', tfType).returnPressed.connect(self.generate_animation)
             self.gttr('setTimeLineEdit', tfType).returnPressed.connect(self.set_new_time_manually)
 
             # Keyboard shortcuts
@@ -110,7 +107,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
             self.gttr('timeSlider', tfType).setMinimum(0)
             self.gttr('timeSlider', tfType).setMaximum(99)
             self.gttr('timeSlider', tfType).setValue(0)
-            self.gttr('timeSlider', tfType).setTickPosition(2) # Set ticks below horizontal slider
+            #self.gttr('timeSlider', tfType).setTickPosition(2) # Set ticks below horizontal slider
             self.gttr('timeSlider', tfType).setTickInterval(1)
 
             # Slider signals
@@ -139,6 +136,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.actionSave_Nashflow.triggered.connect(self.save_nashflow)
         self.actionOpen_ThinFlowComputation.triggered.connect(self.open_tfc)
         self.actionMove_graph_to_ThinFlowComputation.triggered.connect(self.move_to_tfc)
+        self.actionChange_animation_time_range.triggered.connect(self.generate_animation_dialog)
         self.actionOpen_manual.triggered.connect(self.show_help)
 
         # Non-assigned shortcuts
@@ -239,10 +237,26 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.re_init_node_list()
         self.re_init_edge_list()
 
-    def generate_animation(self):
+    def generate_animation_dialog(self):
+        """Show dialog in which new animation range is selected"""
+        lowerBoundInput, lowerGiven = QtGui.QInputDialog.getText(self, 'Enter the lower bound', 'Starting from:')
+        if not lowerGiven:
+            return
+        upperBoundInput, upperGiven = QtGui.QInputDialog.getText(self, 'Enter the upper bound', 'Ending at:')
+        if not upperGiven:
+            return
+
+        # Check if floats given
+        try:
+            float(lowerBoundInput)
+            float(upperBoundInput)
+        except ValueError:
+            return
+
+        self.generate_animation(lowerBoundInput, upperBoundInput)
+
+    def generate_animation(self, lowerBoundInput, upperBoundInput):
         """Generates new animation"""
-        lowerBoundInput = str(self.gttr('animationStartLineEdit').text())
-        upperBoundInput = str(self.gttr('animationEndLineEdit').text())
         if upperBoundInput == "":
             upperBoundInput = self.gttr('nashFlow').node_label('t', self.gttr('nashFlow').flowIntervals[-1][1]) \
                 if self.gttr('nashFlow').flowIntervals[-1][1] < float('inf') \
@@ -479,8 +493,8 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
 
         self.sttr('animationUpperBound', None, self.gttr('animationUpperBound') if self.gttr('animationUpperBound') > 0 else 10)  # This can only happen when infinity is reached
 
-        self.gttr('animationStartLineEdit').setText("%.2f" % self.gttr('animationLowerBound'))
-        self.gttr('animationEndLineEdit').setText("%.2f" % self.gttr('animationUpperBound'))
+        #self.gttr('animationStartLineEdit').setText("%.2f" % self.gttr('animationLowerBound'))
+        #self.gttr('animationEndLineEdit').setText("%.2f" % self.gttr('animationUpperBound'))
 
         self.sttr('plotAnimationCanvas', None, PlotAnimationCanvas(nashflow=self.gttr('nashFlow'), interface=self,
                                                        upperBound=self.gttr('animationUpperBound'),
@@ -515,7 +529,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         totalTimeStr = "Total time: " + str(totalTime)
 
         stringList = [nNodesStr, nEdgesStr, avgNodesStr, avgEdgesStr, avgIPStr, totalIPStr, avgTimeStr, totalTimeStr]
-        statStr = "   |   ".join(stringList)
+        statStr = "   " + "   |   ".join(stringList)
         self.statusBarLabel.setText(statStr)
 
 
