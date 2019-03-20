@@ -91,6 +91,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
             self.gttr('playPushButton', tfType).clicked.connect(self.play_animation)
             self.gttr('pausePushButton', tfType).clicked.connect(self.pause_animation)
             self.gttr('stopPushButton', tfType).clicked.connect(self.stop_animation)
+            self.gttr('recordPushButton', tfType).clicked.connect(self.export_animation)
             self.gttr('computeIntervalPushButton', tfType).clicked.connect(self.compute_next_interval)
             self.gttr('intervalsListWidget', tfType).clicked.connect(self.update_ntf_display)
             self.gttr('setTimeLineEdit', tfType).returnPressed.connect(self.set_new_time_manually)
@@ -1057,6 +1058,24 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.output("Exporting diagram: " + str(fsave))
 
         self.gttr('plotDiagramCanvas').export(path=fsave)
+
+    def export_animation(self):
+        """Export animation to mp4. This requires FFMPEG."""
+        fileType = 'mp4'
+        dialog = QtGui.QFileDialog
+        fsave = dialog.getSaveFileName(self, "Select File", self.defaultLoadSaveDir,
+                                       fileType + " files (*." + fileType + ")")
+
+        if os.name != 'posix':
+            fsave = fsave[0]
+        if len(fsave) == 0:
+            return
+        fsave = str(fsave)
+
+        if not fsave.endswith('.' + fileType):
+            fsave += '.' + fileType
+        self.output("Exporting animation video: " + str(fsave))
+        self.gttr('plotAnimationCanvas').export(path=fsave)
 
     def update_plotanimationcanvas_focusselection(self):
         """Update labels in Tab1 when focus changes"""

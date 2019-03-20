@@ -24,7 +24,7 @@
        </sizepolicy>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="tab_general">
        <attribute name="title">
@@ -563,6 +563,23 @@
                      <property name="icon">
                       <iconset>
                        <normaloff>:/playpausestop/stop.png</normaloff>:/playpausestop/stop.png</iconset>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QPushButton" name="recordPushButton_general">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
+                     <property name="text">
+                      <string/>
+                     </property>
+                     <property name="icon">
+                      <iconset resource="recordIcon.qrc">
+                       <normaloff>:/record/Downloads/rec-button2.png</normaloff>:/record/Downloads/rec-button2.png</iconset>
                      </property>
                     </widget>
                    </item>
@@ -1208,6 +1225,23 @@
                      </property>
                     </widget>
                    </item>
+                   <item>
+                    <widget class="QPushButton" name="recordPushButton_spillback">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
+                     <property name="text">
+                      <string/>
+                     </property>
+                     <property name="icon">
+                      <iconset resource="recordIcon.qrc">
+                       <normaloff>:/record/Downloads/rec-button2.png</normaloff>:/record/Downloads/rec-button2.png</iconset>
+                     </property>
+                    </widget>
+                   </item>
                   </layout>
                  </item>
                  <item row="1" column="0">
@@ -1783,6 +1817,7 @@
  </widget>
  <resources>
   <include location="icons.qrc"/>
+  <include location="recordIcon.qrc"/>
  </resources>
  <connections/>
 </ui>

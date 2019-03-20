@@ -9,12 +9,15 @@ from plotCanvasClass import PlotCanvas
 from networkx import draw_networkx_labels, get_node_attributes
 from utilitiesClass import Utilities
 from bisect import insort
+import os
+from tempfile import gettempdir
 import numpy as np
 import matplotlib
 matplotlib.use("Qt4Agg")
 from matplotlib.patches import Rectangle
 from matplotlib.collections import PatchCollection, LineCollection
 from matplotlib.colors import colorConverter
+from matplotlib.animation import FFMpegFileWriter
 
 # ======================================================================================================================
 
@@ -481,3 +484,14 @@ class PlotAnimationCanvas(PlotCanvas):
             label.set_fontsize(edgeLabelSize)
 
         self.draw_idle()
+
+    def export(self, path):
+        """Export mp4-video of animation to path. This requires FFMPEG."""
+        currentTimeIndex = self.currentTimeIndex  # Index to jump back to
+        ffmpegWriter = FFMpegFileWriter()
+        with ffmpegWriter.saving(self.figure, path, dpi=100):
+            for t_i in range(self.maxTimeIndex):
+                self.time_changed(t_i)
+                ffmpegWriter.grab_frame()
+        self.time_changed(currentTimeIndex)
+
