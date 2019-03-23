@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>974</width>
+    <width>1018</width>
     <height>746</height>
    </rect>
   </property>
@@ -34,25 +34,191 @@
         <item row="0" column="0">
          <widget class="QTabWidget" name="tabWidget_general">
           <property name="currentIndex">
-           <number>1</number>
+           <number>0</number>
           </property>
           <widget class="QWidget" name="tab_3">
            <attribute name="title">
             <string>Create/Load graph</string>
            </attribute>
            <layout class="QGridLayout" name="gridLayout_3">
+            <item row="3" column="0" colspan="3">
+             <widget class="QGroupBox" name="groupBox">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">QGroupBox { 
+     border: 2px solid rgb(0, 0, 127); 
+     border-radius: 1px; 
+ } </string>
+              </property>
+              <property name="title">
+               <string>Config</string>
+              </property>
+              <layout class="QGridLayout" name="gridLayout_2">
+               <item row="3" column="3">
+                <widget class="QCheckBox" name="cleanUpCheckBox_general">
+                 <property name="text">
+                  <string>Clean-up</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="6" column="2">
+                <widget class="QPushButton" name="scipPathPushButton_general">
+                 <property name="text">
+                  <string>Select binary</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="3" column="4">
+                <widget class="QLabel" name="label_8">
+                 <property name="text">
+                  <string>Inflow Rate</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="6" column="4">
+                <widget class="QLabel" name="timeoutLabel_general">
+                 <property name="enabled">
+                  <bool>false</bool>
+                 </property>
+                 <property name="text">
+                  <string>Timeout (in s)</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="6" column="3">
+                <widget class="QCheckBox" name="activateTimeoutCheckBox_general">
+                 <property name="text">
+                  <string>Timeout</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="3" column="2">
+                <widget class="QPushButton" name="outputDirectoryPushButton_general">
+                 <property name="text">
+                  <string>Select directory</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="6" column="0">
+                <widget class="QLabel" name="label_12">
+                 <property name="text">
+                  <string>SCIP path</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="3" column="1">
+                <widget class="QLineEdit" name="outputDirectoryLineEdit_general"/>
+               </item>
+               <item row="6" column="1">
+                <widget class="QLineEdit" name="scipPathLineEdit_general"/>
+               </item>
+               <item row="3" column="0">
+                <widget class="QLabel" name="label_9">
+                 <property name="text">
+                  <string>Output directory</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="6" column="5">
+                <widget class="QLineEdit" name="timeoutLineEdit_general">
+                 <property name="enabled">
+                  <bool>false</bool>
+                 </property>
+                 <property name="text">
+                  <string>300</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="3" column="5">
+                <widget class="QLineEdit" name="inflowLineEdit_general">
+                 <property name="text">
+                  <string>0</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="8" column="0">
+                <widget class="QLabel" name="label_11">
+                 <property name="text">
+                  <string>Algorithm &amp; Template</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="8" column="1">
+                <widget class="QComboBox" name="templateComboBox_general">
+                 <item>
+                  <property name="text">
+                   <string>1. Basic algorithm by Cominetti, Correa and Larré</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>2. Solve only one LP/IP</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>3. Advanced algorithm</string>
+                  </property>
+                 </item>
+                </widget>
+               </item>
+               <item row="8" column="5">
+                <widget class="QLineEdit" name="intervalsLineEdit_general">
+                 <property name="text">
+                  <string>-1</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="8" column="4">
+                <widget class="QLabel" name="label_10">
+                 <property name="text">
+                  <string># Intervals (-1 = all)</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="1">
+                <spacer name="verticalSpacer_7">
+                 <property name="orientation">
+                  <enum>Qt::Vertical</enum>
+                 </property>
+                 <property name="sizeType">
+                  <enum>QSizePolicy::Fixed</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>20</width>
+                   <height>10</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+              </layout>
+              <zorder>label_8</zorder>
+              <zorder>label_9</zorder>
+              <zorder>outputDirectoryLineEdit_general</zorder>
+              <zorder>outputDirectoryPushButton_general</zorder>
+              <zorder>label_12</zorder>
+              <zorder>scipPathLineEdit_general</zorder>
+              <zorder>scipPathPushButton_general</zorder>
+              <zorder>cleanUpCheckBox_general</zorder>
+              <zorder>activateTimeoutCheckBox_general</zorder>
+              <zorder>timeoutLabel_general</zorder>
+              <zorder>timeoutLineEdit_general</zorder>
+              <zorder>inflowLineEdit_general</zorder>
+              <zorder>label_11</zorder>
+              <zorder>templateComboBox_general</zorder>
+              <zorder>intervalsLineEdit_general</zorder>
+              <zorder>label_10</zorder>
+              <zorder>verticalSpacer_7</zorder>
+             </widget>
+            </item>
             <item row="1" column="1" rowspan="2" colspan="2">
              <layout class="QGridLayout" name="gridLayout_6">
-              <item row="0" column="1">
-               <widget class="QListWidget" name="nodeSelectionListWidget_general">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-                  <horstretch>0</horstretch>
-                  <verstretch>2</verstretch>
-                 </sizepolicy>
-                </property>
-               </widget>
-              </item>
               <item row="1" column="0" colspan="2">
                <widget class="QPushButton" name="computeFlowPushButton_general">
                 <property name="sizePolicy">
@@ -63,6 +229,16 @@
                 </property>
                 <property name="text">
                  <string>Compute Nashflow</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QListWidget" name="nodeSelectionListWidget_general">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                  <horstretch>0</horstretch>
+                  <verstretch>2</verstretch>
+                 </sizepolicy>
                 </property>
                </widget>
               </item>
@@ -305,7 +481,7 @@
               <property name="sizePolicy">
                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                 <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
+                <verstretch>1</verstretch>
                </sizepolicy>
               </property>
               <property name="verticalScrollBarPolicy">
@@ -336,6 +512,7 @@
            <zorder>plotFrame_general</zorder>
            <zorder>groupBox_3</zorder>
            <zorder>groupBox_2</zorder>
+           <zorder>groupBox</zorder>
            <zorder>logPlainTextEdit_general</zorder>
           </widget>
           <widget class="QWidget" name="tab_4">
@@ -343,7 +520,7 @@
             <string>Compute Nashflow</string>
            </attribute>
            <layout class="QGridLayout" name="gridLayout_7">
-            <item row="2" column="0">
+            <item row="3" column="0">
              <widget class="QGroupBox" name="groupBox_6">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -377,19 +554,6 @@
                  </property>
                 </spacer>
                </item>
-               <item row="1" column="0" rowspan="2">
-                <widget class="QFrame" name="plotNTFFrame_general">
-                 <property name="sizePolicy">
-                  <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                   <horstretch>3</horstretch>
-                   <verstretch>0</verstretch>
-                  </sizepolicy>
-                 </property>
-                 <property name="frameShape">
-                  <enum>QFrame::Box</enum>
-                 </property>
-                </widget>
-               </item>
                <item row="3" column="0">
                 <widget class="QCheckBox" name="showEdgesWithoutFlowCheckBox_general">
                  <property name="text">
@@ -397,25 +561,6 @@
                  </property>
                  <property name="checked">
                   <bool>true</bool>
-                 </property>
-                </widget>
-               </item>
-               <item row="1" column="1" rowspan="2">
-                <widget class="QListWidget" name="intervalsListWidget_general">
-                 <property name="sizePolicy">
-                  <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-                   <horstretch>1</horstretch>
-                   <verstretch>0</verstretch>
-                  </sizepolicy>
-                 </property>
-                 <property name="frameShape">
-                  <enum>QFrame::Box</enum>
-                 </property>
-                 <property name="frameShadow">
-                  <enum>QFrame::Plain</enum>
-                 </property>
-                 <property name="selectionMode">
-                  <enum>QAbstractItemView::NoSelection</enum>
                  </property>
                 </widget>
                </item>
@@ -441,10 +586,42 @@
                  </property>
                 </widget>
                </item>
+               <item row="1" column="0" rowspan="2">
+                <widget class="QFrame" name="plotNTFFrame_general">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                   <horstretch>3</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="frameShape">
+                  <enum>QFrame::Box</enum>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="1" rowspan="2">
+                <widget class="QListWidget" name="intervalsListWidget_general">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                   <horstretch>1</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="frameShape">
+                  <enum>QFrame::Box</enum>
+                 </property>
+                 <property name="frameShadow">
+                  <enum>QFrame::Plain</enum>
+                 </property>
+                 <property name="selectionMode">
+                  <enum>QAbstractItemView::NoSelection</enum>
+                 </property>
+                </widget>
+               </item>
               </layout>
              </widget>
             </item>
-            <item row="1" column="0">
+            <item row="2" column="0">
              <widget class="QGroupBox" name="groupBox_4">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -639,7 +816,7 @@
               </layout>
              </widget>
             </item>
-            <item row="1" column="1" rowspan="2">
+            <item row="2" column="1" rowspan="2">
              <widget class="QGroupBox" name="groupBox_5">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -778,7 +955,7 @@
         <item row="0" column="0">
          <widget class="QTabWidget" name="tabWidget_spillback">
           <property name="currentIndex">
-           <number>1</number>
+           <number>0</number>
           </property>
           <widget class="QWidget" name="tab_5">
            <attribute name="title">
@@ -1069,7 +1246,7 @@
               <property name="sizePolicy">
                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                 <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
+                <verstretch>1</verstretch>
                </sizepolicy>
               </property>
               <property name="verticalScrollBarPolicy">
@@ -1094,6 +1271,165 @@
               <property name="frameShadow">
                <enum>QFrame::Plain</enum>
               </property>
+             </widget>
+            </item>
+            <item row="3" column="0" colspan="3">
+             <widget class="QGroupBox" name="groupBox_7">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">QGroupBox { 
+     border: 2px solid rgb(0, 0, 127); 
+     border-radius: 1px; 
+ } </string>
+              </property>
+              <property name="title">
+               <string>Config</string>
+              </property>
+              <layout class="QGridLayout" name="gridLayout_16">
+               <item row="3" column="3">
+                <widget class="QCheckBox" name="cleanUpCheckBox_spillback">
+                 <property name="text">
+                  <string>Clean-up</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="6" column="2">
+                <widget class="QPushButton" name="scipPathPushButton_spillback">
+                 <property name="text">
+                  <string>Select binary</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="3" column="4">
+                <widget class="QLabel" name="label_21">
+                 <property name="text">
+                  <string>Inflow Rate</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="6" column="4">
+                <widget class="QLabel" name="timeoutLabel_spillback">
+                 <property name="enabled">
+                  <bool>false</bool>
+                 </property>
+                 <property name="text">
+                  <string>Timeout (in s)</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="6" column="3">
+                <widget class="QCheckBox" name="activateTimeoutCheckBox_spillback">
+                 <property name="text">
+                  <string>Timeout</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="3" column="2">
+                <widget class="QPushButton" name="outputDirectoryPushButton_spillback">
+                 <property name="text">
+                  <string>Select directory</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="6" column="0">
+                <widget class="QLabel" name="label_22">
+                 <property name="text">
+                  <string>SCIP path</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="3" column="1">
+                <widget class="QLineEdit" name="outputDirectoryLineEdit_spillback"/>
+               </item>
+               <item row="6" column="1">
+                <widget class="QLineEdit" name="scipPathLineEdit_spillback"/>
+               </item>
+               <item row="3" column="0">
+                <widget class="QLabel" name="label_26">
+                 <property name="text">
+                  <string>Output directory</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="6" column="5">
+                <widget class="QLineEdit" name="timeoutLineEdit_spillback">
+                 <property name="enabled">
+                  <bool>false</bool>
+                 </property>
+                 <property name="text">
+                  <string>300</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="3" column="5">
+                <widget class="QLineEdit" name="inflowLineEdit_spillback">
+                 <property name="text">
+                  <string>0</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="8" column="0">
+                <widget class="QLabel" name="label_27">
+                 <property name="text">
+                  <string>Algorithm &amp; Template</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="8" column="1">
+                <widget class="QComboBox" name="templateComboBox_spillback">
+                 <item>
+                  <property name="text">
+                   <string>1. Basic algorithm by Cominetti, Correa and Larré</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>2. Solve only one LP/IP</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>3. Advanced algorithm</string>
+                  </property>
+                 </item>
+                </widget>
+               </item>
+               <item row="8" column="5">
+                <widget class="QLineEdit" name="intervalsLineEdit_spillback">
+                 <property name="text">
+                  <string>-1</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="8" column="4">
+                <widget class="QLabel" name="label_28">
+                 <property name="text">
+                  <string># Intervals (-1 = all)</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="1">
+                <spacer name="verticalSpacer_9">
+                 <property name="orientation">
+                  <enum>Qt::Vertical</enum>
+                 </property>
+                 <property name="sizeType">
+                  <enum>QSizePolicy::Fixed</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>20</width>
+                   <height>10</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+              </layout>
              </widget>
             </item>
            </layout>
@@ -1532,182 +1868,6 @@
       </widget>
      </widget>
     </item>
-    <item>
-     <widget class="QGroupBox" name="groupBox">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">QGroupBox { 
-     border: 2px solid rgb(0, 0, 127); 
-     border-radius: 1px; 
- } </string>
-      </property>
-      <property name="title">
-       <string>Config</string>
-      </property>
-      <layout class="QGridLayout" name="gridLayout_2">
-       <item row="3" column="3">
-        <widget class="QCheckBox" name="cleanUpCheckBox">
-         <property name="text">
-          <string>Clean-up</string>
-         </property>
-        </widget>
-       </item>
-       <item row="6" column="2">
-        <widget class="QPushButton" name="scipPathPushButton">
-         <property name="text">
-          <string>Select binary</string>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="4">
-        <widget class="QLabel" name="label_8">
-         <property name="text">
-          <string>Inflow Rate</string>
-         </property>
-        </widget>
-       </item>
-       <item row="6" column="4">
-        <widget class="QLabel" name="timeoutLabel">
-         <property name="enabled">
-          <bool>false</bool>
-         </property>
-         <property name="text">
-          <string>Timeout (in s)</string>
-         </property>
-        </widget>
-       </item>
-       <item row="6" column="3">
-        <widget class="QCheckBox" name="activateTimeoutCheckBox">
-         <property name="text">
-          <string>Timeout</string>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="2">
-        <widget class="QPushButton" name="outputDirectoryPushButton">
-         <property name="text">
-          <string>Select directory</string>
-         </property>
-        </widget>
-       </item>
-       <item row="6" column="0">
-        <widget class="QLabel" name="label_12">
-         <property name="text">
-          <string>SCIP path</string>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="1">
-        <widget class="QLineEdit" name="outputDirectoryLineEdit"/>
-       </item>
-       <item row="6" column="1">
-        <widget class="QLineEdit" name="scipPathLineEdit"/>
-       </item>
-       <item row="3" column="0">
-        <widget class="QLabel" name="label_9">
-         <property name="text">
-          <string>Output directory</string>
-         </property>
-        </widget>
-       </item>
-       <item row="6" column="5">
-        <widget class="QLineEdit" name="timeoutLineEdit">
-         <property name="enabled">
-          <bool>false</bool>
-         </property>
-         <property name="text">
-          <string>300</string>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="5">
-        <widget class="QLineEdit" name="inflowLineEdit">
-         <property name="text">
-          <string>0</string>
-         </property>
-        </widget>
-       </item>
-       <item row="8" column="0">
-        <widget class="QLabel" name="label_11">
-         <property name="text">
-          <string>Algorithm &amp; Template</string>
-         </property>
-        </widget>
-       </item>
-       <item row="8" column="1">
-        <widget class="QComboBox" name="templateComboBox">
-         <item>
-          <property name="text">
-           <string>1. Basic algorithm by Cominetti, Correa and Larré</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>2. Solve only one LP/IP</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>3. Advanced algorithm</string>
-          </property>
-         </item>
-        </widget>
-       </item>
-       <item row="8" column="5">
-        <widget class="QLineEdit" name="intervalsLineEdit">
-         <property name="text">
-          <string>-1</string>
-         </property>
-        </widget>
-       </item>
-       <item row="8" column="4">
-        <widget class="QLabel" name="label_10">
-         <property name="text">
-          <string># Intervals (-1 = all)</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="1">
-        <spacer name="verticalSpacer_7">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeType">
-          <enum>QSizePolicy::Fixed</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>10</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-      </layout>
-      <zorder>label_8</zorder>
-      <zorder>label_9</zorder>
-      <zorder>outputDirectoryLineEdit</zorder>
-      <zorder>outputDirectoryPushButton</zorder>
-      <zorder>label_12</zorder>
-      <zorder>scipPathLineEdit</zorder>
-      <zorder>scipPathPushButton</zorder>
-      <zorder>cleanUpCheckBox</zorder>
-      <zorder>activateTimeoutCheckBox</zorder>
-      <zorder>timeoutLabel</zorder>
-      <zorder>timeoutLineEdit</zorder>
-      <zorder>inflowLineEdit</zorder>
-      <zorder>label_11</zorder>
-      <zorder>templateComboBox</zorder>
-      <zorder>intervalsLineEdit</zorder>
-      <zorder>label_10</zorder>
-      <zorder>verticalSpacer_7</zorder>
-     </widget>
-    </item>
    </layout>
   </widget>
   <widget class="QMenuBar" name="menubar">
@@ -1715,7 +1875,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>974</width>
+     <width>1018</width>
      <height>25</height>
     </rect>
    </property>

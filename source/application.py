@@ -58,8 +58,8 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
             self.sttr('animationLowerBound', tfType, 0)
             self.sttr('animationUpperBound', tfType, 1)
             self.sttr('animationRunning', tfType, False)
+            self.gttr('inflowLineEdit', tfType).setText('1')  # Default value
 
-        self.inflowLineEdit.setText('1')  # Default value
 
         # Config defaults
         self.outputDirectory = ''
@@ -96,6 +96,12 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
             self.gttr('intervalsListWidget', tfType).clicked.connect(self.update_ntf_display)
             self.gttr('setTimeLineEdit', tfType).returnPressed.connect(self.set_new_time_manually)
 
+            # Config signals
+            self.gttr('outputDirectoryPushButton', tfType).clicked.connect(self.select_output_directory)
+            self.gttr('scipPathPushButton', tfType).clicked.connect(self.select_scip_binary)
+            self.gttr('cleanUpCheckBox', tfType).clicked.connect(self.change_cleanup_state)
+            self.gttr('activateTimeoutCheckBox', tfType).clicked.connect(self.change_timeout_state)
+
             # Keyboard shortcuts
             self.gttr('tailLineEdit', tfType).returnPressed.connect(self.update_add_edge)
             self.gttr('headLineEdit', tfType).returnPressed.connect(self.update_add_edge)
@@ -125,10 +131,6 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
 
         # Non-assigned Signals
         self.tabWidget.connect(self.tabWidget, QtCore.SIGNAL("currentChanged(int)"), self.tabSwitched)
-        self.outputDirectoryPushButton.clicked.connect(self.select_output_directory)
-        self.scipPathPushButton.clicked.connect(self.select_scip_binary)
-        self.cleanUpCheckBox.clicked.connect(self.change_cleanup_state)
-        self.activateTimeoutCheckBox.clicked.connect(self.change_timeout_state)
         self.actionNew_graph.triggered.connect(self.re_init_app)
         self.actionLoad_graph.triggered.connect(self.load_graph)
         self.actionSave_graph.triggered.connect(self.save_graph)
@@ -467,7 +469,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         # Update UI
         self.update_node_display()
         self.update_edge_display()
-        self.inflowLineEdit.setText(str(self.gttr('network').graph['inflowRate']))
+        self.gttr('inflowLineEdit').setText(str(self.gttr('network').graph['inflowRate']))
 
         self.re_init_node_list()
         self.re_init_edge_list()
@@ -565,15 +567,13 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.output("Loading graph: " + str(fopen))
         self.re_init_app(NoNewGraph=True)
 
-
-
     def save_graph(self, graphPath=None):
         """
         Save graph instance to '.cg' file
         :param graphPath: If given, then save graph at path graphPath. Else a dialog is opened
         :return: 
         """
-        self.gttr('network').graph['inflowRate'] = float(self.inflowLineEdit.text())
+        self.gttr('network').graph['inflowRate'] = float(self.gttr('inflowLineEdit').text())
 
         if not graphPath:
             dialog = QtGui.QFileDialog
@@ -655,7 +655,8 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
             return
         fselect = str(fselect)
         self.output("Selecting output directory: " + str(fselect))
-        self.outputDirectoryLineEdit.setText(fselect)
+        for tfType in self.tfTypeList:
+            self.gttr('outputDirectoryLineEdit', tfType).setText(fselect)
         self.outputDirectory = fselect
 
     def select_scip_binary(self):
@@ -670,7 +671,8 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
             return
         fselect = str(fselect)
         self.output("Selecting scip binary: " + str(fselect))
-        self.scipPathLineEdit.setText(fselect)
+        for tfType in self.tfTypeList:
+            self.gttr('scipPathLineEdit', tfType).setText(fselect)
         self.scipFile = fselect
 
     def load_config(self):
@@ -687,28 +689,24 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
 
         try:
             self.configFile.read('config.cfg')
-
             self.outputDirectory = self.configFile.get('Settings', 'outputdir')
-            self.outputDirectoryLineEdit.setText(self.outputDirectory)
             self.templateFile = int(self.configFile.get('Settings', 'templatefile'))
-            self.templateComboBox.setCurrentIndex(self.templateFile)
             self.scipFile = self.configFile.get('Settings', 'scippath')
-            self.scipPathLineEdit.setText(self.scipFile)
-
             self.cleanUpEnabled = (self.configFile.get('Settings', 'cleanup') == 'True')
-            self.cleanUpCheckBox.setChecked(self.cleanUpEnabled)
-
             self.numberOfIntervals = self.configFile.get('Settings', 'intervals')
-            self.intervalsLineEdit.setText(self.numberOfIntervals)
-
             self.defaultLoadSaveDir = self.configFile.get('Settings', 'defaultloadsavedir')
-
             self.timeoutActivated = (self.configFile.get('Settings', 'timeoutactivated') == 'True')
-            self.activateTimeoutCheckBox.setChecked(self.timeoutActivated)
-            self.change_timeout_state()
-
             timeoutTime = self.configFile.get('Settings', 'timeoutTime')
-            self.timeoutLineEdit.setText(timeoutTime)
+
+            for tfType in self.tfTypeList:
+                self.gttr('outputDirectoryLineEdit', tfType).setText(self.outputDirectory)
+                self.gttr('templateComboBox', tfType).setCurrentIndex(self.templateFile)
+                self.gttr('scipPathLineEdit', tfType).setText(self.scipFile)
+                self.gttr('cleanUpCheckBox', tfType).setChecked(self.cleanUpEnabled)
+                self.gttr('intervalsLineEdit', tfType).setText(self.numberOfIntervals)
+                self.gttr('activateTimeoutCheckBox', tfType).setChecked(self.timeoutActivated)
+                self.gttr('timeoutLineEdit', tfType).setText(timeoutTime)
+            self.change_timeout_state()
 
             self.output("Loading config: Success")
 
@@ -725,7 +723,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.configFile.set('Settings', 'intervals', self.numberOfIntervals)
         self.configFile.set('Settings', 'defaultloadsavedir', self.defaultLoadSaveDir)
         self.configFile.set('Settings', 'timeoutactivated', self.timeoutActivated)
-        timeoutTime = str(self.timeoutLineEdit.text())
+        timeoutTime = str(self.gttr('timeoutLineEdit').text())
         self.configFile.set('Settings', 'timeoutTime', timeoutTime)
 
         with open('config.cfg', 'wb') as configfile:
@@ -752,13 +750,13 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.gttr('showEdgesWithoutFlowCheckBox').setEnabled(False)
 
         # Get remaining settings
-        self.numberOfIntervals = self.intervalsLineEdit.text()
-        self.templateFile = self.templateComboBox.currentIndex()    # TODO: Does not work if different algorithm set
-        inflowRate = float(self.inflowLineEdit.text())
+        self.numberOfIntervals = self.gttr('intervalsLineEdit').text()
+        self.templateFile = self.gttr('templateComboBox').currentIndex()    # TODO: Does not work if different algorithm set
+        inflowRate = float(self.gttr('inflowLineEdit').text())
 
         self.save_config()  # Save config-settings to file
         self.gttr('tabWidget').setCurrentIndex(1)  # Switch to next tab
-        timeout = -1 if not self.timeoutActivated else float(self.timeoutLineEdit.text())
+        timeout = -1 if not self.timeoutActivated else float(self.gttr('timeoutLineEdit').text())
 
         if not nextIntervalOnly:
             numberString = str(self.numberOfIntervals) if float(self.numberOfIntervals) != -1 else "all"
@@ -996,7 +994,9 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
 
     def change_cleanup_state(self):
         """Active/Deactive cleanup"""
-        self.cleanUpEnabled = (self.cleanUpCheckBox.isChecked())
+        self.cleanUpEnabled = self.gttr('cleanUpCheckBox').isChecked()
+        for tfType in self.tfTypeList:
+            self.gttr('cleanUpCheckBox', tfType).setChecked(self.cleanUpEnabled)
 
     def pressed_delete(self):
         """Slot for DEL Key"""
@@ -1204,9 +1204,11 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
 
     def change_timeout_state(self):
         """Activate/Deactivate Timeout"""
-        self.timeoutActivated = self.activateTimeoutCheckBox.isChecked()
-        self.timeoutLabel.setEnabled(self.timeoutActivated)
-        self.timeoutLineEdit.setEnabled(self.timeoutActivated)
+        self.timeoutActivated = self.gttr('activateTimeoutCheckBox').isChecked()
+        for tfType in self.tfTypeList:
+            self.gttr('activateTimeoutCheckBox', tfType).setChecked(self.timeoutActivated)
+            self.gttr('timeoutLabel', tfType).setEnabled(self.timeoutActivated)
+            self.gttr('timeoutLineEdit', tfType).setEnabled(self.timeoutActivated)
 
     def play_animation(self):
         """Slot to play animation"""
@@ -1313,7 +1315,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
             try:
                 for e in network.out_edges('s'):
                     (v, w) = e
-                    if network[v][w]['inCapacity'] < float(self.inflowLineEdit.text()): #TODO: Should this be <= as in paper? Example from paper doesnt fulfil
+                    if network[v][w]['inCapacity'] < float(self.inflowLineEdit_spillback.text()): #TODO: Should this be <= as in paper? Example from paper doesnt fulfil
                         return 6
             except KeyError:
                 pass
