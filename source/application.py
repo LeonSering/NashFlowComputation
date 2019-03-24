@@ -546,7 +546,8 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         totalTimeStr = "Total time: " + str(totalTime)
 
         stringList = [nNodesStr, nEdgesStr, avgNodesStr, avgEdgesStr, avgIPStr, totalIPStr, avgTimeStr, totalTimeStr]
-        statStr = "   " + "   |   ".join(stringList)
+        stringList = [nNodesStr, nEdgesStr, avgIPStr, totalIPStr, avgTimeStr, totalTimeStr]
+        statStr = " " + " | ".join(stringList)
         self.statusBarLabel.setText(statStr)
 
 
