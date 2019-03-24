@@ -23,6 +23,7 @@ from plotAnimationCanvasClass import PlotAnimationCanvas
 from plotCanvasClass import PlotCanvas
 from plotNTFCanvasClass import PlotNTFCanvas
 from plotValuesCanvasClass import PlotValuesCanvas
+from plotQueueCanvasClass import PlotQueueCanvas
 from ui import mainWdw
 from utilitiesClass import Utilities
 
@@ -44,6 +45,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.plotAnimationCanvasStretchFactor = float(
             self.plotAnimationFrame_general.width()) / self.plotAnimationFrame_general.height()
         self.plotNTFCanvasStretchFactor = float(self.plotNTFFrame_general.width()) / self.plotNTFFrame_general.height()
+        #self.plotQueueCanvasStretchFactor = float(self.plotQueueFrame_general.width()) / self.plotQueueFrame_general.height()
 
         self.tfTypeList = ['general', 'spillback']
         self.gttr('tabWidget', 'spillback').setCurrentIndex(0) # Note: This has to be done first, otherwise self.currentTF is wrong
@@ -237,6 +239,13 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
             self.sttr('plotDiagramCanvas', tfType, PlotValuesCanvas(callback=self.callback_plotvaluescanvas))
             self.gttr('plotDiagramLayout', tfType).addWidget(self.gttr('plotDiagramCanvas', tfType))
 
+            # Configure plotQueueFrame to display queue of selected edge
+            self.sttr('plotQueueFrameLayout', tfType, QtGui.QVBoxLayout())
+            self.gttr('plotQueueFrame', tfType).setLayout(self.gttr('plotQueueFrameLayout', tfType))
+            self.sttr('plotQueueCanvas', tfType, PlotQueueCanvas())
+            self.gttr('plotQueueFrameLayout', tfType).addWidget(self.gttr('plotQueueCanvas', tfType))
+
+
         self.re_init_node_list()
         self.re_init_edge_list()
 
@@ -275,6 +284,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
 
         self.gttr('timeSlider').setValue(0)  # Reset slider
         self.gttr('plotAnimationCanvas').reset_bounds(self.gttr('animationLowerBound'), self.gttr('animationUpperBound'))
+        self.gttr('plotQueueCanvas').update_information_callback(self.gttr('plotAnimationCanvas'))
         self.output("Generating animation")
 
     def update_node_display(self):
@@ -496,9 +506,6 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
 
         self.sttr('animationUpperBound', None, self.gttr('animationUpperBound') if self.gttr('animationUpperBound') > 0 else 10)  # This can only happen when infinity is reached
 
-        #self.gttr('animationStartLineEdit').setText("%.2f" % self.gttr('animationLowerBound'))
-        #self.gttr('animationEndLineEdit').setText("%.2f" % self.gttr('animationUpperBound'))
-
         self.sttr('plotAnimationCanvas', None, PlotAnimationCanvas(nashflow=self.gttr('nashFlow'), interface=self,
                                                        upperBound=self.gttr('animationUpperBound'),
                                                        stretchFactor=self.plotAnimationCanvasStretchFactor))
@@ -512,6 +519,13 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
             self.gttr('plotDiagramCanvas').setParent(None)
         self.sttr('plotDiagramCanvas', None, PlotValuesCanvas(callback=self.callback_plotvaluescanvas))
         self.gttr('plotDiagramLayout').addWidget(self.gttr('plotDiagramCanvas'))
+
+        # Configure plotQueueFrame
+        if self.gttr('plotQueueCanvas') is not None:
+            self.gttr('plotQueueCanvas').setParent(None)
+        self.sttr('plotQueueCanvas', None, PlotQueueCanvas())
+        self.gttr('plotQueueFrameLayout').addWidget(self.gttr('plotQueueCanvas'))
+        self.gttr('plotQueueCanvas').update_information_callback(self.gttr('plotAnimationCanvas'))
 
         self.display_statistics()
 
@@ -836,8 +850,10 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
 
     def slider_value_change(self):
         """Slot function for changes of slider val"""
-        self.gttr('plotAnimationCanvas').time_changed(self.gttr('timeSlider').value())
-        currentTime = self.gttr('plotAnimationCanvas').get_time_from_tick(self.gttr('timeSlider').value())
+        val = self.gttr('timeSlider').value()
+        self.gttr('plotAnimationCanvas').time_changed(val)
+        self.gttr('plotQueueCanvas').time_changed(val)
+        currentTime = self.gttr('plotAnimationCanvas').get_time_from_tick(val)
         self.gttr('plotDiagramCanvas').change_vline_position(currentTime)
         self.gttr('currentSliderTimeLabel').setText("%.2f" % currentTime)
 
@@ -1083,16 +1099,19 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
             self.gttr('currentFocusLabel').setText(str(self.gttr('plotAnimationCanvas').focusNode))
             self.gttr('currentCapacityLabel').setText("N/A")
             self.gttr('currentTransitTimeLabel').setText("N/A")
+            self.gttr('plotQueueCanvas').change_focusEdge(None, None)
         elif self.gttr('plotAnimationCanvas').focusEdge is not None:
             v, w = self.gttr('plotAnimationCanvas').focusEdge
             self.gttr('currentFocusLabel').setText(
                 str((self.gttr('nashFlow').network.node[v]['label'], self.gttr('nashFlow').network.node[w]['label'])))
             self.gttr('currentCapacityLabel').setText(str(self.gttr('nashFlow').network[v][w]['outCapacity']))
             self.gttr('currentTransitTimeLabel').setText(str(self.gttr('nashFlow').network[v][w]['transitTime']))
+            self.gttr('plotQueueCanvas').change_focusEdge(v, w)
         else:
             self.gttr('currentFocusLabel').setText("N/A")
             self.gttr('currentCapacityLabel').setText("N/A")
             self.gttr('currentTransitTimeLabel').setText("N/A")
+            self.gttr('plotQueueCanvas').change_focusEdge(None, None)
 
     def open_tfc(self, moveGraph=None):
         """

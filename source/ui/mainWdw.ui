@@ -24,7 +24,7 @@
        </sizepolicy>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="tab_general">
        <attribute name="title">
@@ -697,97 +697,9 @@
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_5">
                <item>
-                <layout class="QHBoxLayout" name="horizontalLayout_18">
-                 <item>
-                  <layout class="QFormLayout" name="formLayout_13">
-                   <property name="fieldGrowthPolicy">
-                    <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
-                   </property>
-                   <item row="0" column="1">
-                    <widget class="QPushButton" name="playPushButton_general">
-                     <property name="sizePolicy">
-                      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                       <horstretch>0</horstretch>
-                       <verstretch>0</verstretch>
-                      </sizepolicy>
-                     </property>
-                     <property name="text">
-                      <string/>
-                     </property>
-                     <property name="icon">
-                      <iconset>
-                       <normaloff>:/playpausestop/play.png</normaloff>:/playpausestop/play.png</iconset>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="1" column="1">
-                    <widget class="QPushButton" name="pausePushButton_general">
-                     <property name="sizePolicy">
-                      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                       <horstretch>0</horstretch>
-                       <verstretch>0</verstretch>
-                      </sizepolicy>
-                     </property>
-                     <property name="text">
-                      <string/>
-                     </property>
-                     <property name="icon">
-                      <iconset>
-                       <normaloff>:/playpausestop/pause.png</normaloff>:/playpausestop/pause.png</iconset>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="2" column="1">
-                    <widget class="QPushButton" name="stopPushButton_general">
-                     <property name="sizePolicy">
-                      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                       <horstretch>0</horstretch>
-                       <verstretch>0</verstretch>
-                      </sizepolicy>
-                     </property>
-                     <property name="text">
-                      <string/>
-                     </property>
-                     <property name="icon">
-                      <iconset>
-                       <normaloff>:/playpausestop/stop.png</normaloff>:/playpausestop/stop.png</iconset>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="3" column="1">
-                    <widget class="QPushButton" name="recordPushButton_general">
-                     <property name="sizePolicy">
-                      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                       <horstretch>0</horstretch>
-                       <verstretch>0</verstretch>
-                      </sizepolicy>
-                     </property>
-                     <property name="text">
-                      <string/>
-                     </property>
-                     <property name="icon">
-                      <iconset resource="recordIcon.qrc">
-                       <normaloff>:/record/Downloads/rec-button2.png</normaloff>:/record/Downloads/rec-button2.png</iconset>
-                     </property>
-                    </widget>
-                   </item>
-                  </layout>
-                 </item>
-                 <item>
-                  <widget class="QFrame" name="plotQueueFrame_general">
-                   <property name="sizePolicy">
-                    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                     <horstretch>3</horstretch>
-                     <verstretch>0</verstretch>
-                    </sizepolicy>
-                   </property>
-                   <property name="frameShape">
-                    <enum>QFrame::Box</enum>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <layout class="QFormLayout" name="formLayout_14">
+                <layout class="QGridLayout" name="gridLayout_17">
+                 <item row="0" column="2">
+                  <layout class="QFormLayout" name="formLayout_16">
                    <property name="fieldGrowthPolicy">
                     <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
                    </property>
@@ -795,7 +707,7 @@
                     <number>40</number>
                    </property>
                    <item row="0" column="0">
-                    <widget class="QLabel" name="label_59">
+                    <widget class="QLabel" name="label_62">
                      <property name="text">
                       <string>Focus:</string>
                      </property>
@@ -809,7 +721,7 @@
                     </widget>
                    </item>
                    <item row="1" column="0">
-                    <widget class="QLabel" name="label_60">
+                    <widget class="QLabel" name="label_65">
                      <property name="text">
                       <string>Capacity:</string>
                      </property>
@@ -823,9 +735,16 @@
                     </widget>
                    </item>
                    <item row="2" column="0">
-                    <widget class="QLabel" name="label_61">
+                    <widget class="QLabel" name="label_66">
                      <property name="text">
                       <string>Transit time:</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="3" column="0">
+                    <widget class="QLabel" name="label_6">
+                     <property name="text">
+                      <string>Load %:</string>
                      </property>
                     </widget>
                    </item>
@@ -833,13 +752,6 @@
                     <widget class="QLabel" name="currentTransitTimeLabel_general">
                      <property name="text">
                       <string>N/A</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="3" column="0">
-                    <widget class="QLabel" name="label_5">
-                     <property name="text">
-                      <string>Load %:</string>
                      </property>
                     </widget>
                    </item>
@@ -851,6 +763,120 @@
                     </widget>
                    </item>
                   </layout>
+                 </item>
+                 <item row="0" column="0">
+                  <layout class="QHBoxLayout" name="horizontalLayout_4">
+                   <item>
+                    <layout class="QFormLayout" name="formLayout_17">
+                     <property name="fieldGrowthPolicy">
+                      <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+                     </property>
+                     <item row="0" column="1">
+                      <widget class="QPushButton" name="playPushButton_general">
+                       <property name="sizePolicy">
+                        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                         <horstretch>0</horstretch>
+                         <verstretch>0</verstretch>
+                        </sizepolicy>
+                       </property>
+                       <property name="text">
+                        <string/>
+                       </property>
+                       <property name="icon">
+                        <iconset>
+                         <normaloff>:/playpausestop/play.png</normaloff>:/playpausestop/play.png</iconset>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="1" column="1">
+                      <widget class="QPushButton" name="pausePushButton_general">
+                       <property name="sizePolicy">
+                        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                         <horstretch>0</horstretch>
+                         <verstretch>0</verstretch>
+                        </sizepolicy>
+                       </property>
+                       <property name="text">
+                        <string/>
+                       </property>
+                       <property name="icon">
+                        <iconset>
+                         <normaloff>:/playpausestop/pause.png</normaloff>:/playpausestop/pause.png</iconset>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="2" column="1">
+                      <widget class="QPushButton" name="stopPushButton_general">
+                       <property name="sizePolicy">
+                        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                         <horstretch>0</horstretch>
+                         <verstretch>0</verstretch>
+                        </sizepolicy>
+                       </property>
+                       <property name="text">
+                        <string/>
+                       </property>
+                       <property name="icon">
+                        <iconset>
+                         <normaloff>:/playpausestop/stop.png</normaloff>:/playpausestop/stop.png</iconset>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="3" column="1">
+                      <widget class="QPushButton" name="recordPushButton_general">
+                       <property name="sizePolicy">
+                        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                         <horstretch>0</horstretch>
+                         <verstretch>0</verstretch>
+                        </sizepolicy>
+                       </property>
+                       <property name="text">
+                        <string/>
+                       </property>
+                       <property name="icon">
+                        <iconset resource="recordIcon.qrc">
+                         <normaloff>:/record/Downloads/rec-button2.png</normaloff>:/record/Downloads/rec-button2.png</iconset>
+                       </property>
+                      </widget>
+                     </item>
+                    </layout>
+                   </item>
+                   <item>
+                    <widget class="QFrame" name="plotQueueFrame_general">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                       <horstretch>3</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
+                     <property name="maximumSize">
+                      <size>
+                       <width>81</width>
+                       <height>128</height>
+                      </size>
+                     </property>
+                     <property name="layoutDirection">
+                      <enum>Qt::LeftToRight</enum>
+                     </property>
+                     <property name="frameShape">
+                      <enum>QFrame::Box</enum>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                 <item row="0" column="3">
+                  <spacer name="horizontalSpacer_2">
+                   <property name="orientation">
+                    <enum>Qt::Horizontal</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>40</width>
+                     <height>20</height>
+                    </size>
+                   </property>
+                  </spacer>
                  </item>
                 </layout>
                </item>
@@ -1489,6 +1515,7 @@
                   <enum>QFrame::Box</enum>
                  </property>
                  <zorder>playPushButton_spillback</zorder>
+                 <zorder>groupBox_11</zorder>
                 </widget>
                </item>
                <item>
@@ -1621,96 +1648,8 @@
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_10">
                <item>
-                <layout class="QHBoxLayout" name="horizontalLayout_14">
-                 <item>
-                  <layout class="QFormLayout" name="formLayout_2">
-                   <property name="fieldGrowthPolicy">
-                    <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
-                   </property>
-                   <item row="0" column="1">
-                    <widget class="QPushButton" name="playPushButton_spillback">
-                     <property name="sizePolicy">
-                      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                       <horstretch>0</horstretch>
-                       <verstretch>0</verstretch>
-                      </sizepolicy>
-                     </property>
-                     <property name="text">
-                      <string/>
-                     </property>
-                     <property name="icon">
-                      <iconset>
-                       <normaloff>:/playpausestop/play.png</normaloff>:/playpausestop/play.png</iconset>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="1" column="1">
-                    <widget class="QPushButton" name="pausePushButton_spillback">
-                     <property name="sizePolicy">
-                      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                       <horstretch>0</horstretch>
-                       <verstretch>0</verstretch>
-                      </sizepolicy>
-                     </property>
-                     <property name="text">
-                      <string/>
-                     </property>
-                     <property name="icon">
-                      <iconset>
-                       <normaloff>:/playpausestop/pause.png</normaloff>:/playpausestop/pause.png</iconset>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="2" column="1">
-                    <widget class="QPushButton" name="stopPushButton_spillback">
-                     <property name="sizePolicy">
-                      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                       <horstretch>0</horstretch>
-                       <verstretch>0</verstretch>
-                      </sizepolicy>
-                     </property>
-                     <property name="text">
-                      <string/>
-                     </property>
-                     <property name="icon">
-                      <iconset>
-                       <normaloff>:/playpausestop/stop.png</normaloff>:/playpausestop/stop.png</iconset>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="3" column="1">
-                    <widget class="QPushButton" name="recordPushButton_spillback">
-                     <property name="sizePolicy">
-                      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                       <horstretch>0</horstretch>
-                       <verstretch>0</verstretch>
-                      </sizepolicy>
-                     </property>
-                     <property name="text">
-                      <string/>
-                     </property>
-                     <property name="icon">
-                      <iconset resource="recordIcon.qrc">
-                       <normaloff>:/record/Downloads/rec-button2.png</normaloff>:/record/Downloads/rec-button2.png</iconset>
-                     </property>
-                    </widget>
-                   </item>
-                  </layout>
-                 </item>
-                 <item>
-                  <widget class="QFrame" name="plotQueueFrame_spillback">
-                   <property name="sizePolicy">
-                    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                     <horstretch>3</horstretch>
-                     <verstretch>0</verstretch>
-                    </sizepolicy>
-                   </property>
-                   <property name="frameShape">
-                    <enum>QFrame::Box</enum>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
+                <layout class="QGridLayout" name="gridLayout_13">
+                 <item row="0" column="2">
                   <layout class="QFormLayout" name="formLayout">
                    <property name="fieldGrowthPolicy">
                     <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
@@ -1753,17 +1692,17 @@
                      </property>
                     </widget>
                    </item>
-                   <item row="2" column="1">
-                    <widget class="QLabel" name="currentTransitTimeLabel_spillback">
-                     <property name="text">
-                      <string>N/A</string>
-                     </property>
-                    </widget>
-                   </item>
                    <item row="3" column="0">
                     <widget class="QLabel" name="label">
                      <property name="text">
                       <string>Load %:</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="2" column="1">
+                    <widget class="QLabel" name="currentTransitTimeLabel_spillback">
+                     <property name="text">
+                      <string>N/A</string>
                      </property>
                     </widget>
                    </item>
@@ -1775,6 +1714,120 @@
                     </widget>
                    </item>
                   </layout>
+                 </item>
+                 <item row="0" column="0">
+                  <layout class="QHBoxLayout" name="horizontalLayout_3">
+                   <item>
+                    <layout class="QFormLayout" name="formLayout_2">
+                     <property name="fieldGrowthPolicy">
+                      <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+                     </property>
+                     <item row="0" column="1">
+                      <widget class="QPushButton" name="playPushButton_spillback">
+                       <property name="sizePolicy">
+                        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                         <horstretch>0</horstretch>
+                         <verstretch>0</verstretch>
+                        </sizepolicy>
+                       </property>
+                       <property name="text">
+                        <string/>
+                       </property>
+                       <property name="icon">
+                        <iconset>
+                         <normaloff>:/playpausestop/play.png</normaloff>:/playpausestop/play.png</iconset>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="1" column="1">
+                      <widget class="QPushButton" name="pausePushButton_spillback">
+                       <property name="sizePolicy">
+                        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                         <horstretch>0</horstretch>
+                         <verstretch>0</verstretch>
+                        </sizepolicy>
+                       </property>
+                       <property name="text">
+                        <string/>
+                       </property>
+                       <property name="icon">
+                        <iconset>
+                         <normaloff>:/playpausestop/pause.png</normaloff>:/playpausestop/pause.png</iconset>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="2" column="1">
+                      <widget class="QPushButton" name="stopPushButton_spillback">
+                       <property name="sizePolicy">
+                        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                         <horstretch>0</horstretch>
+                         <verstretch>0</verstretch>
+                        </sizepolicy>
+                       </property>
+                       <property name="text">
+                        <string/>
+                       </property>
+                       <property name="icon">
+                        <iconset>
+                         <normaloff>:/playpausestop/stop.png</normaloff>:/playpausestop/stop.png</iconset>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="3" column="1">
+                      <widget class="QPushButton" name="recordPushButton_spillback">
+                       <property name="sizePolicy">
+                        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                         <horstretch>0</horstretch>
+                         <verstretch>0</verstretch>
+                        </sizepolicy>
+                       </property>
+                       <property name="text">
+                        <string/>
+                       </property>
+                       <property name="icon">
+                        <iconset resource="recordIcon.qrc">
+                         <normaloff>:/record/Downloads/rec-button2.png</normaloff>:/record/Downloads/rec-button2.png</iconset>
+                       </property>
+                      </widget>
+                     </item>
+                    </layout>
+                   </item>
+                   <item>
+                    <widget class="QFrame" name="plotQueueFrame_spillback">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                       <horstretch>3</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
+                     <property name="maximumSize">
+                      <size>
+                       <width>81</width>
+                       <height>128</height>
+                      </size>
+                     </property>
+                     <property name="layoutDirection">
+                      <enum>Qt::LeftToRight</enum>
+                     </property>
+                     <property name="frameShape">
+                      <enum>QFrame::Box</enum>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                 <item row="0" column="3">
+                  <spacer name="horizontalSpacer">
+                   <property name="orientation">
+                    <enum>Qt::Horizontal</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>40</width>
+                     <height>20</height>
+                    </size>
+                   </property>
+                  </spacer>
                  </item>
                 </layout>
                </item>
@@ -1789,6 +1842,7 @@
                  <property name="frameShape">
                   <enum>QFrame::Box</enum>
                  </property>
+                 <zorder>horizontalLayoutWidget</zorder>
                 </widget>
                </item>
                <item>
