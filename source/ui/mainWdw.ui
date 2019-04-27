@@ -34,7 +34,7 @@
         <item row="0" column="0">
          <widget class="QTabWidget" name="tabWidget_general">
           <property name="currentIndex">
-           <number>1</number>
+           <number>0</number>
           </property>
           <widget class="QWidget" name="tab_3">
            <attribute name="title">
@@ -296,25 +296,12 @@
                  <property name="fieldGrowthPolicy">
                   <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
                  </property>
-                 <item row="0" column="0">
-                  <widget class="QLabel" name="label_13">
-                   <property name="text">
-                    <string>Tail</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="0" column="1">
-                  <widget class="QLineEdit" name="tailLineEdit_general"/>
-                 </item>
                  <item row="1" column="0">
                   <widget class="QLabel" name="label_14">
                    <property name="text">
                     <string>Head</string>
                    </property>
                   </widget>
-                 </item>
-                 <item row="1" column="1">
-                  <widget class="QLineEdit" name="headLineEdit_general"/>
                  </item>
                  <item row="2" column="0">
                   <widget class="QLabel" name="label_15">
@@ -336,12 +323,33 @@
                  <item row="3" column="1">
                   <widget class="QLineEdit" name="transitTimeLineEdit_general"/>
                  </item>
+                 <item row="0" column="0">
+                  <widget class="QLabel" name="label_13">
+                   <property name="text">
+                    <string>Tail</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="1">
+                  <widget class="QLabel" name="headLabel_general">
+                   <property name="text">
+                    <string/>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="0" column="1">
+                  <widget class="QLabel" name="tailLabel_general">
+                   <property name="text">
+                    <string/>
+                   </property>
+                  </widget>
+                 </item>
                 </layout>
                </item>
                <item>
                 <widget class="QPushButton" name="updateEdgeButton_general">
                  <property name="text">
-                  <string>Add/Upd. edge</string>
+                  <string>Update edge</string>
                  </property>
                  <property name="autoDefault">
                   <bool>false</bool>
@@ -985,7 +993,7 @@
         <item row="0" column="0">
          <widget class="QTabWidget" name="tabWidget_spillback">
           <property name="currentIndex">
-           <number>1</number>
+           <number>0</number>
           </property>
           <widget class="QWidget" name="tab_5">
            <attribute name="title">
@@ -1071,25 +1079,12 @@
                  <property name="fieldGrowthPolicy">
                   <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
                  </property>
-                 <item row="0" column="0">
-                  <widget class="QLabel" name="label_38">
-                   <property name="text">
-                    <string>Tail</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="0" column="1">
-                  <widget class="QLineEdit" name="tailLineEdit_spillback"/>
-                 </item>
                  <item row="1" column="0">
                   <widget class="QLabel" name="label_39">
                    <property name="text">
                     <string>Head</string>
                    </property>
                   </widget>
-                 </item>
-                 <item row="1" column="1">
-                  <widget class="QLineEdit" name="headLineEdit_spillback"/>
                  </item>
                  <item row="2" column="0">
                   <widget class="QLabel" name="label_40">
@@ -1101,16 +1096,6 @@
                  <item row="2" column="1">
                   <widget class="QLineEdit" name="inCapacityLineEdit_spillback"/>
                  </item>
-                 <item row="5" column="0">
-                  <widget class="QLabel" name="label_41">
-                   <property name="text">
-                    <string>Transit time</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="5" column="1">
-                  <widget class="QLineEdit" name="transitTimeLineEdit_spillback"/>
-                 </item>
                  <item row="3" column="0">
                   <widget class="QLabel" name="label_63">
                    <property name="text">
@@ -1121,13 +1106,44 @@
                  <item row="3" column="1">
                   <widget class="QLineEdit" name="outCapacityLineEdit_spillback"/>
                  </item>
-                 <item row="4" column="1">
-                  <widget class="QLineEdit" name="storageLineEdit_spillback"/>
-                 </item>
                  <item row="4" column="0">
                   <widget class="QLabel" name="label_64">
                    <property name="text">
                     <string>Storage</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="4" column="1">
+                  <widget class="QLineEdit" name="storageLineEdit_spillback"/>
+                 </item>
+                 <item row="5" column="0">
+                  <widget class="QLabel" name="label_41">
+                   <property name="text">
+                    <string>Transit time</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="5" column="1">
+                  <widget class="QLineEdit" name="transitTimeLineEdit_spillback"/>
+                 </item>
+                 <item row="0" column="0">
+                  <widget class="QLabel" name="label_38">
+                   <property name="text">
+                    <string>Tail</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="0" column="1">
+                  <widget class="QLabel" name="tailLabel_spillback">
+                   <property name="text">
+                    <string/>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="1">
+                  <widget class="QLabel" name="headLabel_spillback">
+                   <property name="text">
+                    <string/>
                    </property>
                   </widget>
                  </item>
@@ -1136,7 +1152,7 @@
                <item>
                 <widget class="QPushButton" name="updateEdgeButton_spillback">
                  <property name="text">
-                  <string>Add/Upd. edge</string>
+                  <string>Update edge</string>
                  </property>
                  <property name="autoDefault">
                   <bool>false</bool>
@@ -1514,8 +1530,6 @@
                  <property name="frameShape">
                   <enum>QFrame::Box</enum>
                  </property>
-                 <zorder>playPushButton_spillback</zorder>
-                 <zorder>groupBox_11</zorder>
                 </widget>
                </item>
                <item>
@@ -1842,7 +1856,6 @@
                  <property name="frameShape">
                   <enum>QFrame::Box</enum>
                  </property>
-                 <zorder>horizontalLayoutWidget</zorder>
                 </widget>
                </item>
                <item>

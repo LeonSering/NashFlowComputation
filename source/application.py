@@ -105,8 +105,6 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
             self.gttr('activateTimeoutCheckBox', tfType).clicked.connect(self.change_timeout_state)
 
             # Keyboard shortcuts
-            self.gttr('tailLineEdit', tfType).returnPressed.connect(self.update_add_edge)
-            self.gttr('headLineEdit', tfType).returnPressed.connect(self.update_add_edge)
             self.gttr('transitTimeLineEdit', tfType).returnPressed.connect(self.update_add_edge)
             self.gttr('nodeNameLineEdit', tfType).returnPressed.connect(self.update_node)
             self.gttr('nodeXLineEdit', tfType).returnPressed.connect(self.update_node)
@@ -359,8 +357,8 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         """Update display of the properties of the currently focussed edge focusEdge, if existing"""
         edge = self.gttr('graphCreationCanvas').focusEdge
         if edge is not None:
-            self.gttr('tailLineEdit').setText(self.gttr('network').node[edge[0]]['label'])
-            self.gttr('headLineEdit').setText(self.gttr('network').node[edge[1]]['label'])
+            self.gttr('tailLabel').setText(str(edge[0]))
+            self.gttr('headLabel').setText(str(edge[1]))
             self.gttr('transitTimeLineEdit').setText(
                 str(self.gttr('network')[edge[0]][edge[1]]['transitTime']))
 
@@ -375,8 +373,8 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
                 self.storageLineEdit_spillback.setText(
                 str(self.gttr('network', 'spillback')[edge[0]][edge[1]]['storage']))
         else:
-            self.gttr('tailLineEdit').setText("")
-            self.gttr('headLineEdit').setText("")
+            self.gttr('tailLabel').setText("")
+            self.gttr('headLabel').setText("")
             self.gttr('transitTimeLineEdit').setText("")
 
             if self.currentTF == 'general':
@@ -392,9 +390,10 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         """Add an edge or update attributes of focusNode, if existing"""
         if self.gttr('graphCreationCanvas').focusEdge is None:
             return
+        focusEdge = self.gttr('graphCreationCanvas')
 
-        tailLabel = str(self.gttr('tailLineEdit').text())
-        headLabel = str(self.gttr('headLineEdit').text())
+        tailLabel = str(focusEdge[0])
+        headLabel = str(focusEdge[1])
         transitText = float(self.gttr('transitTimeLineEdit').text())
 
         if self.currentTF == 'general':
@@ -1118,7 +1117,6 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         """
         Opens ThinFlowComputation Tool
         :param moveGraph: network that should be moved, None if not specified
-        :return: 
         """
         #TODO: This has to been adapted to open tfType correctly
         if not moveGraph:
@@ -1285,16 +1283,13 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
 
         self.gttr('timeSlider').setValue(0)
 
-    def output(self, txt, streamTo=None):
+    def output(self, txt):
         """
         Write to log
         :param txt: will be written to log
-        :param streamTo: tfType to which we output to
         """
         currentTime = Utilities.get_time_for_log()
         logText = currentTime + " - " + txt
-        # TODO: Until we don't have a better solution, print everything to both logPlainTextEdits
-        #self.gttr('logPlainTextEdit', tfType=streamTo).appendPlainText(logText)
         for tfType in self.tfTypeList:
             self.gttr('logPlainTextEdit', tfType=tfType).appendPlainText(logText)
 
