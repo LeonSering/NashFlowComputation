@@ -373,8 +373,8 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
                 self.storageLineEdit_spillback.setText(
                 str(self.gttr('network', 'spillback')[edge[0]][edge[1]]['storage']))
         else:
-            self.gttr('tailLabel').setText("")
-            self.gttr('headLabel').setText("")
+            self.gttr('tailLabel').setText("N/A")
+            self.gttr('headLabel').setText("N/A")
             self.gttr('transitTimeLineEdit').setText("")
 
             if self.currentTF == 'general':

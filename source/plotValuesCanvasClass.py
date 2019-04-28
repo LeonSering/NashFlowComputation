@@ -6,7 +6,7 @@
 # ===========================================================================
 
 import matplotlib
-from matplotlib import figure
+from matplotlib import figure, widgets
 from utilitiesClass import Utilities
 
 matplotlib.use("Qt4Agg")
@@ -25,6 +25,8 @@ class PlotValuesCanvas(FigureCanvas):
         self.plots = []
         self.hLines = []
         self.hLinesLabels = []
+        self.legendToLineDict = dict()
+        self.lineToHLineDict = dict()
         self.additionalColors = ['green', 'red', 'blue', 'orange']
         self.verticalLine = None
         self.verticalLinePos = 0
@@ -36,9 +38,11 @@ class PlotValuesCanvas(FigureCanvas):
         self.callback = callback
 
         self.visibleBool = False
+        self.picked = False
 
         # Signals
         self.mpl_connect('button_press_event', self.on_click)
+        self.mpl_connect('pick_event', self.on_click)
 
         # Enforce using PDFLatex instead of xetex
         pgf_with_pdflatex = {
@@ -60,22 +64,33 @@ class PlotValuesCanvas(FigureCanvas):
         self.plots = []
         self.hLines = []
         self.hLinesLabels = []
+        self.legendToLineDict = dict()
+        self.lineToHLineDict = dict()
         self.storageHLine = None
 
         axes = self.figure.add_subplot(111)
+        lines = []
 
         yMin, yMax = min(yValues), max(yValues)
-        axes.plot(xValues, yValues, linewidth=2, color=self.additionalColors[0], label=labels[0])
-        self.plots.append((xValues, yValues))
+        line, = axes.plot(xValues, yValues, linewidth=2, color=self.additionalColors[0], label=labels[0])
+        self.plots.append((xValues, yValues, line))
+        lines.append(line)
         colorCounter = 1
         for xVals, yVals in additional_values:
             yMin, yMax = min(yMin, min(yVals)), max(yMax, max(yVals))
-            axes.plot(xVals, yVals, linewidth=2, color=self.additionalColors[colorCounter], label=labels[colorCounter])
-            self.plots.append((xVals, yVals))
+            line, = axes.plot(xVals, yVals, linewidth=2, color=self.additionalColors[colorCounter], label=labels[colorCounter])
+            self.plots.append((xVals, yVals, line))
+            lines.append(line)
             colorCounter += 1
 
         axes.set_xlim(lowerBound, upperBound)
         axes.set_ylim(max(0, yMin), int(max(1, yMax) * 1.5))
+
+        legend = axes.legend(loc='upper left')
+
+        for idx, legend_entry in enumerate(legend.get_lines()):
+            legend_entry.set_picker(5)  # 5 pts tolerance
+            self.legendToLineDict[legend_entry] = lines[idx]
 
         if storage is not None and axes.get_ylim()[0] <= storage <= axes.get_ylim()[1]:
             # Add the storage line
@@ -89,7 +104,6 @@ class PlotValuesCanvas(FigureCanvas):
             self.verticalLine = None
 
         self.visibleBool = True
-        axes.legend(loc='upper left')
         self.draw_idle()
 
     def clear_plot(self):
@@ -98,6 +112,8 @@ class PlotValuesCanvas(FigureCanvas):
         self.plots = []
         self.hLines = []
         self.hLinesLabels = []
+        self.legendToLineDict = dict()
+        self.lineToHLineDict = dict()
         self.draw_idle()
 
         self.verticalLine = None    # self.verticalLine is automatically removed by self.figure.clf()
@@ -128,9 +144,17 @@ class PlotValuesCanvas(FigureCanvas):
         Onclick-event handling
         :param event: event which is emitted by matplotlib
         """
-        if event.xdata is None or event.ydata is None:
+        callName = event.name
+        # Need to catch pick_event as every pick_event emits another click_event
+        if callName == "pick_event":
+            self.picked = True
+            return self.on_pick(event)
+        elif self.picked:
+            self.picked = False
             return
 
+        if event.xdata is None or event.ydata is None:
+            return
         # Note: event.x/y = relative position, event.xdata/ydata = absolute position
         xAbsolute, yAbsolute = event.xdata, event.ydata
 
@@ -138,6 +162,31 @@ class PlotValuesCanvas(FigureCanvas):
 
         if action == 1:
             self.callback(xAbsolute)
+
+    def on_pick(self, event):
+        """
+        Onpick-event handling
+        :param event: event which is emitted by matplotlib
+        """
+        legend_entry = event.artist
+        line = self.legendToLineDict[legend_entry]
+        visibility = not line.get_visible()
+        line.set_visible(visibility)
+
+        # Change visibility of hLines if they exist
+        try:
+            hLine, hLineText = self.lineToHLineDict[line]
+            hLine.set_visible(visibility)
+            hLineText.set_visible(visibility)
+        except KeyError:
+            pass
+
+        # Change alpha of legend to indicate visibility
+        if visibility:
+            legend_entry.set_alpha(1.0)
+        else:
+            legend_entry.set_alpha(0.2)
+        self.draw_idle()
 
     def export(self, path):
         """Export diagram to file"""
@@ -169,16 +218,17 @@ class PlotValuesCanvas(FigureCanvas):
 
     def add_hline_to_plots(self):
         """Add horizontal lines to intersect vertical line"""
-        for l in self.hLines:
-            l.remove()
+        for hLine in self.hLines:
+            hLine.remove()
         self.hLines = []
+        self.lineToHLineDict = dict()
 
         for label in self.hLinesLabels:
             label.remove()
         self.hLinesLabels = []
 
         for plot in self.plots:
-            xVals, yVals = plot
+            xVals, yVals, line = plot
 
             # Get the y-value of self.verticalLinePos
             index = Utilities.get_insertion_point_left(xVals, self.verticalLinePos)
@@ -193,10 +243,15 @@ class PlotValuesCanvas(FigureCanvas):
             axes = self.figure.gca()
             lowerBound, upperBound = axes.get_xlim()
             lineBeginFac = float(x - lowerBound) / (upperBound - lowerBound)
-            l = axes.axhline(y=y, xmin=lineBeginFac, xmax=1, linewidth=self.verticalLineWidth)
-            l.set_color(self.verticalLineColor)
-            self.hLines.append(l)
-            t = axes.text(1.02, y, "%.2f" % y, va='center', ha="left", bbox=dict(facecolor="w", alpha=0.5),
+            hLine = axes.axhline(y=y, xmin=lineBeginFac, xmax=1, linewidth=self.verticalLineWidth)
+            hLine.set_color(self.verticalLineColor)
+            self.hLines.append(hLine)
+            hLineText = axes.text(1.02, y, "%.2f" % y, va='center', ha="left", bbox=dict(facecolor="w", alpha=0.5),
                           transform=axes.get_yaxis_transform())
-            t.set_fontsize(8)
-            self.hLinesLabels.append(t)
+            hLineText.set_fontsize(8)
+            self.hLinesLabels.append(hLineText)
+
+            if not line.get_visible():
+                hLine.set_visible(False)
+                hLineText.set_visible(False)
+            self.lineToHLineDict[line] = (hLine, hLineText)
