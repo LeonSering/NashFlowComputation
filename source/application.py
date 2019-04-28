@@ -409,6 +409,11 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
             elif tailLabel == 's' and storageText != float('inf'):
                 # This has to be satisfied
                 return
+            if storageText <= transitText * inCapacityText:
+                # This is not allowed and is corrected automatically
+                corrector = 0.1 if storageText/transitText > 0.1 else 0.1*storageText/transitText
+                inCapacityText = storageText/transitText - corrector
+                self.inCapacityLineEdit_spillback.setText(str(inCapacityText))
 
 
         # Work with actual node IDs, not labels
