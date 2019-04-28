@@ -390,7 +390,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         """Add an edge or update attributes of focusNode, if existing"""
         if self.gttr('graphCreationCanvas').focusEdge is None:
             return
-        focusEdge = self.gttr('graphCreationCanvas')
+        focusEdge = self.gttr('graphCreationCanvas').focusEdge
 
         tailLabel = str(focusEdge[0])
         headLabel = str(focusEdge[1])
