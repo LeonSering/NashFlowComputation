@@ -62,7 +62,7 @@ class NormalizedThinFlow_spillback(NormalizedThinFlow):
             for edge in self.network.edges():
                 v, w = edge[0], edge[1]
                 capacity = str(self.network[v][w]['outCapacity'])
-                inflowBound = str(self.network[v][w]['inflowBound'])
+                inflowBound = str(self.network[v][w]['inflowBound']) if self.network[v][w]['inflowBound'] != float('inf') else str(-1)
                 isInE_0 = str(1) if edge in self.flowEdges else str(0)
                 isInE_Star = str(1) if edge in self.resettingEdges else str(0)
                 outputString = str(v) + ":" + str(

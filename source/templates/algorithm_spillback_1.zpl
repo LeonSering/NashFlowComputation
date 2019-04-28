@@ -15,6 +15,8 @@ set E_star := {<v,w> in E with InE_star[v,w] == 1};
 
 param nu[E] := read "edges.txt" as "<1s, 2s> 3n" comment "#";
 param b[E] := read "edges.txt" as "<1s, 2s> 4n" comment "#";
+set EInfiniteB := {<v,w> in E with b[v,w] == -1};
+set EFiniteB := E without EInfiniteB;
 param r := read "other.txt" as "1n" use 1 comment "#";
 param M := read "other.txt" as "1n" skip 1 comment "#";
 
@@ -66,8 +68,10 @@ subto noResettingActiveMinimum_1: forall <u,v> in E_0 without E_star do l[v] >= 
 subto noResettingActiveMinimum_2: forall <u,v> in E_0 without E_star do c[v]*l[v]*nu[u,v] >= x[u,v];
 
 # TF4
-subto allEdgeMax: forall <v,w> in E do l[v]*b[v,w] >= x[v,w];
+subto allEdgeMax: forall <v,w> in EFiniteB do l[v]*b[v,w] >= x[v,w];
+subto allEdgeMaxInfinite: forall <v,w> in EInfiniteB do l[v] >= 0;
 
 # TF5
-subto edgeMax: forall <v,w> in E do l[v] * b[v,w] <= x[v,w] + b[v,w]*M*(1-m[v,w]);
+subto edgeMax: forall <v,w> in EFiniteB do l[v] * b[v,w] <= x[v,w] + b[v,w]*M*(1-m[v,w]);
+subto edgeMaxInfinity: forall <v,w> in EInfiniteB do l[v] <= 0 + M*(1-m[v,w]);
 
