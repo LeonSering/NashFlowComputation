@@ -183,8 +183,7 @@ class PlotCanvas(FigureCanvas):
                         if self.type == 'general':
                             self.network.add_edge(self.selectedNode, clickedNode, transitTime=1, inCapacity=float('inf'), outCapacity=1, storage=float('inf'))
                         elif self.type == 'spillback':
-                            storage = float('inf') if self.selectedNode == 's' else 2
-                            self.network.add_edge(self.selectedNode, clickedNode, transitTime=1, inCapacity=1, outCapacity=1, storage=storage)
+                            self.network.add_edge(self.selectedNode, clickedNode, transitTime=1, inCapacity=float('inf'), outCapacity=1, storage=float('inf'))
 
 
                         # TODO: inflowBound will lead to problems within TFC
