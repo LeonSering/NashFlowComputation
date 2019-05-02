@@ -24,7 +24,7 @@
        </sizepolicy>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="tab_general">
        <attribute name="title">
@@ -34,7 +34,7 @@
         <item row="0" column="0">
          <widget class="QTabWidget" name="tabWidget_general">
           <property name="currentIndex">
-           <number>0</number>
+           <number>1</number>
           </property>
           <widget class="QWidget" name="tab_3">
            <attribute name="title">
@@ -1998,6 +1998,83 @@
    </property>
   </action>
  </widget>
+ <tabstops>
+  <tabstop>tabWidget</tabstop>
+  <tabstop>tabWidget_general</tabstop>
+  <tabstop>capacityLineEdit_general</tabstop>
+  <tabstop>transitTimeLineEdit_general</tabstop>
+  <tabstop>updateEdgeButton_general</tabstop>
+  <tabstop>deleteEdgeButton_general</tabstop>
+  <tabstop>nodeNameLineEdit_general</tabstop>
+  <tabstop>nodeXLineEdit_general</tabstop>
+  <tabstop>nodeYLineEdit_general</tabstop>
+  <tabstop>updateNodeButton_general</tabstop>
+  <tabstop>deleteNodeButton_general</tabstop>
+  <tabstop>edgeSelectionListWidget_general</tabstop>
+  <tabstop>nodeSelectionListWidget_general</tabstop>
+  <tabstop>logPlainTextEdit_general</tabstop>
+  <tabstop>computeFlowPushButton_general</tabstop>
+  <tabstop>outputDirectoryLineEdit_general</tabstop>
+  <tabstop>outputDirectoryPushButton_general</tabstop>
+  <tabstop>cleanUpCheckBox_general</tabstop>
+  <tabstop>inflowLineEdit_general</tabstop>
+  <tabstop>scipPathLineEdit_general</tabstop>
+  <tabstop>scipPathPushButton_general</tabstop>
+  <tabstop>activateTimeoutCheckBox_general</tabstop>
+  <tabstop>timeoutLineEdit_general</tabstop>
+  <tabstop>templateComboBox_general</tabstop>
+  <tabstop>intervalsLineEdit_general</tabstop>
+  <tabstop>pausePushButton_spillback</tabstop>
+  <tabstop>exportDiagramPushButton_spillback</tabstop>
+  <tabstop>playPushButton_spillback</tabstop>
+  <tabstop>recordPushButton_spillback</tabstop>
+  <tabstop>timeSlider_spillback</tabstop>
+  <tabstop>intervalsListWidget_spillback</tabstop>
+  <tabstop>exportComboBox_spillback</tabstop>
+  <tabstop>computeIntervalPushButton_spillback</tabstop>
+  <tabstop>showEdgesWithoutFlowCheckBox_spillback</tabstop>
+  <tabstop>stopPushButton_spillback</tabstop>
+  <tabstop>setTimePushButton_spillback</tabstop>
+  <tabstop>setTimeLineEdit_spillback</tabstop>
+  <tabstop>playPushButton_general</tabstop>
+  <tabstop>pausePushButton_general</tabstop>
+  <tabstop>stopPushButton_general</tabstop>
+  <tabstop>recordPushButton_general</tabstop>
+  <tabstop>timeSlider_general</tabstop>
+  <tabstop>showEdgesWithoutFlowCheckBox_general</tabstop>
+  <tabstop>intervalsListWidget_general</tabstop>
+  <tabstop>computeIntervalPushButton_general</tabstop>
+  <tabstop>exportComboBox_general</tabstop>
+  <tabstop>exportDiagramPushButton_general</tabstop>
+  <tabstop>setTimeLineEdit_general</tabstop>
+  <tabstop>setTimePushButton_general</tabstop>
+  <tabstop>tabWidget_spillback</tabstop>
+  <tabstop>inCapacityLineEdit_spillback</tabstop>
+  <tabstop>outCapacityLineEdit_spillback</tabstop>
+  <tabstop>storageLineEdit_spillback</tabstop>
+  <tabstop>transitTimeLineEdit_spillback</tabstop>
+  <tabstop>updateEdgeButton_spillback</tabstop>
+  <tabstop>deleteEdgeButton_spillback</tabstop>
+  <tabstop>nodeNameLineEdit_spillback</tabstop>
+  <tabstop>nodeXLineEdit_spillback</tabstop>
+  <tabstop>nodeYLineEdit_spillback</tabstop>
+  <tabstop>updateNodeButton_spillback</tabstop>
+  <tabstop>deleteNodeButton_spillback</tabstop>
+  <tabstop>edgeSelectionListWidget_spillback</tabstop>
+  <tabstop>nodeSelectionListWidget_spillback</tabstop>
+  <tabstop>logPlainTextEdit_spillback</tabstop>
+  <tabstop>computeFlowPushButton_spillback</tabstop>
+  <tabstop>outputDirectoryLineEdit_spillback</tabstop>
+  <tabstop>outputDirectoryPushButton_spillback</tabstop>
+  <tabstop>cleanUpCheckBox_spillback</tabstop>
+  <tabstop>inflowLineEdit_spillback</tabstop>
+  <tabstop>scipPathLineEdit_spillback</tabstop>
+  <tabstop>scipPathPushButton_spillback</tabstop>
+  <tabstop>activateTimeoutCheckBox_spillback</tabstop>
+  <tabstop>timeoutLineEdit_spillback</tabstop>
+  <tabstop>templateComboBox_spillback</tabstop>
+  <tabstop>intervalsLineEdit_spillback</tabstop>
+ </tabstops>
  <resources>
   <include location="icons.qrc"/>
   <include location="recordIcon.qrc"/>
