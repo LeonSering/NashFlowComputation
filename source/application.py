@@ -357,8 +357,6 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         """Update display of the properties of the currently focussed edge focusEdge, if existing"""
         edge = self.gttr('graphCreationCanvas').focusEdge
         if edge is not None:
-            self.gttr('tailLabel').setText(str(edge[0]))
-            self.gttr('headLabel').setText(str(edge[1]))
             self.gttr('transitTimeLineEdit').setText(
                 str(self.gttr('network')[edge[0]][edge[1]]['transitTime']))
 
@@ -373,8 +371,6 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
                 self.storageLineEdit_spillback.setText(
                 str(self.gttr('network', 'spillback')[edge[0]][edge[1]]['storage']))
         else:
-            self.gttr('tailLabel').setText("N/A")
-            self.gttr('headLabel').setText("N/A")
             self.gttr('transitTimeLineEdit').setText("")
 
             if self.currentTF == 'general':
