@@ -24,7 +24,7 @@
        </sizepolicy>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="tab_general">
        <attribute name="title">
@@ -219,6 +219,9 @@
             </item>
             <item row="1" column="1" rowspan="2" colspan="2">
              <layout class="QGridLayout" name="gridLayout_6">
+              <property name="verticalSpacing">
+               <number>6</number>
+              </property>
               <item row="1" column="0" colspan="2">
                <widget class="QPushButton" name="computeFlowPushButton_general">
                 <property name="sizePolicy">
@@ -259,7 +262,7 @@
               <property name="sizePolicy">
                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                 <horstretch>1</horstretch>
-                <verstretch>11</verstretch>
+                <verstretch>4</verstretch>
                </sizepolicy>
               </property>
               <property name="styleSheet">
@@ -296,53 +299,25 @@
                  <property name="fieldGrowthPolicy">
                   <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
                  </property>
-                 <item row="1" column="0">
-                  <widget class="QLabel" name="label_14">
-                   <property name="text">
-                    <string>Head</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="2" column="0">
+                 <item row="0" column="0">
                   <widget class="QLabel" name="label_15">
                    <property name="text">
                     <string>Capacity</string>
                    </property>
                   </widget>
                  </item>
-                 <item row="2" column="1">
+                 <item row="0" column="1">
                   <widget class="QLineEdit" name="capacityLineEdit_general"/>
                  </item>
-                 <item row="3" column="0">
+                 <item row="1" column="0">
                   <widget class="QLabel" name="label_16">
                    <property name="text">
                     <string>Transit time</string>
                    </property>
                   </widget>
                  </item>
-                 <item row="3" column="1">
-                  <widget class="QLineEdit" name="transitTimeLineEdit_general"/>
-                 </item>
-                 <item row="0" column="0">
-                  <widget class="QLabel" name="label_13">
-                   <property name="text">
-                    <string>Tail</string>
-                   </property>
-                  </widget>
-                 </item>
                  <item row="1" column="1">
-                  <widget class="QLabel" name="headLabel_general">
-                   <property name="text">
-                    <string>N/A</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="0" column="1">
-                  <widget class="QLabel" name="tailLabel_general">
-                   <property name="text">
-                    <string>N/A</string>
-                   </property>
-                  </widget>
+                  <widget class="QLineEdit" name="transitTimeLineEdit_general"/>
                  </item>
                 </layout>
                </item>
@@ -1042,7 +1017,7 @@
               <property name="sizePolicy">
                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                 <horstretch>1</horstretch>
-                <verstretch>11</verstretch>
+                <verstretch>4</verstretch>
                </sizepolicy>
               </property>
               <property name="styleSheet">
@@ -1079,73 +1054,45 @@
                  <property name="fieldGrowthPolicy">
                   <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
                  </property>
-                 <item row="1" column="0">
-                  <widget class="QLabel" name="label_39">
-                   <property name="text">
-                    <string>Head</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="2" column="0">
+                 <item row="0" column="0">
                   <widget class="QLabel" name="label_40">
                    <property name="text">
                     <string>incapacity</string>
                    </property>
                   </widget>
                  </item>
-                 <item row="2" column="1">
+                 <item row="0" column="1">
                   <widget class="QLineEdit" name="inCapacityLineEdit_spillback"/>
                  </item>
-                 <item row="3" column="0">
+                 <item row="1" column="0">
                   <widget class="QLabel" name="label_63">
                    <property name="text">
                     <string>outcapacity</string>
                    </property>
                   </widget>
                  </item>
-                 <item row="3" column="1">
+                 <item row="1" column="1">
                   <widget class="QLineEdit" name="outCapacityLineEdit_spillback"/>
                  </item>
-                 <item row="4" column="0">
+                 <item row="2" column="0">
                   <widget class="QLabel" name="label_64">
                    <property name="text">
                     <string>Storage</string>
                    </property>
                   </widget>
                  </item>
-                 <item row="4" column="1">
+                 <item row="2" column="1">
                   <widget class="QLineEdit" name="storageLineEdit_spillback"/>
                  </item>
-                 <item row="5" column="0">
+                 <item row="3" column="0">
                   <widget class="QLabel" name="label_41">
                    <property name="text">
                     <string>Transit time</string>
                    </property>
                   </widget>
                  </item>
-                 <item row="5" column="1">
+                 <item row="3" column="1">
                   <widget class="QLineEdit" name="transitTimeLineEdit_spillback"/>
-                 </item>
-                 <item row="0" column="0">
-                  <widget class="QLabel" name="label_38">
-                   <property name="text">
-                    <string>Tail</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="0" column="1">
-                  <widget class="QLabel" name="tailLabel_spillback">
-                   <property name="text">
-                    <string>N/A</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="1" column="1">
-                  <widget class="QLabel" name="headLabel_spillback">
-                   <property name="text">
-                    <string>N/A</string>
-                   </property>
-                  </widget>
                  </item>
                 </layout>
                </item>
