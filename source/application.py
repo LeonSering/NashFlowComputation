@@ -466,6 +466,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         """
         if not NoNewGraph:
             self.sttr('network', self.currentTF, self.init_graph())  # Reinstantiation of the CurrentGraph
+            self.gttr('network', self.currentTF).graph['type'] = self.currentTF
             self.output("Clearing graph")
 
         # Reinitialization of graphCreationCanvas
