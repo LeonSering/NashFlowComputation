@@ -195,13 +195,8 @@ class NashFlow:
 
             # Queue size changes
             if vTimeUpper < float('inf'):
-                # TODO THIS COMPUTATION IS FLAWED
                 lastQueueSizeTime = next(reversed(self.network[v][w]['queueSize']))
                 lastQueueSize = self.network[v][w]['queueSize'][lastQueueSizeTime]
-                # Queue at beginning
-                #self.network[v][w]['queueSize'][vTimeUpper] = max(0, lastQueueSize + (
-                #        inflowVal - self.network[v][w]['outCapacity']) * (vTimeUpper - vTimeLower))
-                # Queue at end
                 self.network[v][w]['queueSize'][vTimeUpper + self.network[v][w]['transitTime']] = max(0, lastQueueSize + (
                         inflowVal - self.network[v][w]['outCapacity']) * (vTimeUpper - vTimeLower))
 

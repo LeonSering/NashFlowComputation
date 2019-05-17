@@ -150,7 +150,7 @@ class NashFlow_spillback(NashFlow):
 
             self.network[v][w]['queueSize'] = OrderedDict()
             self.network[v][w]['queueSize'][0] = 0
-            self.network[v][w]['queueSize'][vTimeLower] = 0
+            self.network[v][w]['queueSize'][vTimeLower + self.network[v][w]['transitTime']] = 0
 
             self.network[v][w]['load'] = OrderedDict()
             self.network[v][w]['load'][0] = 0
@@ -194,19 +194,40 @@ class NashFlow_spillback(NashFlow):
 
             # Queue size changes
             if vTimeUpper < float('inf'):
-                # TODO THIS COMPUTATION IS FLAWED
-                lastQueueSizeTime = next(reversed(self.network[v][w]['queueSize']))
-                lastQueueSize = self.network[v][w]['queueSize'][lastQueueSizeTime]
-                self.network[v][w]['queueSize'][vTimeUpper] = max(0, lastQueueSize + (
-                        inflowVal - self.network[v][w]['outCapacity']) * (vTimeUpper - vTimeLower))
-
+                self.update_queue_size(v, w, vTimeLower, vTimeUpper)
             self.animationIntervals[(v, w)].append(((vTimeLower, vTimeUpper), (wTimeLower, wTimeUpper)))
 
             if vTimeUpper <= wTimeUpper:
                 # Lies on shortest path
                 self.network[v][w]['load'][vTimeUpper] = self.arc_load(v, w, vTimeUpper)
 
+    def update_queue_size(self, v, w, vTimeLower, vTimeUpper):
+        # This is now more complicated, as outflow changes even if queue exists (due to spillback)
+        transitTime = self.network[v][w]['transitTime']
+        lastQueueSizeTime = next(reversed(self.network[v][w]['queueSize'])) # Should be vTimeLower + transitTime
+        lastQueueSize = self.network[v][w]['queueSize'][lastQueueSizeTime]
+        inflowVal = self.network[v][w]['inflow'][(vTimeLower, vTimeUpper)]
 
+        # Find all changes in outflow in interval [vTimeLower + transitTime, vTimeUpper + transitTime]
+        l, u = vTimeLower + transitTime, vTimeUpper + transitTime
+        lastSize = lastQueueSize
+        for timeInterval, outflowVal in self.network[v][w]['outflow'].items():
+            wTimeLower, wTimeUpper = timeInterval
+            if wTimeUpper <= l:
+                # Not relevant
+                continue
+            elif u < wTimeLower:
+                # Not relevant
+                break
+            elif l <= wTimeUpper <= u:
+                lastSize = max(0, lastSize + (inflowVal - outflowVal)*(wTimeUpper - l))
+                l = wTimeUpper
+                self.network[v][w]['queueSize'][l] = lastSize
+            elif l <= u < wTimeUpper:
+                lastSize = max(0, lastSize + (inflowVal - outflowVal)*(u - l))
+                l = u
+                self.network[v][w]['queueSize'][l] = lastSize
+                break
 
     def get_cumulative_inflow(self, v, w, t):
         """

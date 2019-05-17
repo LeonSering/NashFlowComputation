@@ -922,42 +922,57 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         if self.gttr('plotAnimationCanvas').focusEdge is None:
             return
         v, w = self.gttr('plotAnimationCanvas').focusEdge[0], self.gttr('plotAnimationCanvas').focusEdge[1]
-
+        nF = self.gttr('nashFlow')
+        network = nF.network
         lowerBound = self.gttr('animationLowerBound')
         upperBound = self.gttr('animationUpperBound')
 
-        inflowXValues = self.gttr('nashFlow').network[v][w]['cumulativeInflow'].keys()
-        inflowYValues = self.gttr('nashFlow').network[v][w]['cumulativeInflow'].values()
+        inflowXValues = network[v][w]['cumulativeInflow'].keys()
+        inflowYValues = network[v][w]['cumulativeInflow'].values()
 
-        if upperBound > inflowXValues[-1] and self.gttr('nashFlow').infinityReached:
-            lastInflow = self.gttr('nashFlow').network[v][w]['inflow'][next(reversed(self.gttr('nashFlow').network[v][w]['inflow']))]
+        if upperBound > inflowXValues[-1] and nF.infinityReached:
+            lastInflow = network[v][w]['inflow'][next(reversed(network[v][w]['inflow']))]
             val = inflowYValues[-1] + (upperBound - inflowXValues[-1]) * lastInflow
             inflowXValues.append(upperBound)
             inflowYValues.append(val)
 
-        outflowXValues = self.gttr('nashFlow').network[v][w]['cumulativeOutflow'].keys()
-        outflowYValues = self.gttr('nashFlow').network[v][w]['cumulativeOutflow'].values()
+        outflowXValues = network[v][w]['cumulativeOutflow'].keys()
+        outflowYValues = network[v][w]['cumulativeOutflow'].values()
 
-        if upperBound > outflowXValues[-1] and self.gttr('nashFlow').infinityReached:
-            lastOutflow = self.gttr('nashFlow').network[v][w]['outflow'][next(reversed(self.gttr('nashFlow').network[v][w]['outflow']))]
+        if upperBound > outflowXValues[-1] and nF.infinityReached:
+            lastOutflow = network[v][w]['outflow'][next(reversed(network[v][w]['outflow']))]
             val = outflowYValues[-1] + (upperBound - outflowXValues[-1]) * lastOutflow
             outflowXValues.append(upperBound)
             outflowYValues.append(val)
 
-        queueXValues = self.gttr('nashFlow').network[v][w]['queueSize'].keys()
-        queueYValues = self.gttr('nashFlow').network[v][w]['queueSize'].values()
+        queueXValues = network[v][w]['queueSize'].keys()
+        queueYValues = network[v][w]['queueSize'].values()
 
-        if upperBound > queueXValues[-1] and self.gttr('nashFlow').infinityReached:
+        if upperBound > queueXValues[-1] and nF.infinityReached:
             # Queue size stays constant or grows (but queue is never empty, if not already)
             lastQueueSize = queueYValues[-1]
-            lastInflowInterval = next(reversed(self.gttr('nashFlow').network[v][w]['inflow']))
-            lastInflow = self.gttr('nashFlow').network[v][w]['inflow'][lastInflowInterval]
+            lastQueueSizeTime = queueXValues[-1]
+            lastInflowInterval = next(reversed(network[v][w]['inflow']))
+            lastInflow = network[v][w]['inflow'][lastInflowInterval]
 
-            val = max(0, lastQueueSize + (lastInflow - self.gttr('nashFlow').network[v][w]['outCapacity']) * (
-                    upperBound - lastInflowInterval[0]))
-
-            queueXValues.append(upperBound)
-            queueYValues.append(val)
+            l, u = lastQueueSizeTime, upperBound
+            lastSize = lastQueueSize
+            for timeInterval, outflowVal in network[v][w]['outflow'].items():
+                wTimeLower, wTimeUpper = timeInterval
+                if wTimeUpper <= l:
+                    # Not relevant
+                    continue
+                elif l <= wTimeUpper <= u:
+                    lastSize = max(0, lastSize + (lastInflow - outflowVal) * (wTimeUpper - l))
+                    l = wTimeUpper
+                    queueXValues.append(l)
+                    queueYValues.append(lastSize)
+                elif l <= u < wTimeUpper:
+                    lastSize = max(0, lastSize + (lastInflow - outflowVal) * (u - l))
+                    l = u
+                    queueXValues.append(u)
+                    queueYValues.append(lastSize)
+                    break
 
         # Compute load=cumInflow - cumOutflow diagram
         # Interpolate values

@@ -68,7 +68,7 @@ class Utilities:
 
     @staticmethod
     def is_greater_tol(a, b, tol=TOL):
-        """Is greater than with tolerance"""
+        """Is 'a' greater than 'b' with tolerance"""
         return a - tol - b > 0
 
     @staticmethod
