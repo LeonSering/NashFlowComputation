@@ -42,7 +42,9 @@ class PlotQueueCanvas(FigureCanvas):
         if not v or not w:
             # No edge given, hence node must be selected
             self.focusEdge = None
-            self.figure.clf()
+            if self.boxColoring is not None:
+                self.boxColoring.remove()
+                self.boxColoring = None
             self.draw_idle()
         else:
             self.focusEdge = (v, w)
@@ -70,7 +72,7 @@ class PlotQueueCanvas(FigureCanvas):
         """Update queue animation to display different edge queue"""
         if not self.focusEdge:
             return
-        if self.boxColoring is not None:
+        if self.boxColoring:
             self.boxColoring.remove()
         self.boxColoring = None
 
