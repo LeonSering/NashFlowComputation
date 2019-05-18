@@ -13,7 +13,6 @@ from matplotlib.patches import Rectangle, Circle
 
 import networkx as nx
 
-matplotlib.use("Qt4Agg")
 import numpy as np
 import bisect
 

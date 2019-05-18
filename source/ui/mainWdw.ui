@@ -24,7 +24,7 @@
        </sizepolicy>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="tab_general">
        <attribute name="title">
@@ -766,8 +766,8 @@
                         <string/>
                        </property>
                        <property name="icon">
-                        <iconset>
-                         <normaloff>:/playpausestop/play.png</normaloff>:/playpausestop/play.png</iconset>
+                        <iconset resource="icons.qrc">
+                         <normaloff>:/Play/Pause/Stop/play.png</normaloff>:/Play/Pause/Stop/play.png</iconset>
                        </property>
                       </widget>
                      </item>
@@ -783,8 +783,8 @@
                         <string/>
                        </property>
                        <property name="icon">
-                        <iconset>
-                         <normaloff>:/playpausestop/pause.png</normaloff>:/playpausestop/pause.png</iconset>
+                        <iconset resource="icons.qrc">
+                         <normaloff>:/Play/Pause/Stop/pause.png</normaloff>:/Play/Pause/Stop/pause.png</iconset>
                        </property>
                       </widget>
                      </item>
@@ -800,8 +800,8 @@
                         <string/>
                        </property>
                        <property name="icon">
-                        <iconset>
-                         <normaloff>:/playpausestop/stop.png</normaloff>:/playpausestop/stop.png</iconset>
+                        <iconset resource="icons.qrc">
+                         <normaloff>:/Play/Pause/Stop/stop.png</normaloff>:/Play/Pause/Stop/stop.png</iconset>
                        </property>
                       </widget>
                      </item>
@@ -968,7 +968,7 @@
         <item row="0" column="0">
          <widget class="QTabWidget" name="tabWidget_spillback">
           <property name="currentIndex">
-           <number>0</number>
+           <number>1</number>
           </property>
           <widget class="QWidget" name="tab_5">
            <attribute name="title">
@@ -1695,8 +1695,8 @@
                         <string/>
                        </property>
                        <property name="icon">
-                        <iconset>
-                         <normaloff>:/playpausestop/play.png</normaloff>:/playpausestop/play.png</iconset>
+                        <iconset resource="icons.qrc">
+                         <normaloff>:/Play/Pause/Stop/play.png</normaloff>:/Play/Pause/Stop/play.png</iconset>
                        </property>
                       </widget>
                      </item>
@@ -1712,8 +1712,8 @@
                         <string/>
                        </property>
                        <property name="icon">
-                        <iconset>
-                         <normaloff>:/playpausestop/pause.png</normaloff>:/playpausestop/pause.png</iconset>
+                        <iconset resource="icons.qrc">
+                         <normaloff>:/Play/Pause/Stop/pause.png</normaloff>:/Play/Pause/Stop/pause.png</iconset>
                        </property>
                       </widget>
                      </item>
@@ -1729,8 +1729,8 @@
                         <string/>
                        </property>
                        <property name="icon">
-                        <iconset>
-                         <normaloff>:/playpausestop/stop.png</normaloff>:/playpausestop/stop.png</iconset>
+                        <iconset resource="icons.qrc">
+                         <normaloff>:/Play/Pause/Stop/stop.png</normaloff>:/Play/Pause/Stop/stop.png</iconset>
                        </property>
                       </widget>
                      </item>
@@ -1899,7 +1899,7 @@
      <x>0</x>
      <y>0</y>
      <width>1018</width>
-     <height>25</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -2076,8 +2076,8 @@
   <tabstop>intervalsLineEdit_spillback</tabstop>
  </tabstops>
  <resources>
-  <include location="icons.qrc"/>
   <include location="recordIcon.qrc"/>
+  <include location="icons.qrc"/>
  </resources>
  <connections/>
 </ui>

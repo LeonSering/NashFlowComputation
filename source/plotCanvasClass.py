@@ -11,8 +11,7 @@ import networkx as nx
 from math import sqrt
 from utilitiesClass import Utilities
 
-matplotlib.use("Qt4Agg")
-from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.colors import colorConverter
 from networkx import draw_networkx_labels, draw_networkx_edge_labels
 

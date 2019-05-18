@@ -12,9 +12,6 @@ import networkx as nx
 from plotCanvasClass import PlotCanvas
 from utilitiesClass import Utilities
 
-matplotlib.use("Qt4Agg")
-
-
 # ======================================================================================================================
 
 

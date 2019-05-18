@@ -5,7 +5,7 @@
 # Description:  Interface class; controlling signals/slots & communication between widgets
 # ===========================================================================
 
-from PyQt4 import QtGui, QtCore
+from PyQt5 import QtGui, QtCore, QtWidgets
 import ConfigParser
 import os
 import pickle
@@ -32,12 +32,12 @@ filterwarnings('ignore')  # For the moment: ignore warnings as pyplot.hold is de
 QtCore.QCoreApplication.setAttribute(QtCore.Qt.AA_X11InitThreads)  # This is necessary if threads access the GUI
 
 
-class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
+class Interface(QtWidgets.QMainWindow, mainWdw.Ui_MainWindow):
     """Controls GUI"""
 
     def __init__(self):
         """Initialization of Class and GUI"""
-        QtGui.QMainWindow.__init__(self)
+        QtWidgets.QMainWindow.__init__(self)
         self.setupUi(self)
 
         # Scaling factors of frames, to avoid distortion
@@ -130,11 +130,11 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.storageLineEdit_spillback.returnPressed.connect(self.update_add_edge)
 
         # Non-assigned Signals
-        self.tabWidget.connect(self.tabWidget, QtCore.SIGNAL("currentChanged(int)"), self.tabSwitched)
+        self.tabWidget.currentChanged.connect(self.tabSwitched)
         self.actionNew_graph.triggered.connect(self.re_init_app)
         self.actionLoad_graph.triggered.connect(self.load_graph)
         self.actionSave_graph.triggered.connect(self.save_graph)
-        self.actionExit.triggered.connect(QtGui.QApplication.quit)
+        self.actionExit.triggered.connect(QtWidgets.QApplication.quit)
         self.actionLoad_Nashflow.triggered.connect(self.load_nashflow)
         self.actionSave_Nashflow.triggered.connect(self.save_nashflow)
         self.actionOpen_ThinFlowComputation.triggered.connect(self.open_tfc)
@@ -143,11 +143,11 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.actionOpen_manual.triggered.connect(self.show_help)
 
         # Non-assigned shortcuts
-        QtGui.QShortcut(QtGui.QKeySequence(QtCore.Qt.Key_Delete), self).activated.connect(
+        QtWidgets.QShortcut(QtGui.QKeySequence(QtCore.Qt.Key_Delete), self).activated.connect(
             self.pressed_delete)  # Pressed Delete
 
         # Statusbar
-        self.statusBarLabel = QtGui.QLabel()
+        self.statusBarLabel = QtWidgets.QLabel()
         self.statusBar.addWidget(self.statusBarLabel)
 
         if len(sys.argv) >= 3:
@@ -202,7 +202,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         """Initialization of Tabs"""
         for tfType in self.tfTypeList:
             # Configure plotFrame to display plots of graphs
-            self.sttr('plotFrameLayout', tfType, QtGui.QVBoxLayout())
+            self.sttr('plotFrameLayout', tfType, QtWidgets.QVBoxLayout())
             self.gttr('plotFrame', tfType).setLayout(self.gttr('plotFrameLayout', tfType))
             self.sttr('graphCreationCanvas', tfType, PlotCanvas(self.gttr('network', tfType), self,
                                                                 stretchFactor=1.57, onlyNTF=False,
@@ -210,7 +210,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
             self.gttr('plotFrameLayout', tfType).addWidget(self.gttr('graphCreationCanvas', tfType))
 
             # Configure plotNTFFrame
-            self.sttr('plotNTFFrameLayout', tfType, QtGui.QVBoxLayout())
+            self.sttr('plotNTFFrameLayout', tfType, QtWidgets.QVBoxLayout())
             self.gttr('plotNTFFrame', tfType).setLayout(self.gttr('plotNTFFrameLayout', tfType))
 
             # TODO: Does this destroy layout?
@@ -227,18 +227,18 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
             #self.gttr('plotNTFFrameLayout', tfType).addWidget(self.gttr('plotNTFCanvas', tfType))
 
             # Configure plotAnimationFrame to display animation
-            self.sttr('plotAnimationFrameLayout', tfType, QtGui.QVBoxLayout())
+            self.sttr('plotAnimationFrameLayout', tfType, QtWidgets.QVBoxLayout())
             self.gttr('plotAnimationFrame', tfType).setLayout(self.gttr('plotAnimationFrameLayout', tfType))
             self.sttr('plotAnimationCanvas', tfType, None)
 
             # Configure plotDiagramFrame to display edge in- and outflow, queue-size and node labels
-            self.sttr('plotDiagramLayout', tfType, QtGui.QVBoxLayout())
+            self.sttr('plotDiagramLayout', tfType, QtWidgets.QVBoxLayout())
             self.gttr('plotDiagramFrame', tfType).setLayout(self.gttr('plotDiagramLayout', tfType))
             self.sttr('plotDiagramCanvas', tfType, PlotValuesCanvas(callback=self.callback_plotvaluescanvas))
             self.gttr('plotDiagramLayout', tfType).addWidget(self.gttr('plotDiagramCanvas', tfType))
 
             # Configure plotQueueFrame to display queue of selected edge
-            self.sttr('plotQueueFrameLayout', tfType, QtGui.QVBoxLayout())
+            self.sttr('plotQueueFrameLayout', tfType, QtWidgets.QVBoxLayout())
             self.gttr('plotQueueFrame', tfType).setLayout(self.gttr('plotQueueFrameLayout', tfType))
             self.sttr('plotQueueCanvas', tfType, PlotQueueCanvas())
             self.gttr('plotQueueFrameLayout', tfType).addWidget(self.gttr('plotQueueCanvas', tfType))
@@ -249,10 +249,10 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
 
     def generate_animation_dialog(self):
         """Show dialog in which new animation range is selected"""
-        lowerBoundInput, lowerGiven = QtGui.QInputDialog.getText(self, 'Enter the lower bound', 'Starting from:')
+        lowerBoundInput, lowerGiven = QtWidgets.QInputDialog.getText(self, 'Enter the lower bound', 'Starting from:')
         if not lowerGiven:
             return
-        upperBoundInput, upperGiven = QtGui.QInputDialog.getText(self, 'Enter the upper bound', 'Ending at:')
+        upperBoundInput, upperGiven = QtWidgets.QInputDialog.getText(self, 'Enter the upper bound', 'Ending at:')
         if not upperGiven:
             return
 
@@ -559,12 +559,11 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         :return: 
         """
         if not graphPath:
-            dialog = QtGui.QFileDialog
+            dialog = QtWidgets.QFileDialog
             # noinspection PyCallByClass,PyCallByClass
             fopen = dialog.getOpenFileName(self, "Select File", self.defaultLoadSaveDir, "network files (*.cg)")
 
-            if os.name != 'posix':  # For Windows
-                fopen = fopen[0]
+            fopen = fopen[0]
             if len(fopen) == 0:
                 return
             fopen = str(fopen)
@@ -592,11 +591,10 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         self.gttr('network').graph['inflowRate'] = float(self.gttr('inflowLineEdit').text())
 
         if not graphPath:
-            dialog = QtGui.QFileDialog
+            dialog = QtWidgets.QFileDialog
             fsave = dialog.getSaveFileName(self, "Select File", self.defaultLoadSaveDir, "network files (*.cg)")
 
-            if os.name != 'posix':
-                fsave = fsave[0]
+            fsave = fsave[0]
             if len(fsave) == 0:
                 return
             fsave = str(fsave)
@@ -618,11 +616,10 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
     def load_nashflow(self):
         """Load NashFlow instance from '.nf' file"""
         # TODO: This has to be adapted to NF Type
-        dialog = QtGui.QFileDialog
+        dialog = QtWidgets.QFileDialog
         fopen = dialog.getOpenFileName(self, "Select File", self.defaultLoadSaveDir, "Nashflow files (*.nf)")
 
-        if os.name != 'posix':
-            fopen = fopen[0]
+        fopen = fopen[0]
         if len(fopen) == 0:
             return
         fopen = str(fopen)
@@ -640,11 +637,10 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
 
     def save_nashflow(self):
         """Save Nashflow instance to '.nf' file"""
-        dialog = QtGui.QFileDialog
+        dialog = QtWidgets.QFileDialog
         fsave = dialog.getSaveFileName(self, "Select File", self.defaultLoadSaveDir, "Nashflow files (*.nf)")
 
-        if os.name != 'posix':
-            fsave = fsave[0]
+        fsave = fsave[0]
         if len(fsave) == 0:
             return
         fsave = str(fsave)
@@ -662,11 +658,10 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
     def select_output_directory(self):
         """Select output directory for nash flow computation"""
         defaultDir = self.outputDirectory
-        dialog = QtGui.QFileDialog
+        dialog = QtWidgets.QFileDialog
         fselect = dialog.getExistingDirectory(self, "Select Directory", defaultDir)
 
-        if os.name != 'posix':
-            fselect = fselect[0]
+        fselect = fselect[0]
         if len(fselect) == 0:
             return
         fselect = str(fselect)
@@ -678,11 +673,10 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
     def select_scip_binary(self):
         """Select scip binary"""
         defaultDir = '' if not os.path.isfile(self.scipFile) else os.path.dirname(self.scipFile)
-        dialog = QtGui.QFileDialog
+        dialog = QtWidgets.QFileDialog
         fselect = dialog.getOpenFileName(self, "Select File", defaultDir)
 
-        if os.name != 'posix':
-            fselect = fselect[0]
+        fselect = fselect[0]
         if len(fselect) == 0:
             return
         fselect = str(fselect)
@@ -758,8 +752,8 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         if returnCode != 0:
             # Invalid input has been given
             # Spawn warning
-            QtGui.QMessageBox.question(QtGui.QWidget(), 'Abort: Input error', self.get_error_message(returnCode),
-                                       QtGui.QMessageBox.Ok)
+            QtWidgets.QMessageBox.question(QtWidgets.QWidget(), 'Abort: Input error', self.get_error_message(returnCode),
+                                       QtWidgets.QMessageBox.Ok)
             return
 
         # While computing it should not be possible to change showEdgesWithoutFlowCheckBox
@@ -812,8 +806,8 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         for index, interval in enumerate(self.gttr('nashFlow').flowIntervals):
             intervalString = 'Interval ' + str(interval[2].id) + ': [' + str("%.2f" % interval[0]) + ',' + str(
                 "%.2f" % interval[1]) + '['
-            item = QtGui.QListWidgetItem(intervalString)
-            item.setBackgroundColor(
+            item = QtWidgets.QListWidgetItem(intervalString)
+            item.setBackground(
                 QtGui.QColor(self.gttr('plotAnimationCanvas').NTFColors[index % len(self.gttr('plotAnimationCanvas').NTFColors)]))
             self.gttr('intervalsListWidget').addItem(item)  # Add item to listWidget
 
@@ -1073,12 +1067,11 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
     def export_diagram(self):
         """Export diagram to PDF or PGF"""
         fileType = 'pdf' if self.gttr('exportComboBox').currentIndex() == 0 else 'pgf'
-        dialog = QtGui.QFileDialog
+        dialog = QtWidgets.QFileDialog
         fsave = dialog.getSaveFileName(self, "Select File", self.defaultLoadSaveDir,
                                        fileType + " files (*." + fileType + ")")
 
-        if os.name != 'posix':
-            fsave = fsave[0]
+        fsave = fsave[0]
         if len(fsave) == 0:
             return
         fsave = str(fsave)
@@ -1095,12 +1088,11 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
     def export_animation(self):
         """Export animation to mp4. This requires FFMPEG."""
         fileType = 'mp4'
-        dialog = QtGui.QFileDialog
+        dialog = QtWidgets.QFileDialog
         fsave = dialog.getSaveFileName(self, "Select File", self.defaultLoadSaveDir,
                                        fileType + " files (*." + fileType + ")")
 
-        if os.name != 'posix':
-            fsave = fsave[0]
+        fsave = fsave[0]
         if len(fsave) == 0:
             return
         fsave = str(fsave)
@@ -1217,7 +1209,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
             tfType = self.currentTF
 
         nodeString = 'Node ' + str(node) + ': ' + self.gttr('network', tfType).node[node]['label']
-        item = QtGui.QListWidgetItem(nodeString)
+        item = QtWidgets.QListWidgetItem(nodeString)
         self.gttr('nodeToListItem', tfType)[node] = item
         self.gttr('nodeSelectionListWidget', tfType).addItem(item)  # Add item to listWidget
 
@@ -1233,7 +1225,7 @@ class Interface(QtGui.QMainWindow, mainWdw.Ui_MainWindow):
         v, w = edge
         edgeString = 'Edge: ' + str(
             (self.gttr('network', tfType).node[v]['label'], self.gttr('network', tfType).node[w]['label']))
-        item = QtGui.QListWidgetItem(edgeString)
+        item = QtWidgets.QListWidgetItem(edgeString)
         self.gttr('edgeToListItem')[edge] = item
         self.gttr('edgeSelectionListWidget', tfType).addItem(item)
 

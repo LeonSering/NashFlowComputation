@@ -13,8 +13,7 @@ from matplotlib.patches import Rectangle
 from matplotlib.collections import PatchCollection
 from utilitiesClass import Utilities
 
-matplotlib.use("Qt4Agg")
-from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 
 # ======================================================================================================================
 

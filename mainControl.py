@@ -16,7 +16,7 @@ if __name__ == '__main__':
         newCwd = os.path.dirname(cwd)
         os.chdir(newCwd)
 
-    app = application.QtGui.QApplication(sys.argv)
+    app = application.QtWidgets.QApplication(sys.argv)
     form = application.Interface()
     form.show()
     app.exec_()

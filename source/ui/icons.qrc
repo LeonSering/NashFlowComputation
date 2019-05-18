@@ -1,5 +1,5 @@
 <RCC>
-  <qresource prefix="playpausestop">
+  <qresource prefix="Play/Pause/Stop">
     <file>pause.png</file>
     <file>play.png</file>
     <file>stop.png</file>

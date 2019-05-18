@@ -13,7 +13,6 @@ import os
 from tempfile import gettempdir
 import numpy as np
 import matplotlib
-matplotlib.use("Qt4Agg")
 from matplotlib.patches import Rectangle
 from matplotlib.collections import PatchCollection, LineCollection
 from matplotlib.colors import colorConverter
