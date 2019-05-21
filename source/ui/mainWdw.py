@@ -1,17 +1,18 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'mainWdw.ui'
+# Form implementation generated from reading ui file 'mainWdw_Leon.ui'
 #
-# Created by: PyQt5 UI code generator 5.10.1
+# Created by: PyQt5 UI code generator 5.12.1
 #
 # WARNING! All changes made in this file will be lost!
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
+
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(1018, 746)
+        MainWindow.resize(1018, 750)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.verticalLayout_2 = QtWidgets.QVBoxLayout(self.centralwidget)
@@ -39,10 +40,6 @@ class Ui_MainWindow(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.groupBox.sizePolicy().hasHeightForWidth())
         self.groupBox.setSizePolicy(sizePolicy)
-        self.groupBox.setStyleSheet("QGroupBox { \n"
-"     border: 2px solid rgb(0, 0, 127); \n"
-"     border-radius: 1px; \n"
-" } ")
         self.groupBox.setObjectName("groupBox")
         self.gridLayout_2 = QtWidgets.QGridLayout(self.groupBox)
         self.gridLayout_2.setObjectName("gridLayout_2")
@@ -99,7 +96,7 @@ class Ui_MainWindow(object):
         self.label_10 = QtWidgets.QLabel(self.groupBox)
         self.label_10.setObjectName("label_10")
         self.gridLayout_2.addWidget(self.label_10, 8, 4, 1, 1)
-        spacerItem = QtWidgets.QSpacerItem(20, 10, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
+        spacerItem = QtWidgets.QSpacerItem(20, 5, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
         self.gridLayout_2.addItem(spacerItem, 0, 1, 1, 1)
         self.label_8.raise_()
         self.label_9.raise_()
@@ -152,14 +149,10 @@ class Ui_MainWindow(object):
         sizePolicy.setVerticalStretch(4)
         sizePolicy.setHeightForWidth(self.groupBox_2.sizePolicy().hasHeightForWidth())
         self.groupBox_2.setSizePolicy(sizePolicy)
-        self.groupBox_2.setStyleSheet("QGroupBox { \n"
-"     border: 2px solid rgb(0, 0, 127); \n"
-"     border-radius: 1px; \n"
-" } ")
         self.groupBox_2.setObjectName("groupBox_2")
         self.verticalLayout_4 = QtWidgets.QVBoxLayout(self.groupBox_2)
         self.verticalLayout_4.setObjectName("verticalLayout_4")
-        spacerItem1 = QtWidgets.QSpacerItem(20, 10, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
+        spacerItem1 = QtWidgets.QSpacerItem(20, 5, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
         self.verticalLayout_4.addItem(spacerItem1)
         self.formLayout_3 = QtWidgets.QFormLayout()
         self.formLayout_3.setSizeConstraint(QtWidgets.QLayout.SetDefaultConstraint)
@@ -197,10 +190,6 @@ class Ui_MainWindow(object):
         sizePolicy.setVerticalStretch(4)
         sizePolicy.setHeightForWidth(self.groupBox_3.sizePolicy().hasHeightForWidth())
         self.groupBox_3.setSizePolicy(sizePolicy)
-        self.groupBox_3.setStyleSheet("QGroupBox { \n"
-"     border: 2px solid rgb(0, 0, 127); \n"
-"     border-radius: 1px; \n"
-" } ")
         self.groupBox_3.setObjectName("groupBox_3")
         self.gridLayout_5 = QtWidgets.QGridLayout(self.groupBox_3)
         self.gridLayout_5.setObjectName("gridLayout_5")
@@ -237,7 +226,7 @@ class Ui_MainWindow(object):
         self.updateNodeButton_general.setFlat(False)
         self.updateNodeButton_general.setObjectName("updateNodeButton_general")
         self.gridLayout_5.addWidget(self.updateNodeButton_general, 2, 0, 1, 1)
-        spacerItem2 = QtWidgets.QSpacerItem(20, 10, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
+        spacerItem2 = QtWidgets.QSpacerItem(20, 5, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
         self.gridLayout_5.addItem(spacerItem2, 0, 0, 1, 1)
         self.gridLayout_3.addWidget(self.groupBox_3, 0, 2, 1, 1)
         self.logPlainTextEdit_general = QtWidgets.QPlainTextEdit(self.tab_3)
@@ -256,8 +245,6 @@ class Ui_MainWindow(object):
         sizePolicy.setVerticalStretch(1)
         sizePolicy.setHeightForWidth(self.plotFrame_general.sizePolicy().hasHeightForWidth())
         self.plotFrame_general.setSizePolicy(sizePolicy)
-        self.plotFrame_general.setFrameShape(QtWidgets.QFrame.Box)
-        self.plotFrame_general.setFrameShadow(QtWidgets.QFrame.Plain)
         self.plotFrame_general.setObjectName("plotFrame_general")
         self.gridLayout_3.addWidget(self.plotFrame_general, 0, 0, 2, 1)
         self.plotFrame_general.raise_()
@@ -276,19 +263,13 @@ class Ui_MainWindow(object):
         sizePolicy.setVerticalStretch(3)
         sizePolicy.setHeightForWidth(self.groupBox_6.sizePolicy().hasHeightForWidth())
         self.groupBox_6.setSizePolicy(sizePolicy)
-        self.groupBox_6.setStyleSheet("QGroupBox { \n"
-"     border: 2px solid rgb(0, 0, 127); \n"
-"     border-radius: 1px; \n"
-" } ")
         self.groupBox_6.setObjectName("groupBox_6")
         self.gridLayout_9 = QtWidgets.QGridLayout(self.groupBox_6)
         self.gridLayout_9.setObjectName("gridLayout_9")
-        spacerItem3 = QtWidgets.QSpacerItem(20, 10, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
-        self.gridLayout_9.addItem(spacerItem3, 0, 0, 1, 1)
         self.showEdgesWithoutFlowCheckBox_general = QtWidgets.QCheckBox(self.groupBox_6)
         self.showEdgesWithoutFlowCheckBox_general.setChecked(True)
         self.showEdgesWithoutFlowCheckBox_general.setObjectName("showEdgesWithoutFlowCheckBox_general")
-        self.gridLayout_9.addWidget(self.showEdgesWithoutFlowCheckBox_general, 3, 0, 1, 1)
+        self.gridLayout_9.addWidget(self.showEdgesWithoutFlowCheckBox_general, 2, 0, 1, 1)
         self.computeIntervalPushButton_general = QtWidgets.QPushButton(self.groupBox_6)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
@@ -299,27 +280,24 @@ class Ui_MainWindow(object):
         self.computeIntervalPushButton_general.setDefault(False)
         self.computeIntervalPushButton_general.setFlat(False)
         self.computeIntervalPushButton_general.setObjectName("computeIntervalPushButton_general")
-        self.gridLayout_9.addWidget(self.computeIntervalPushButton_general, 3, 1, 1, 1)
+        self.gridLayout_9.addWidget(self.computeIntervalPushButton_general, 2, 1, 1, 1)
         self.plotNTFFrame_general = QtWidgets.QFrame(self.groupBox_6)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(3)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.plotNTFFrame_general.sizePolicy().hasHeightForWidth())
         self.plotNTFFrame_general.setSizePolicy(sizePolicy)
-        self.plotNTFFrame_general.setFrameShape(QtWidgets.QFrame.Box)
         self.plotNTFFrame_general.setObjectName("plotNTFFrame_general")
-        self.gridLayout_9.addWidget(self.plotNTFFrame_general, 1, 0, 2, 1)
+        self.gridLayout_9.addWidget(self.plotNTFFrame_general, 0, 0, 2, 1)
         self.intervalsListWidget_general = QtWidgets.QListWidget(self.groupBox_6)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(1)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.intervalsListWidget_general.sizePolicy().hasHeightForWidth())
         self.intervalsListWidget_general.setSizePolicy(sizePolicy)
-        self.intervalsListWidget_general.setFrameShape(QtWidgets.QFrame.Box)
-        self.intervalsListWidget_general.setFrameShadow(QtWidgets.QFrame.Plain)
         self.intervalsListWidget_general.setSelectionMode(QtWidgets.QAbstractItemView.NoSelection)
         self.intervalsListWidget_general.setObjectName("intervalsListWidget_general")
-        self.gridLayout_9.addWidget(self.intervalsListWidget_general, 1, 1, 2, 1)
+        self.gridLayout_9.addWidget(self.intervalsListWidget_general, 0, 1, 2, 1)
         self.gridLayout_7.addWidget(self.groupBox_6, 3, 0, 1, 1)
         self.groupBox_4 = QtWidgets.QGroupBox(self.tab_4)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
@@ -327,22 +305,15 @@ class Ui_MainWindow(object):
         sizePolicy.setVerticalStretch(4)
         sizePolicy.setHeightForWidth(self.groupBox_4.sizePolicy().hasHeightForWidth())
         self.groupBox_4.setSizePolicy(sizePolicy)
-        self.groupBox_4.setStyleSheet("QGroupBox { \n"
-"     border: 2px solid rgb(0, 0, 127); \n"
-"     border-radius: 1px; \n"
-" } ")
         self.groupBox_4.setObjectName("groupBox_4")
         self.verticalLayout_7 = QtWidgets.QVBoxLayout(self.groupBox_4)
         self.verticalLayout_7.setObjectName("verticalLayout_7")
-        spacerItem4 = QtWidgets.QSpacerItem(20, 10, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
-        self.verticalLayout_7.addItem(spacerItem4)
         self.plotAnimationFrame_general = QtWidgets.QFrame(self.groupBox_4)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(2)
         sizePolicy.setHeightForWidth(self.plotAnimationFrame_general.sizePolicy().hasHeightForWidth())
         self.plotAnimationFrame_general.setSizePolicy(sizePolicy)
-        self.plotAnimationFrame_general.setFrameShape(QtWidgets.QFrame.Box)
         self.plotAnimationFrame_general.setObjectName("plotAnimationFrame_general")
         self.verticalLayout_7.addWidget(self.plotAnimationFrame_general)
         self.timeSlider_general = QtWidgets.QSlider(self.groupBox_4)
@@ -356,10 +327,6 @@ class Ui_MainWindow(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.groupBox_5.sizePolicy().hasHeightForWidth())
         self.groupBox_5.setSizePolicy(sizePolicy)
-        self.groupBox_5.setStyleSheet("QGroupBox { \n"
-"     border: 2px solid rgb(0, 0, 127); \n"
-"     border-radius: 1px; \n"
-" } ")
         self.groupBox_5.setTitle("")
         self.groupBox_5.setObjectName("groupBox_5")
         self.verticalLayout_5 = QtWidgets.QVBoxLayout(self.groupBox_5)
@@ -457,12 +424,11 @@ class Ui_MainWindow(object):
         self.plotQueueFrame_general.setSizePolicy(sizePolicy)
         self.plotQueueFrame_general.setMaximumSize(QtCore.QSize(81, 128))
         self.plotQueueFrame_general.setLayoutDirection(QtCore.Qt.LeftToRight)
-        self.plotQueueFrame_general.setFrameShape(QtWidgets.QFrame.Box)
         self.plotQueueFrame_general.setObjectName("plotQueueFrame_general")
         self.horizontalLayout_4.addWidget(self.plotQueueFrame_general)
         self.gridLayout_17.addLayout(self.horizontalLayout_4, 0, 0, 1, 1)
-        spacerItem5 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.gridLayout_17.addItem(spacerItem5, 0, 3, 1, 1)
+        spacerItem3 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.gridLayout_17.addItem(spacerItem3, 0, 3, 1, 1)
         self.verticalLayout_5.addLayout(self.gridLayout_17)
         self.plotDiagramFrame_general = QtWidgets.QFrame(self.groupBox_5)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
@@ -470,7 +436,6 @@ class Ui_MainWindow(object):
         sizePolicy.setVerticalStretch(1)
         sizePolicy.setHeightForWidth(self.plotDiagramFrame_general.sizePolicy().hasHeightForWidth())
         self.plotDiagramFrame_general.setSizePolicy(sizePolicy)
-        self.plotDiagramFrame_general.setFrameShape(QtWidgets.QFrame.Box)
         self.plotDiagramFrame_general.setObjectName("plotDiagramFrame_general")
         self.verticalLayout_5.addWidget(self.plotDiagramFrame_general)
         self.horizontalLayout = QtWidgets.QHBoxLayout()
@@ -562,15 +527,11 @@ class Ui_MainWindow(object):
         sizePolicy.setVerticalStretch(4)
         sizePolicy.setHeightForWidth(self.groupBox_8.sizePolicy().hasHeightForWidth())
         self.groupBox_8.setSizePolicy(sizePolicy)
-        self.groupBox_8.setStyleSheet("QGroupBox { \n"
-"     border: 2px solid rgb(0, 0, 127); \n"
-"     border-radius: 1px; \n"
-" } ")
         self.groupBox_8.setObjectName("groupBox_8")
         self.verticalLayout_6 = QtWidgets.QVBoxLayout(self.groupBox_8)
         self.verticalLayout_6.setObjectName("verticalLayout_6")
-        spacerItem6 = QtWidgets.QSpacerItem(20, 10, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
-        self.verticalLayout_6.addItem(spacerItem6)
+        spacerItem4 = QtWidgets.QSpacerItem(20, 5, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
+        self.verticalLayout_6.addItem(spacerItem4)
         self.formLayout_6 = QtWidgets.QFormLayout()
         self.formLayout_6.setSizeConstraint(QtWidgets.QLayout.SetDefaultConstraint)
         self.formLayout_6.setFieldGrowthPolicy(QtWidgets.QFormLayout.AllNonFixedFieldsGrow)
@@ -619,10 +580,6 @@ class Ui_MainWindow(object):
         sizePolicy.setVerticalStretch(4)
         sizePolicy.setHeightForWidth(self.groupBox_9.sizePolicy().hasHeightForWidth())
         self.groupBox_9.setSizePolicy(sizePolicy)
-        self.groupBox_9.setStyleSheet("QGroupBox { \n"
-"     border: 2px solid rgb(0, 0, 127); \n"
-"     border-radius: 1px; \n"
-" } ")
         self.groupBox_9.setObjectName("groupBox_9")
         self.gridLayout_11 = QtWidgets.QGridLayout(self.groupBox_9)
         self.gridLayout_11.setObjectName("gridLayout_11")
@@ -659,8 +616,8 @@ class Ui_MainWindow(object):
         self.updateNodeButton_spillback.setFlat(False)
         self.updateNodeButton_spillback.setObjectName("updateNodeButton_spillback")
         self.gridLayout_11.addWidget(self.updateNodeButton_spillback, 2, 0, 1, 1)
-        spacerItem7 = QtWidgets.QSpacerItem(20, 10, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
-        self.gridLayout_11.addItem(spacerItem7, 0, 0, 1, 1)
+        spacerItem5 = QtWidgets.QSpacerItem(20, 5, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
+        self.gridLayout_11.addItem(spacerItem5, 0, 0, 1, 1)
         self.gridLayout_4.addWidget(self.groupBox_9, 0, 2, 1, 1)
         self.logPlainTextEdit_spillback = QtWidgets.QPlainTextEdit(self.tab_5)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
@@ -678,8 +635,6 @@ class Ui_MainWindow(object):
         sizePolicy.setVerticalStretch(1)
         sizePolicy.setHeightForWidth(self.plotFrame_spillback.sizePolicy().hasHeightForWidth())
         self.plotFrame_spillback.setSizePolicy(sizePolicy)
-        self.plotFrame_spillback.setFrameShape(QtWidgets.QFrame.Box)
-        self.plotFrame_spillback.setFrameShadow(QtWidgets.QFrame.Plain)
         self.plotFrame_spillback.setObjectName("plotFrame_spillback")
         self.gridLayout_4.addWidget(self.plotFrame_spillback, 0, 0, 2, 1)
         self.groupBox_7 = QtWidgets.QGroupBox(self.tab_5)
@@ -688,10 +643,6 @@ class Ui_MainWindow(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.groupBox_7.sizePolicy().hasHeightForWidth())
         self.groupBox_7.setSizePolicy(sizePolicy)
-        self.groupBox_7.setStyleSheet("QGroupBox { \n"
-"     border: 2px solid rgb(0, 0, 127); \n"
-"     border-radius: 1px; \n"
-" } ")
         self.groupBox_7.setObjectName("groupBox_7")
         self.gridLayout_16 = QtWidgets.QGridLayout(self.groupBox_7)
         self.gridLayout_16.setObjectName("gridLayout_16")
@@ -748,8 +699,8 @@ class Ui_MainWindow(object):
         self.label_28 = QtWidgets.QLabel(self.groupBox_7)
         self.label_28.setObjectName("label_28")
         self.gridLayout_16.addWidget(self.label_28, 8, 4, 1, 1)
-        spacerItem8 = QtWidgets.QSpacerItem(20, 10, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
-        self.gridLayout_16.addItem(spacerItem8, 0, 1, 1, 1)
+        spacerItem6 = QtWidgets.QSpacerItem(20, 5, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
+        self.gridLayout_16.addItem(spacerItem6, 0, 1, 1, 1)
         self.gridLayout_4.addWidget(self.groupBox_7, 3, 0, 1, 3)
         self.tabWidget_spillback.addTab(self.tab_5, "")
         self.tab_6 = QtWidgets.QWidget()
@@ -762,22 +713,15 @@ class Ui_MainWindow(object):
         sizePolicy.setVerticalStretch(4)
         sizePolicy.setHeightForWidth(self.groupBox_10.sizePolicy().hasHeightForWidth())
         self.groupBox_10.setSizePolicy(sizePolicy)
-        self.groupBox_10.setStyleSheet("QGroupBox { \n"
-"     border: 2px solid rgb(0, 0, 127); \n"
-"     border-radius: 1px; \n"
-" } ")
         self.groupBox_10.setObjectName("groupBox_10")
         self.verticalLayout_9 = QtWidgets.QVBoxLayout(self.groupBox_10)
         self.verticalLayout_9.setObjectName("verticalLayout_9")
-        spacerItem9 = QtWidgets.QSpacerItem(20, 10, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
-        self.verticalLayout_9.addItem(spacerItem9)
         self.plotAnimationFrame_spillback = QtWidgets.QFrame(self.groupBox_10)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(2)
         sizePolicy.setHeightForWidth(self.plotAnimationFrame_spillback.sizePolicy().hasHeightForWidth())
         self.plotAnimationFrame_spillback.setSizePolicy(sizePolicy)
-        self.plotAnimationFrame_spillback.setFrameShape(QtWidgets.QFrame.Box)
         self.plotAnimationFrame_spillback.setObjectName("plotAnimationFrame_spillback")
         self.verticalLayout_9.addWidget(self.plotAnimationFrame_spillback)
         self.timeSlider_spillback = QtWidgets.QSlider(self.groupBox_10)
@@ -791,39 +735,18 @@ class Ui_MainWindow(object):
         sizePolicy.setVerticalStretch(3)
         sizePolicy.setHeightForWidth(self.groupBox_12.sizePolicy().hasHeightForWidth())
         self.groupBox_12.setSizePolicy(sizePolicy)
-        self.groupBox_12.setStyleSheet("QGroupBox { \n"
-"     border: 2px solid rgb(0, 0, 127); \n"
-"     border-radius: 1px; \n"
-" } ")
         self.groupBox_12.setObjectName("groupBox_12")
         self.gridLayout_14 = QtWidgets.QGridLayout(self.groupBox_12)
         self.gridLayout_14.setObjectName("gridLayout_14")
-        spacerItem10 = QtWidgets.QSpacerItem(20, 10, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
-        self.gridLayout_14.addItem(spacerItem10, 0, 0, 1, 1)
-        self.plotNTFFrame_spillback = QtWidgets.QFrame(self.groupBox_12)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
-        sizePolicy.setHorizontalStretch(3)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.plotNTFFrame_spillback.sizePolicy().hasHeightForWidth())
-        self.plotNTFFrame_spillback.setSizePolicy(sizePolicy)
-        self.plotNTFFrame_spillback.setFrameShape(QtWidgets.QFrame.Box)
-        self.plotNTFFrame_spillback.setObjectName("plotNTFFrame_spillback")
-        self.gridLayout_14.addWidget(self.plotNTFFrame_spillback, 1, 0, 2, 1)
-        self.showEdgesWithoutFlowCheckBox_spillback = QtWidgets.QCheckBox(self.groupBox_12)
-        self.showEdgesWithoutFlowCheckBox_spillback.setChecked(True)
-        self.showEdgesWithoutFlowCheckBox_spillback.setObjectName("showEdgesWithoutFlowCheckBox_spillback")
-        self.gridLayout_14.addWidget(self.showEdgesWithoutFlowCheckBox_spillback, 3, 0, 1, 1)
         self.intervalsListWidget_spillback = QtWidgets.QListWidget(self.groupBox_12)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(1)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.intervalsListWidget_spillback.sizePolicy().hasHeightForWidth())
         self.intervalsListWidget_spillback.setSizePolicy(sizePolicy)
-        self.intervalsListWidget_spillback.setFrameShape(QtWidgets.QFrame.Box)
-        self.intervalsListWidget_spillback.setFrameShadow(QtWidgets.QFrame.Plain)
         self.intervalsListWidget_spillback.setSelectionMode(QtWidgets.QAbstractItemView.NoSelection)
         self.intervalsListWidget_spillback.setObjectName("intervalsListWidget_spillback")
-        self.gridLayout_14.addWidget(self.intervalsListWidget_spillback, 1, 1, 2, 1)
+        self.gridLayout_14.addWidget(self.intervalsListWidget_spillback, 0, 1, 2, 1)
         self.computeIntervalPushButton_spillback = QtWidgets.QPushButton(self.groupBox_12)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
@@ -834,7 +757,19 @@ class Ui_MainWindow(object):
         self.computeIntervalPushButton_spillback.setDefault(False)
         self.computeIntervalPushButton_spillback.setFlat(False)
         self.computeIntervalPushButton_spillback.setObjectName("computeIntervalPushButton_spillback")
-        self.gridLayout_14.addWidget(self.computeIntervalPushButton_spillback, 3, 1, 1, 1)
+        self.gridLayout_14.addWidget(self.computeIntervalPushButton_spillback, 2, 1, 1, 1)
+        self.plotNTFFrame_spillback = QtWidgets.QFrame(self.groupBox_12)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
+        sizePolicy.setHorizontalStretch(3)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.plotNTFFrame_spillback.sizePolicy().hasHeightForWidth())
+        self.plotNTFFrame_spillback.setSizePolicy(sizePolicy)
+        self.plotNTFFrame_spillback.setObjectName("plotNTFFrame_spillback")
+        self.gridLayout_14.addWidget(self.plotNTFFrame_spillback, 0, 0, 2, 1)
+        self.showEdgesWithoutFlowCheckBox_spillback = QtWidgets.QCheckBox(self.groupBox_12)
+        self.showEdgesWithoutFlowCheckBox_spillback.setChecked(True)
+        self.showEdgesWithoutFlowCheckBox_spillback.setObjectName("showEdgesWithoutFlowCheckBox_spillback")
+        self.gridLayout_14.addWidget(self.showEdgesWithoutFlowCheckBox_spillback, 2, 0, 1, 1)
         self.gridLayout_12.addWidget(self.groupBox_12, 3, 0, 1, 1)
         self.groupBox_11 = QtWidgets.QGroupBox(self.tab_6)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
@@ -842,10 +777,6 @@ class Ui_MainWindow(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.groupBox_11.sizePolicy().hasHeightForWidth())
         self.groupBox_11.setSizePolicy(sizePolicy)
-        self.groupBox_11.setStyleSheet("QGroupBox { \n"
-"     border: 2px solid rgb(0, 0, 127); \n"
-"     border-radius: 1px; \n"
-" } ")
         self.groupBox_11.setTitle("")
         self.groupBox_11.setObjectName("groupBox_11")
         self.verticalLayout_10 = QtWidgets.QVBoxLayout(self.groupBox_11)
@@ -935,12 +866,11 @@ class Ui_MainWindow(object):
         self.plotQueueFrame_spillback.setSizePolicy(sizePolicy)
         self.plotQueueFrame_spillback.setMaximumSize(QtCore.QSize(81, 128))
         self.plotQueueFrame_spillback.setLayoutDirection(QtCore.Qt.LeftToRight)
-        self.plotQueueFrame_spillback.setFrameShape(QtWidgets.QFrame.Box)
         self.plotQueueFrame_spillback.setObjectName("plotQueueFrame_spillback")
         self.horizontalLayout_3.addWidget(self.plotQueueFrame_spillback)
         self.gridLayout_13.addLayout(self.horizontalLayout_3, 0, 0, 1, 1)
-        spacerItem11 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.gridLayout_13.addItem(spacerItem11, 0, 3, 1, 1)
+        spacerItem7 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.gridLayout_13.addItem(spacerItem7, 0, 3, 1, 1)
         self.verticalLayout_10.addLayout(self.gridLayout_13)
         self.plotDiagramFrame_spillback = QtWidgets.QFrame(self.groupBox_11)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
@@ -948,7 +878,6 @@ class Ui_MainWindow(object):
         sizePolicy.setVerticalStretch(1)
         sizePolicy.setHeightForWidth(self.plotDiagramFrame_spillback.sizePolicy().hasHeightForWidth())
         self.plotDiagramFrame_spillback.setSizePolicy(sizePolicy)
-        self.plotDiagramFrame_spillback.setFrameShape(QtWidgets.QFrame.Box)
         self.plotDiagramFrame_spillback.setObjectName("plotDiagramFrame_spillback")
         self.verticalLayout_10.addWidget(self.plotDiagramFrame_spillback)
         self.horizontalLayout_9 = QtWidgets.QHBoxLayout()
@@ -1000,7 +929,7 @@ class Ui_MainWindow(object):
         self.verticalLayout_2.addWidget(self.tabWidget)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 1018, 22))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 1018, 30))
         self.menubar.setObjectName("menubar")
         self.menuFile = QtWidgets.QMenu(self.menubar)
         self.menuFile.setObjectName("menuFile")
@@ -1053,7 +982,7 @@ class Ui_MainWindow(object):
         self.menubar.addAction(self.menuHelp.menuAction())
 
         self.retranslateUi(MainWindow)
-        self.tabWidget.setCurrentIndex(0)
+        self.tabWidget.setCurrentIndex(1)
         self.tabWidget_general.setCurrentIndex(1)
         self.tabWidget_spillback.setCurrentIndex(1)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
@@ -1219,8 +1148,8 @@ class Ui_MainWindow(object):
         self.tabWidget_spillback.setTabText(self.tabWidget_spillback.indexOf(self.tab_5), _translate("MainWindow", "Create/Load graph"))
         self.groupBox_10.setTitle(_translate("MainWindow", "Nashflow"))
         self.groupBox_12.setTitle(_translate("MainWindow", "Thinflow"))
-        self.showEdgesWithoutFlowCheckBox_spillback.setText(_translate("MainWindow", "Show edges w/out flow"))
         self.computeIntervalPushButton_spillback.setText(_translate("MainWindow", "Compute next interval"))
+        self.showEdgesWithoutFlowCheckBox_spillback.setText(_translate("MainWindow", "Show edges w/out flow"))
         self.label_45.setText(_translate("MainWindow", "Focus:"))
         self.currentFocusLabel_spillback.setText(_translate("MainWindow", "N/A"))
         self.label_46.setText(_translate("MainWindow", "Capacity:"))
@@ -1253,6 +1182,7 @@ class Ui_MainWindow(object):
         self.actionOpen_ThinFlowComputation.setText(_translate("MainWindow", "Open ThinFlowComputation"))
         self.actionMove_graph_to_ThinFlowComputation.setText(_translate("MainWindow", "Move current graph to ThinFlowComputation"))
         self.actionChange_animation_time_range.setText(_translate("MainWindow", "Change animation time range"))
+
 
 import icons_rc
 import recordIcon_rc
