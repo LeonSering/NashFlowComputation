@@ -391,7 +391,7 @@ class Utilities:
         modEdgeColors = list(edge_colors)
         modEdgeColors = tuple(modEdgeColors + [colorConverter.to_rgba('w', alpha)
                                      for c in edge_color])
-        #print modEdgeColors
+        #print(modEdgeColors)
         edge_collection = LineCollection(np.asarray(list(edge_pos)*2),
                                          colors=modEdgeColors,
                                          linewidths=[6]*len(list(edge_colors))+[4]*len(list(edge_colors)),

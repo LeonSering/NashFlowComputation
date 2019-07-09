@@ -9,7 +9,7 @@ import matplotlib.figure
 import numpy as np
 import networkx as nx
 from math import sqrt
-from utilitiesClass import Utilities
+from source.utilitiesClass import Utilities
 
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.colors import colorConverter
@@ -302,7 +302,7 @@ class PlotCanvas(FigureCanvas):
         clickedNode = None
         minDist = float('inf')
         positions = nx.get_node_attributes(self.network, 'position')
-        for node, pos in positions.iteritems():
+        for node, pos in positions.items():
             dist = sqrt((xAbsolute - pos[0]) ** 2 + (yAbsolute - pos[1]) ** 2)
             if dist <= SIMILARITY_DIST:
                 clickedNode = node
@@ -451,7 +451,7 @@ class PlotCanvas(FigureCanvas):
                                          labels={v: self.network.node[v]['label']}, font_size=nodeLabelSize))
 
         # Update node label texts and positions
-        for v, label in self.nodeLabelCollection.iteritems():  # type(label) = matplotlib.text.Text object
+        for v, label in self.nodeLabelCollection.items():  # type(label) = matplotlib.text.Text object
             if label.get_text() != self.network.node[v]['label']:
                 label.remove()
                 self.nodeLabelCollection[v] = \
@@ -593,7 +593,7 @@ class PlotCanvas(FigureCanvas):
 
         # Update edge label texts and positions
         lbls = self.get_edge_labels()
-        for edge, label in self.edgeLabelCollection.iteritems():  # type(label) = matplotlib.text.Text object
+        for edge, label in self.edgeLabelCollection.items():  # type(label) = matplotlib.text.Text object
             v, w = edge
             if self.focusNode is not None:
                 if v not in self.focusNode and w not in self.focusNode:
@@ -637,17 +637,17 @@ class PlotCanvas(FigureCanvas):
         # Scale font size of node labels
         self.nodeLabelFontSize = smaller(self.nodeLabelFontSize)
         nodeLabelSize = int(round(self.nodeLabelFontSize))
-        for v, label in self.nodeLabelCollection.iteritems():
+        for v, label in self.nodeLabelCollection.items():
             label.set_fontsize(nodeLabelSize)
 
         # Scale font size of Additional Node Labels, if existing
-        for v, label in self.additionalNodeLabelCollection.iteritems():
+        for v, label in self.additionalNodeLabelCollection.items():
             label.set_fontsize(nodeLabelSize)
 
         # Scale font size of edge labels
         self.edgeLabelFontSize = smaller(self.edgeLabelFontSize)
         edgeLabelSize = int(round(self.edgeLabelFontSize))
-        for edge, label in self.edgeLabelCollection.iteritems():
+        for edge, label in self.edgeLabelCollection.items():
             label.set_fontsize(edgeLabelSize)
 
         self.draw_idle()

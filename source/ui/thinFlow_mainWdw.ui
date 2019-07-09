@@ -183,9 +183,6 @@
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
-           <property name="frameShape">
-            <enum>QFrame::Box</enum>
-           </property>
           </widget>
          </item>
          <item row="0" column="0">
@@ -196,12 +193,6 @@
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
-           <property name="frameShape">
-            <enum>QFrame::Box</enum>
-           </property>
-           <property name="frameShadow">
-            <enum>QFrame::Plain</enum>
-           </property>
           </widget>
          </item>
          <item row="0" column="1">
@@ -211,12 +202,6 @@
              <horstretch>1</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
-           </property>
-           <property name="styleSheet">
-            <string notr="true">QGroupBox { 
-     border: 2px solid rgb(0, 0, 127); 
-     border-radius: 1px; 
- } </string>
            </property>
            <property name="title">
             <string>Edge</string>
@@ -342,9 +327,6 @@
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
-           <property name="frameShape">
-            <enum>QFrame::Box</enum>
-           </property>
           </widget>
          </item>
          <item row="0" column="1">
@@ -354,12 +336,6 @@
              <horstretch>1</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
-           </property>
-           <property name="styleSheet">
-            <string notr="true">QGroupBox { 
-     border: 2px solid rgb(0, 0, 127); 
-     border-radius: 1px; 
- } </string>
            </property>
            <property name="title">
             <string>Edge</string>
@@ -376,7 +352,7 @@
               <property name="sizeHint" stdset="0">
                <size>
                 <width>20</width>
-                <height>10</height>
+                <height>5</height>
                </size>
               </property>
              </spacer>
@@ -491,12 +467,6 @@
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
-           <property name="frameShape">
-            <enum>QFrame::Box</enum>
-           </property>
-           <property name="frameShadow">
-            <enum>QFrame::Plain</enum>
-           </property>
           </widget>
          </item>
          <item row="0" column="2">
@@ -506,12 +476,6 @@
              <horstretch>1</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
-           </property>
-           <property name="styleSheet">
-            <string notr="true">QGroupBox { 
-     border: 2px solid rgb(0, 0, 127); 
-     border-radius: 1px; 
- } </string>
            </property>
            <property name="title">
             <string>Node</string>
@@ -594,7 +558,7 @@
               <property name="sizeHint" stdset="0">
                <size>
                 <width>20</width>
-                <height>10</height>
+                <height>5</height>
                </size>
               </property>
              </spacer>
@@ -648,12 +612,6 @@
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">QGroupBox { 
-     border: 2px solid rgb(0, 0, 127); 
-     border-radius: 1px; 
- } </string>
        </property>
        <property name="title">
         <string>Config</string>
@@ -801,7 +759,7 @@
      <x>0</x>
      <y>0</y>
      <width>1043</width>
-     <height>25</height>
+     <height>30</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">

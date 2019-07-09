@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1018</width>
-    <height>746</height>
+    <height>750</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -24,7 +24,7 @@
        </sizepolicy>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="tab_general">
        <attribute name="title">
@@ -48,12 +48,6 @@
                 <horstretch>0</horstretch>
                 <verstretch>0</verstretch>
                </sizepolicy>
-              </property>
-              <property name="styleSheet">
-               <string notr="true">QGroupBox { 
-     border: 2px solid rgb(0, 0, 127); 
-     border-radius: 1px; 
- } </string>
               </property>
               <property name="title">
                <string>Config</string>
@@ -192,7 +186,7 @@
                  <property name="sizeHint" stdset="0">
                   <size>
                    <width>20</width>
-                   <height>10</height>
+                   <height>5</height>
                   </size>
                  </property>
                 </spacer>
@@ -265,12 +259,6 @@
                 <verstretch>4</verstretch>
                </sizepolicy>
               </property>
-              <property name="styleSheet">
-               <string notr="true">QGroupBox { 
-     border: 2px solid rgb(0, 0, 127); 
-     border-radius: 1px; 
- } </string>
-              </property>
               <property name="title">
                <string>Edge</string>
               </property>
@@ -286,7 +274,7 @@
                  <property name="sizeHint" stdset="0">
                   <size>
                    <width>20</width>
-                   <height>10</height>
+                   <height>5</height>
                   </size>
                  </property>
                 </spacer>
@@ -363,12 +351,6 @@
                 <horstretch>1</horstretch>
                 <verstretch>4</verstretch>
                </sizepolicy>
-              </property>
-              <property name="styleSheet">
-               <string notr="true">QGroupBox { 
-     border: 2px solid rgb(0, 0, 127); 
-     border-radius: 1px; 
- } </string>
               </property>
               <property name="title">
                <string>Node</string>
@@ -451,7 +433,7 @@
                  <property name="sizeHint" stdset="0">
                   <size>
                    <width>20</width>
-                   <height>10</height>
+                   <height>5</height>
                   </size>
                  </property>
                 </spacer>
@@ -483,12 +465,6 @@
                 <verstretch>1</verstretch>
                </sizepolicy>
               </property>
-              <property name="frameShape">
-               <enum>QFrame::Box</enum>
-              </property>
-              <property name="frameShadow">
-               <enum>QFrame::Plain</enum>
-              </property>
              </widget>
             </item>
            </layout>
@@ -511,33 +487,11 @@
                 <verstretch>3</verstretch>
                </sizepolicy>
               </property>
-              <property name="styleSheet">
-               <string notr="true">QGroupBox { 
-     border: 2px solid rgb(0, 0, 127); 
-     border-radius: 1px; 
- } </string>
-              </property>
               <property name="title">
                <string>Thinflow</string>
               </property>
               <layout class="QGridLayout" name="gridLayout_9">
-               <item row="0" column="0">
-                <spacer name="verticalSpacer_8">
-                 <property name="orientation">
-                  <enum>Qt::Vertical</enum>
-                 </property>
-                 <property name="sizeType">
-                  <enum>QSizePolicy::Fixed</enum>
-                 </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>20</width>
-                   <height>10</height>
-                  </size>
-                 </property>
-                </spacer>
-               </item>
-               <item row="3" column="0">
+               <item row="2" column="0">
                 <widget class="QCheckBox" name="showEdgesWithoutFlowCheckBox_general">
                  <property name="text">
                   <string>Show edges w/out flow</string>
@@ -547,7 +501,7 @@
                  </property>
                 </widget>
                </item>
-               <item row="3" column="1">
+               <item row="2" column="1">
                 <widget class="QPushButton" name="computeIntervalPushButton_general">
                  <property name="sizePolicy">
                   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -569,7 +523,7 @@
                  </property>
                 </widget>
                </item>
-               <item row="1" column="0" rowspan="2">
+               <item row="0" column="0" rowspan="2">
                 <widget class="QFrame" name="plotNTFFrame_general">
                  <property name="sizePolicy">
                   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -577,24 +531,15 @@
                    <verstretch>0</verstretch>
                   </sizepolicy>
                  </property>
-                 <property name="frameShape">
-                  <enum>QFrame::Box</enum>
-                 </property>
                 </widget>
                </item>
-               <item row="1" column="1" rowspan="2">
+               <item row="0" column="1" rowspan="2">
                 <widget class="QListWidget" name="intervalsListWidget_general">
                  <property name="sizePolicy">
                   <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
                    <horstretch>1</horstretch>
                    <verstretch>0</verstretch>
                   </sizepolicy>
-                 </property>
-                 <property name="frameShape">
-                  <enum>QFrame::Box</enum>
-                 </property>
-                 <property name="frameShadow">
-                  <enum>QFrame::Plain</enum>
                  </property>
                  <property name="selectionMode">
                   <enum>QAbstractItemView::NoSelection</enum>
@@ -612,32 +557,10 @@
                 <verstretch>4</verstretch>
                </sizepolicy>
               </property>
-              <property name="styleSheet">
-               <string notr="true">QGroupBox { 
-     border: 2px solid rgb(0, 0, 127); 
-     border-radius: 1px; 
- } </string>
-              </property>
               <property name="title">
                <string>Nashflow</string>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_7">
-               <item>
-                <spacer name="verticalSpacer_5">
-                 <property name="orientation">
-                  <enum>Qt::Vertical</enum>
-                 </property>
-                 <property name="sizeType">
-                  <enum>QSizePolicy::Fixed</enum>
-                 </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>20</width>
-                   <height>10</height>
-                  </size>
-                 </property>
-                </spacer>
-               </item>
                <item>
                 <widget class="QFrame" name="plotAnimationFrame_general">
                  <property name="sizePolicy">
@@ -645,9 +568,6 @@
                    <horstretch>0</horstretch>
                    <verstretch>2</verstretch>
                   </sizepolicy>
-                 </property>
-                 <property name="frameShape">
-                  <enum>QFrame::Box</enum>
                  </property>
                 </widget>
                </item>
@@ -668,12 +588,6 @@
                 <horstretch>1</horstretch>
                 <verstretch>0</verstretch>
                </sizepolicy>
-              </property>
-              <property name="styleSheet">
-               <string notr="true">QGroupBox { 
-     border: 2px solid rgb(0, 0, 127); 
-     border-radius: 1px; 
- } </string>
               </property>
               <property name="title">
                <string/>
@@ -817,7 +731,7 @@
                         <string/>
                        </property>
                        <property name="icon">
-                        <iconset resource="recordIcon.qrc">
+                        <iconset>
                          <normaloff>:/record/Downloads/rec-button2.png</normaloff>:/record/Downloads/rec-button2.png</iconset>
                        </property>
                       </widget>
@@ -840,9 +754,6 @@
                      </property>
                      <property name="layoutDirection">
                       <enum>Qt::LeftToRight</enum>
-                     </property>
-                     <property name="frameShape">
-                      <enum>QFrame::Box</enum>
                      </property>
                     </widget>
                    </item>
@@ -870,9 +781,6 @@
                    <horstretch>0</horstretch>
                    <verstretch>1</verstretch>
                   </sizepolicy>
-                 </property>
-                 <property name="frameShape">
-                  <enum>QFrame::Box</enum>
                  </property>
                 </widget>
                </item>
@@ -1020,12 +928,6 @@
                 <verstretch>4</verstretch>
                </sizepolicy>
               </property>
-              <property name="styleSheet">
-               <string notr="true">QGroupBox { 
-     border: 2px solid rgb(0, 0, 127); 
-     border-radius: 1px; 
- } </string>
-              </property>
               <property name="title">
                <string>Edge</string>
               </property>
@@ -1041,7 +943,7 @@
                  <property name="sizeHint" stdset="0">
                   <size>
                    <width>20</width>
-                   <height>10</height>
+                   <height>5</height>
                   </size>
                  </property>
                 </spacer>
@@ -1139,12 +1041,6 @@
                 <verstretch>4</verstretch>
                </sizepolicy>
               </property>
-              <property name="styleSheet">
-               <string notr="true">QGroupBox { 
-     border: 2px solid rgb(0, 0, 127); 
-     border-radius: 1px; 
- } </string>
-              </property>
               <property name="title">
                <string>Node</string>
               </property>
@@ -1226,7 +1122,7 @@
                  <property name="sizeHint" stdset="0">
                   <size>
                    <width>20</width>
-                   <height>10</height>
+                   <height>5</height>
                   </size>
                  </property>
                 </spacer>
@@ -1258,12 +1154,6 @@
                 <verstretch>1</verstretch>
                </sizepolicy>
               </property>
-              <property name="frameShape">
-               <enum>QFrame::Box</enum>
-              </property>
-              <property name="frameShadow">
-               <enum>QFrame::Plain</enum>
-              </property>
              </widget>
             </item>
             <item row="3" column="0" colspan="3">
@@ -1273,12 +1163,6 @@
                 <horstretch>0</horstretch>
                 <verstretch>0</verstretch>
                </sizepolicy>
-              </property>
-              <property name="styleSheet">
-               <string notr="true">QGroupBox { 
-     border: 2px solid rgb(0, 0, 127); 
-     border-radius: 1px; 
- } </string>
               </property>
               <property name="title">
                <string>Config</string>
@@ -1417,7 +1301,7 @@
                  <property name="sizeHint" stdset="0">
                   <size>
                    <width>20</width>
-                   <height>10</height>
+                   <height>5</height>
                   </size>
                  </property>
                 </spacer>
@@ -1440,32 +1324,10 @@
                 <verstretch>4</verstretch>
                </sizepolicy>
               </property>
-              <property name="styleSheet">
-               <string notr="true">QGroupBox { 
-     border: 2px solid rgb(0, 0, 127); 
-     border-radius: 1px; 
- } </string>
-              </property>
               <property name="title">
                <string>Nashflow</string>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_9">
-               <item>
-                <spacer name="verticalSpacer_12">
-                 <property name="orientation">
-                  <enum>Qt::Vertical</enum>
-                 </property>
-                 <property name="sizeType">
-                  <enum>QSizePolicy::Fixed</enum>
-                 </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>20</width>
-                   <height>10</height>
-                  </size>
-                 </property>
-                </spacer>
-               </item>
                <item>
                 <widget class="QFrame" name="plotAnimationFrame_spillback">
                  <property name="sizePolicy">
@@ -1473,9 +1335,6 @@
                    <horstretch>0</horstretch>
                    <verstretch>2</verstretch>
                   </sizepolicy>
-                 </property>
-                 <property name="frameShape">
-                  <enum>QFrame::Box</enum>
                  </property>
                 </widget>
                </item>
@@ -1497,56 +1356,11 @@
                 <verstretch>3</verstretch>
                </sizepolicy>
               </property>
-              <property name="styleSheet">
-               <string notr="true">QGroupBox { 
-     border: 2px solid rgb(0, 0, 127); 
-     border-radius: 1px; 
- } </string>
-              </property>
               <property name="title">
                <string>Thinflow</string>
               </property>
               <layout class="QGridLayout" name="gridLayout_14">
-               <item row="0" column="0">
-                <spacer name="verticalSpacer_14">
-                 <property name="orientation">
-                  <enum>Qt::Vertical</enum>
-                 </property>
-                 <property name="sizeType">
-                  <enum>QSizePolicy::Fixed</enum>
-                 </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>20</width>
-                   <height>10</height>
-                  </size>
-                 </property>
-                </spacer>
-               </item>
-               <item row="1" column="0" rowspan="2">
-                <widget class="QFrame" name="plotNTFFrame_spillback">
-                 <property name="sizePolicy">
-                  <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                   <horstretch>3</horstretch>
-                   <verstretch>0</verstretch>
-                  </sizepolicy>
-                 </property>
-                 <property name="frameShape">
-                  <enum>QFrame::Box</enum>
-                 </property>
-                </widget>
-               </item>
-               <item row="3" column="0">
-                <widget class="QCheckBox" name="showEdgesWithoutFlowCheckBox_spillback">
-                 <property name="text">
-                  <string>Show edges w/out flow</string>
-                 </property>
-                 <property name="checked">
-                  <bool>true</bool>
-                 </property>
-                </widget>
-               </item>
-               <item row="1" column="1" rowspan="2">
+               <item row="0" column="1" rowspan="2">
                 <widget class="QListWidget" name="intervalsListWidget_spillback">
                  <property name="sizePolicy">
                   <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
@@ -1554,18 +1368,12 @@
                    <verstretch>0</verstretch>
                   </sizepolicy>
                  </property>
-                 <property name="frameShape">
-                  <enum>QFrame::Box</enum>
-                 </property>
-                 <property name="frameShadow">
-                  <enum>QFrame::Plain</enum>
-                 </property>
                  <property name="selectionMode">
                   <enum>QAbstractItemView::NoSelection</enum>
                  </property>
                 </widget>
                </item>
-               <item row="3" column="1">
+               <item row="2" column="1">
                 <widget class="QPushButton" name="computeIntervalPushButton_spillback">
                  <property name="sizePolicy">
                   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -1587,6 +1395,26 @@
                  </property>
                 </widget>
                </item>
+               <item row="0" column="0" rowspan="2">
+                <widget class="QFrame" name="plotNTFFrame_spillback">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                   <horstretch>3</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="0">
+                <widget class="QCheckBox" name="showEdgesWithoutFlowCheckBox_spillback">
+                 <property name="text">
+                  <string>Show edges w/out flow</string>
+                 </property>
+                 <property name="checked">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
               </layout>
              </widget>
             </item>
@@ -1597,12 +1425,6 @@
                 <horstretch>1</horstretch>
                 <verstretch>0</verstretch>
                </sizepolicy>
-              </property>
-              <property name="styleSheet">
-               <string notr="true">QGroupBox { 
-     border: 2px solid rgb(0, 0, 127); 
-     border-radius: 1px; 
- } </string>
               </property>
               <property name="title">
                <string/>
@@ -1746,7 +1568,7 @@
                         <string/>
                        </property>
                        <property name="icon">
-                        <iconset resource="recordIcon.qrc">
+                        <iconset>
                          <normaloff>:/record/Downloads/rec-button2.png</normaloff>:/record/Downloads/rec-button2.png</iconset>
                        </property>
                       </widget>
@@ -1769,9 +1591,6 @@
                      </property>
                      <property name="layoutDirection">
                       <enum>Qt::LeftToRight</enum>
-                     </property>
-                     <property name="frameShape">
-                      <enum>QFrame::Box</enum>
                      </property>
                     </widget>
                    </item>
@@ -1799,9 +1618,6 @@
                    <horstretch>0</horstretch>
                    <verstretch>1</verstretch>
                   </sizepolicy>
-                 </property>
-                 <property name="frameShape">
-                  <enum>QFrame::Box</enum>
                  </property>
                 </widget>
                </item>
@@ -1899,7 +1715,7 @@
      <x>0</x>
      <y>0</y>
      <width>1018</width>
-     <height>22</height>
+     <height>30</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">

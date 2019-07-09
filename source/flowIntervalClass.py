@@ -12,8 +12,8 @@ import time
 import signal
 import subprocess
 
-from normalizedThinFlowClass import NormalizedThinFlow
-from utilitiesClass import Utilities
+from source.normalizedThinFlowClass import NormalizedThinFlow
+from source.utilitiesClass import Utilities
 
 # =======================================================================================================================
 
@@ -88,7 +88,7 @@ class FlowInterval:
             out = subprocess.check_output(['ps', '-A'])  # Get active processes on UNIX
             for line in out.splitlines():
                 if "scip" in line:
-                    print "KILLING SCIP PROCESS"
+                    print("KILLING SCIP PROCESS")
                     pid = int(line.split(None, 1)[0])
                     os.kill(pid, signal.SIGKILL)  # Kill SCIP process
 
@@ -398,10 +398,10 @@ class FlowInterval:
     def assert_ntf(self):
         """Check if computed NTF really is an NTF"""
         # Works only on shortest path network
-        p = lambda (v, w): max(
-            [self.NTFNodeLabelDict[v], self.NTFEdgeFlowDict[(v, w)] / self.network[v][w]['outCapacity']]) \
-            if (v, w) not in self.resettingEdges \
-            else self.NTFEdgeFlowDict[(v, w)] / self.network[v][w]['outCapacity']
+        p = lambda e: max(
+            [self.NTFNodeLabelDict[e[0]], self.NTFEdgeFlowDict[e] / self.network[e[0]][e[1]]['outCapacity']]) \
+            if e not in self.resettingEdges \
+            else self.NTFEdgeFlowDict[e] / self.network[e[0]][e[1]]['outCapacity']
         for w in self.shortestPathNetwork:
             if self.shortestPathNetwork.in_edges(w):
                 minimalCongestion = min(map(p, self.shortestPathNetwork.in_edges(w)))

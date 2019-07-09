@@ -51,7 +51,7 @@ def printPdf(done=False):
 
 
 # loading network
-print "Loading network: " + str(graph_path)
+print("Loading network: " + str(graph_path))
 with open(graph_path, 'rb') as f:
     network = pickle.load(f)
 
@@ -66,11 +66,11 @@ for v, w in network.edges():
 for inflowRate in np.arange(0.0, u_bound + u_step, u_step):
     counter += 1
     # computing nash flow
-    print "Computing Nash flow with inflow rate: " + str(inflowRate)
+    print("Computing Nash flow with inflow rate: " + str(inflowRate))
 
     nashFlow = NashFlow(network, inflowRate, -1, outputDir, 0, scipPath, True, 0)
     nashFlow.run()
-    print "Computation complete in " + "%.2f" % nashFlow.computationalTime + " seconds"
+    print("Computation complete in " + "%.2f" % nashFlow.computationalTime + " seconds")
 
     # creating data points
     for interval in nashFlow.flowIntervals:
@@ -91,7 +91,7 @@ for inflowRate in np.arange(0.0, u_bound + u_step, u_step):
                     eventQueue[e].append((endTime, inflowRate))
     if counter % 10 == 0:
         printPdf()
-print eventActive
-print eventQueue
+print(eventActive)
+print(eventQueue)
 
 printPdf(True)

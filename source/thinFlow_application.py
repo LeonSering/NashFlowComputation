@@ -361,8 +361,8 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
 
         # Work with actual node IDs, not labels
         labels = nx.get_node_attributes(self.gttr('network'), 'label')
-        tail = labels.keys()[labels.values().index(tailLabel)]
-        head = labels.keys()[labels.values().index(headLabel)]
+        tail = list(labels.keys())[list(labels.values()).index(tailLabel)]
+        head = list(labels.keys())[list(labels.values()).index(headLabel)]
 
         if capacityText <= 0:
             # This is not allowed
@@ -459,7 +459,7 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
         self.gttr('graphCreationCanvas').focusEdge = None
         index = self.gttr('nodeSelectionListWidget').currentRow()
         item = self.gttr('nodeSelectionListWidget').item(index)
-        node = self.gttr('nodeToListItem').keys()[self.gttr('nodeToListItem').values().index(item)]
+        node = list(self.gttr('nodeToListItem').keys())[list(self.gttr('nodeToListItem').values()).index(item)]
         self.gttr('graphCreationCanvas').focusNode = node
         self.gttr('graphCreationCanvas').update_nodes(color=True)
         self.gttr('graphCreationCanvas').update_edges(color=True)
@@ -473,7 +473,7 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
         self.gttr('graphCreationCanvas').focusNode = None
         index = self.gttr('edgeSelectionListWidget').currentRow()
         item = self.gttr('edgeSelectionListWidget').item(index)
-        edge = self.gttr('edgeToListItem').keys()[self.gttr('edgeToListItem').values().index(item)]
+        edge = list(self.gttr('edgeToListItem').keys())[list(self.gttr('edgeToListItem').values()).index(item)]
         self.gttr('graphCreationCanvas').focusEdge = edge
         self.gttr('graphCreationCanvas').update_nodes(color=True)
         self.gttr('graphCreationCanvas').update_edges(color=True)

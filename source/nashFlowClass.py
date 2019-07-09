@@ -9,8 +9,8 @@ from collections import OrderedDict
 from shutil import rmtree
 import os
 import time
-from flowIntervalClass import FlowInterval
-from utilitiesClass import Utilities
+from source.flowIntervalClass import FlowInterval
+from source.utilitiesClass import Utilities
 
 # ======================================================================================================================
 

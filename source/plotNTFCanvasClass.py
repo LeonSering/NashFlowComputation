@@ -9,8 +9,8 @@ import matplotlib.figure
 
 import networkx as nx
 
-from plotCanvasClass import PlotCanvas
-from utilitiesClass import Utilities
+from source.plotCanvasClass import PlotCanvas
+from source.utilitiesClass import Utilities
 
 # ======================================================================================================================
 

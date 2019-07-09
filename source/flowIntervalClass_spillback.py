@@ -5,9 +5,9 @@
 # Description:  FlowInterval class managing one alpha-extension for Spillback Flows
 # ===========================================================================
 
-from flowIntervalClass import FlowInterval
-from normalizedThinFlowClass_spillback import NormalizedThinFlow_spillback
-from utilitiesClass import Utilities
+from source.flowIntervalClass import FlowInterval
+from source.normalizedThinFlowClass_spillback import NormalizedThinFlow_spillback
+from source.utilitiesClass import Utilities
 from itertools import combinations
 
 # =======================================================================================================================
@@ -143,12 +143,12 @@ class FlowInterval_spillback(FlowInterval):
             # Check if some spillback factor is not in ]0,1]
             assert (0 < self.NTFNodeSpillbackFactorDict[w] <= 1)
 
-        p = lambda (v, w): max(
-            [self.NTFNodeLabelDict[v],
-             self.NTFEdgeFlowDict[(v, w)] / (self.network[v][w]['outCapacity'] * self.NTFNodeSpillbackFactorDict[w])]) \
-            if (v, w) not in self.resettingEdges \
-            else self.NTFEdgeFlowDict[(v, w)] / (self.network[v][w]['outCapacity'] * self.NTFNodeSpillbackFactorDict[w])
-        xb = lambda (v, w): float(self.NTFEdgeFlowDict[(v, w)]) / self.shortestPathNetwork[v][w]['inflowBound']
+        p = lambda e: max(
+            [self.NTFNodeLabelDict[e[0]],
+             self.NTFEdgeFlowDict[e] / (self.network[e[0]][e[1]]['outCapacity'] * self.NTFNodeSpillbackFactorDict[e[1]])]) \
+            if e not in self.resettingEdges \
+            else self.NTFEdgeFlowDict[e] / (self.network[e[0]][e[1]]['outCapacity'] * self.NTFNodeSpillbackFactorDict[e[1]])
+        xb = lambda e: float(self.NTFEdgeFlowDict[e]) / self.shortestPathNetwork[e[0]][e[1]]['inflowBound']
 
         for w in self.shortestPathNetwork:
             if self.shortestPathNetwork.in_edges(w):
@@ -222,7 +222,7 @@ class FlowInterval_spillback(FlowInterval):
                 # Proceed with next interval, as intervals are actually half open, i.e. of form [.,.[
                 j += 1
 
-            intervalList = self.network[u][v]['outflow'].items()[j:]
+            intervalList = list(self.network[u][v]['outflow'].items())[j:]
             if not intervalList:
                 # l_u(theta_k) = l_v(theta_k)
                 return self.alpha
@@ -286,7 +286,7 @@ class FlowInterval_spillback(FlowInterval):
                 # There exist other intervals
                 _, _, j = self.outflow_time_interval(u, v, uTimeLower)
                 firstFlag = True
-                intervalList = self.network[u][v]['outflow'].items()[j:]
+                intervalList = list(self.network[u][v]['outflow'].items())[j:]
                 alpha = 0
                 R = sigma_e - self.network[u][v]['load'][uTimeLower]
                 for interval in intervalList:

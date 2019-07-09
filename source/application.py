@@ -6,7 +6,7 @@
 # ===========================================================================
 
 from PyQt5 import QtGui, QtCore, QtWidgets
-import ConfigParser
+import configparser
 import os
 import pickle
 import threading
@@ -17,15 +17,15 @@ import subprocess
 from tempfile import gettempdir
 import sys
 
-from nashFlowClass import NashFlow
-from nashFlowClass_spillback import NashFlow_spillback
-from plotAnimationCanvasClass import PlotAnimationCanvas
-from plotCanvasClass import PlotCanvas
-from plotNTFCanvasClass import PlotNTFCanvas
-from plotValuesCanvasClass import PlotValuesCanvas
-from plotQueueCanvasClass import PlotQueueCanvas
-from ui import mainWdw
-from utilitiesClass import Utilities
+from source.nashFlowClass import NashFlow
+from source.nashFlowClass_spillback import NashFlow_spillback
+from source.plotAnimationCanvasClass import PlotAnimationCanvas
+from source.plotCanvasClass import PlotCanvas
+from source.plotNTFCanvasClass import PlotNTFCanvas
+from source.plotValuesCanvasClass import PlotValuesCanvas
+from source.plotQueueCanvasClass import PlotQueueCanvas
+from source.ui import mainWdw
+from source.utilitiesClass import Utilities
 
 # =======================================================================================================================
 filterwarnings('ignore')  # For the moment: ignore warnings as pyplot.hold is deprecated
@@ -72,7 +72,7 @@ class Interface(QtWidgets.QMainWindow, mainWdw.Ui_MainWindow):
         self.numberOfIntervals = -1
         self.cleanUpEnabled = True
 
-        self.configFile = ConfigParser.RawConfigParser()  # This is the parser, not to confuse with the actual config.txt File, which cannot be specified
+        self.configFile = configparser.ConfigParser()  # This is the parser, not to confuse with the actual config.txt File, which cannot be specified
 
         # Initializations
         self.init_app()
@@ -414,8 +414,8 @@ class Interface(QtWidgets.QMainWindow, mainWdw.Ui_MainWindow):
 
         # Work with actual node IDs, not labels
         labels = nx.get_node_attributes(self.gttr('network'), 'label')
-        tail = labels.keys()[labels.values().index(tailLabel)]
-        head = labels.keys()[labels.values().index(headLabel)]
+        tail = list(labels.keys())[list(labels.values()).index(tailLabel)]
+        head = list(labels.keys())[list(labels.values()).index(headLabel)]
 
         if self.gttr('network').has_edge(tail, head):
             # Update the edges attributes
@@ -661,7 +661,7 @@ class Interface(QtWidgets.QMainWindow, mainWdw.Ui_MainWindow):
         dialog = QtWidgets.QFileDialog
         fselect = dialog.getExistingDirectory(self, "Select Directory", defaultDir)
 
-        fselect = fselect[0]
+        #fselect = fselect[0]
         if len(fselect) == 0:
             return
         fselect = str(fselect)
@@ -727,16 +727,16 @@ class Interface(QtWidgets.QMainWindow, mainWdw.Ui_MainWindow):
     def save_config(self):
         """Save the config file"""
         self.configFile.set('Settings', 'outputdir', self.outputDirectory)
-        self.configFile.set('Settings', 'templatefile', self.templateFile)
+        self.configFile.set('Settings', 'templatefile', str(self.templateFile))
         self.configFile.set('Settings', 'scippath', self.scipFile)
-        self.configFile.set('Settings', 'cleanup', self.cleanUpEnabled)
-        self.configFile.set('Settings', 'intervals', self.numberOfIntervals)
+        self.configFile.set('Settings', 'cleanup', str(self.cleanUpEnabled))
+        self.configFile.set('Settings', 'intervals', str(self.numberOfIntervals))
         self.configFile.set('Settings', 'defaultloadsavedir', self.defaultLoadSaveDir)
-        self.configFile.set('Settings', 'timeoutactivated', self.timeoutActivated)
+        self.configFile.set('Settings', 'timeoutactivated', str(self.timeoutActivated))
         timeoutTime = str(self.gttr('timeoutLineEdit').text())
         self.configFile.set('Settings', 'timeoutTime', timeoutTime)
 
-        with open('config.cfg', 'wb') as configfile:
+        with open('config.cfg', 'w') as configfile:
             self.configFile.write(configfile)
 
         self.output("Saving config: config.cfg")
@@ -922,8 +922,8 @@ class Interface(QtWidgets.QMainWindow, mainWdw.Ui_MainWindow):
         lowerBound = self.gttr('animationLowerBound')
         upperBound = self.gttr('animationUpperBound')
 
-        inflowXValues = network[v][w]['cumulativeInflow'].keys()
-        inflowYValues = network[v][w]['cumulativeInflow'].values()
+        inflowXValues = list(network[v][w]['cumulativeInflow'].keys())
+        inflowYValues = list(network[v][w]['cumulativeInflow'].values())
 
         if upperBound > inflowXValues[-1] and nF.infinityReached:
             lastInflow = network[v][w]['inflow'][next(reversed(network[v][w]['inflow']))]
@@ -931,8 +931,8 @@ class Interface(QtWidgets.QMainWindow, mainWdw.Ui_MainWindow):
             inflowXValues.append(upperBound)
             inflowYValues.append(val)
 
-        outflowXValues = network[v][w]['cumulativeOutflow'].keys()
-        outflowYValues = network[v][w]['cumulativeOutflow'].values()
+        outflowXValues = list(network[v][w]['cumulativeOutflow'].keys())
+        outflowYValues = list(network[v][w]['cumulativeOutflow'].values())
 
         if upperBound > outflowXValues[-1] and nF.infinityReached:
             lastOutflow = network[v][w]['outflow'][next(reversed(network[v][w]['outflow']))]
@@ -940,8 +940,8 @@ class Interface(QtWidgets.QMainWindow, mainWdw.Ui_MainWindow):
             outflowXValues.append(upperBound)
             outflowYValues.append(val)
 
-        queueXValues = network[v][w]['queueSize'].keys()
-        queueYValues = network[v][w]['queueSize'].values()
+        queueXValues = list(network[v][w]['queueSize'].keys())
+        queueYValues = list(network[v][w]['queueSize'].values())
 
         if upperBound > queueXValues[-1] and nF.infinityReached:
             # Queue size stays constant or grows (but queue is never empty, if not already)
@@ -1162,7 +1162,7 @@ class Interface(QtWidgets.QMainWindow, mainWdw.Ui_MainWindow):
         self.gttr('graphCreationCanvas').focusEdge = None
         index = self.gttr('nodeSelectionListWidget').currentRow()
         item = self.gttr('nodeSelectionListWidget').item(index)
-        node = self.gttr('nodeToListItem').keys()[self.gttr('nodeToListItem').values().index(item)]
+        node = list(self.gttr('nodeToListItem').keys())[list(self.gttr('nodeToListItem').values()).index(item)]
         self.gttr('graphCreationCanvas').focusNode = node
         self.gttr('graphCreationCanvas').update_nodes(color=True)
         self.gttr('graphCreationCanvas').update_edges(color=True)
@@ -1174,7 +1174,7 @@ class Interface(QtWidgets.QMainWindow, mainWdw.Ui_MainWindow):
         self.gttr('graphCreationCanvas').focusNode = None
         index = self.gttr('edgeSelectionListWidget').currentRow()
         item = self.gttr('edgeSelectionListWidget').item(index)
-        edge = self.gttr('edgeToListItem').keys()[self.gttr('edgeToListItem').values().index(item)]
+        edge = list(self.gttr('edgeToListItem').keys())[list(self.gttr('edgeToListItem').values()).index(item)]
         self.gttr('graphCreationCanvas').focusEdge = edge
         self.gttr('graphCreationCanvas').update_nodes(color=True)
         self.gttr('graphCreationCanvas').update_edges(color=True)
@@ -1261,7 +1261,7 @@ class Interface(QtWidgets.QMainWindow, mainWdw.Ui_MainWindow):
                     self.change_NTF_display(currentIntervalIndex)
                     nextBound = get_next_bound(currentIntervalIndex)
 
-                if self.gttr('timeSlider').value >= 1 and lastTime != self.gttr('plotAnimationCanvas').get_time_from_tick(
+                if self.gttr('timeSlider').value() >= 1 and lastTime != self.gttr('plotAnimationCanvas').get_time_from_tick(
                         self.gttr('timeSlider').value() - 1):
                     # Necessary to check, as user could click somewhere on the slider
                     currentIntervalIndex = self.gttr('plotAnimationCanvas').get_flowinterval_index_from_tick(
@@ -1316,7 +1316,7 @@ class Interface(QtWidgets.QMainWindow, mainWdw.Ui_MainWindow):
         elif network.out_edges('t'):
             # Edges going out from t
             return 2
-        for (v, d) in network.in_degree():
+        for (v, d) in network.in_degree().items():
             if d == 0 and v != 's':
                 # Non-reachable node found
                 return 3

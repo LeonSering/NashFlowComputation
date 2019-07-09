@@ -42,7 +42,7 @@ fig, ax = plt.subplots()
 currenttime = time.strftime("%Y%m%d-%H%M%S")
 
 def printPdf(done = False):
-    print clusterSplit
+    print(clusterSplit)
 
     # going from time to particle:    
     clusterJoinP = [[(a[0][0]*a[0][1], a[0][1]),(a[1][0]*a[1][1], a[1][1])] for a in clusterJoin]
@@ -81,7 +81,7 @@ def printPdf(done = False):
 
 
 # loading network
-print "Loading network: " + str(graph_path)
+print("Loading network: " + str(graph_path))
 with open(graph_path, 'rb') as f:
     network = pickle.load(f)
 
@@ -100,11 +100,11 @@ oldInterval = {}
 for inflowRate in np.arange(u_lowerbound, u_upperbound+u_step, u_step):
     counter += 1
     #computing nash flow
-    print "Computing Nash flow with inflow rate: " + str(inflowRate)
+    print("Computing Nash flow with inflow rate: " + str(inflowRate))
 
     nashFlow = NashFlow(network, inflowRate, -1, outputDir, 0, scipPath, True, 0)
     nashFlow.run()
-    print "Computation complete in " + "%.2f" % nashFlow.computationalTime + " seconds"
+    print("Computation complete in " + "%.2f" % nashFlow.computationalTime + " seconds")
 
     intervalCounter = 0
 
@@ -127,22 +127,22 @@ for inflowRate in np.arange(u_lowerbound, u_upperbound+u_step, u_step):
                 if e not in thinFlow.resettingEdges:
                     if abs(thinFlow.NTFNodeLabelDict[v] - thinFlow.NTFNodeLabelDict[w]) < TOL and abs(oldNodeLabel[v] - oldNodeLabel[w]) > TOL:
                         clusterJoin.append([(startTime, inflowRate - 0.5 * u_step), (endTime, inflowRate - 0.5 * u_step)])
-                        print "JOIN inflowrat: " + str(inflowRate) + ", interval: " + str(intervalCounter) + ", arc: " + str(e) + ", l" +str(v) + " = " + str(thinFlow.NTFNodeLabelDict[v]) + ", l" +str(w) + " = " + str(thinFlow.NTFNodeLabelDict[w])  + ", oldl" +str(v) + " = " + str(oldNodeLabel[v]) + ", oldl" +str(w) + " = " + str(oldNodeLabel[w])
+                        print("JOIN inflowrat: " + str(inflowRate) + ", interval: " + str(intervalCounter) + ", arc: " + str(e) + ", l" +str(v) + " = " + str(thinFlow.NTFNodeLabelDict[v]) + ", l" +str(w) + " = " + str(thinFlow.NTFNodeLabelDict[w])  + ", oldl" +str(v) + " = " + str(oldNodeLabel[v]) + ", oldl" +str(w) + " = " + str(oldNodeLabel[w]))
                     if abs(thinFlow.NTFNodeLabelDict[v] - thinFlow.NTFNodeLabelDict[w]) > TOL and abs(oldNodeLabel[v] - oldNodeLabel[w]) < TOL:
                         clusterSplit.append([(oldInterval[intervalCounter][0], inflowRate - u_step), (timeLimit*1000 if oldInterval[intervalCounter][1] == float('inf') else oldInterval[intervalCounter][1] , inflowRate - u_step)]) # Insert Split line to the old inflow rate for nice pictures
-                        print "SPLIT inflowrat: " + str(inflowRate) + ", interval: " + str(intervalCounter) + ", arc: " + str(e) + ", l" +str(v) + " = " + str(thinFlow.NTFNodeLabelDict[v]) + ", l" +str(w) + " = " + str(thinFlow.NTFNodeLabelDict[w])  + ", oldl" +str(v) + " = " + str(oldNodeLabel[v]) + ", oldl" +str(w) + " = " + str(oldNodeLabel[w])
+                        print("SPLIT inflowrat: " + str(inflowRate) + ", interval: " + str(intervalCounter) + ", arc: " + str(e) + ", l" +str(v) + " = " + str(thinFlow.NTFNodeLabelDict[v]) + ", l" +str(w) + " = " + str(thinFlow.NTFNodeLabelDict[w])  + ", oldl" +str(v) + " = " + str(oldNodeLabel[v]) + ", oldl" +str(w) + " = " + str(oldNodeLabel[w]))
 
         oldInterval[intervalCounter] = interval
         intervalCounter += 1
         
-    for k in oldInterval.keys(): # if there are less intervals then before the non existing intervals must be deleted
+    for k in list(oldInterval.keys()): # if there are less intervals then before the non existing intervals must be deleted
         if k >= intervalCounter:
             del oldInterval[k]
-            print "delete interveral " + str(k)
+            print("delete interveral " + str(k))
     if counter % 10 == 0:
         printPdf()
-print eventActive
-print eventQueue
+print(eventActive)
+print(eventQueue)
 
 printPdf(True)
 

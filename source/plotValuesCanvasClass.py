@@ -7,7 +7,7 @@
 
 import matplotlib
 from matplotlib import figure, widgets
-from utilitiesClass import Utilities
+from source.utilitiesClass import Utilities
 
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 

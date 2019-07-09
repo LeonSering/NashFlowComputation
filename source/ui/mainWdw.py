@@ -1,13 +1,12 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'mainWdw_Leon.ui'
+# Form implementation generated from reading ui file 'mainWdw.ui'
 #
-# Created by: PyQt5 UI code generator 5.12.1
+# Created by: PyQt5 UI code generator 5.10.1
 #
 # WARNING! All changes made in this file will be lost!
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -1183,6 +1182,5 @@ class Ui_MainWindow(object):
         self.actionMove_graph_to_ThinFlowComputation.setText(_translate("MainWindow", "Move current graph to ThinFlowComputation"))
         self.actionChange_animation_time_range.setText(_translate("MainWindow", "Change animation time range"))
 
-
-import icons_rc
-import recordIcon_rc
+from . import icons_rc
+from . import recordIcon_rc

@@ -5,9 +5,9 @@
 # Description:  Class to extend plotCanvas in order to visualize animation
 # ===========================================================================
 
-from plotCanvasClass import PlotCanvas
+from source.plotCanvasClass import PlotCanvas
 from networkx import draw_networkx_labels, get_node_attributes
-from utilitiesClass import Utilities
+from source.utilitiesClass import Utilities
 from bisect import insort
 import os
 from tempfile import gettempdir
@@ -207,7 +207,7 @@ class PlotAnimationCanvas(PlotCanvas):
         """Update additional node labels"""
         nodeLabelSize = int(round(self.nodeLabelFontSize))
 
-        for v, label in self.additionalNodeLabelCollection.iteritems():  # type(label) = matplotlib.text.Text object
+        for v, label in self.additionalNodeLabelCollection.items():  # type(label) = matplotlib.text.Text object
             label.remove()
 
         self.additionalNodeLabelCollection = draw_networkx_labels(self.network, pos=self.movedPositions, ax=self.axes,
@@ -469,17 +469,17 @@ class PlotAnimationCanvas(PlotCanvas):
         # Scale font size of node labels
         self.nodeLabelFontSize = smaller(self.nodeLabelFontSize)
         nodeLabelSize = int(round(self.nodeLabelFontSize))
-        for v, label in self.nodeLabelCollection.iteritems():
+        for v, label in self.nodeLabelCollection.items():
             label.set_fontsize(nodeLabelSize)
 
         # Scale font size of Additional Node Labels, if existing
-        for v, label in self.additionalNodeLabelCollection.iteritems():
+        for v, label in self.additionalNodeLabelCollection.items():
             label.set_fontsize(nodeLabelSize)
 
         # Scale font size of edge labels
         self.edgeLabelFontSize = smaller(self.edgeLabelFontSize)
         edgeLabelSize = int(round(self.edgeLabelFontSize))
-        for edge, label in self.edgeLabelCollection.iteritems():
+        for edge, label in self.edgeLabelCollection.items():
             label.set_fontsize(edgeLabelSize)
 
         self.draw_idle()

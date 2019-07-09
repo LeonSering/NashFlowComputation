@@ -5,7 +5,7 @@
 # Description:  Data structure for spillback thin flow and computation methods
 # ===========================================================================
 
-from normalizedThinFlowClass import NormalizedThinFlow
+from source.normalizedThinFlowClass import NormalizedThinFlow
 import os
 import re
 

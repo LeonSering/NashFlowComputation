@@ -11,7 +11,7 @@ import numpy as np
 from matplotlib import figure
 from matplotlib.patches import Rectangle
 from matplotlib.collections import PatchCollection
-from utilitiesClass import Utilities
+from source.utilitiesClass import Utilities
 
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 

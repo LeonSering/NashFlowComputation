@@ -9,7 +9,7 @@ import os
 import re
 import subprocess
 from shutil import copy
-from utilitiesClass import Utilities
+from source.utilitiesClass import Utilities
 
 PRINT_TO_CONSOLE = False
 # ======================================================================================================================
@@ -90,7 +90,7 @@ class NormalizedThinFlow:
 
         if PRINT_TO_CONSOLE:
             # Print stdout to terminal
-            print stdOut
+            print(stdOut)
 
     def write_zimpl_files(self):
         """Write the ZIMPL files"""
