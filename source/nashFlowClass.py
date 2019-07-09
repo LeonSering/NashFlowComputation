@@ -92,8 +92,9 @@ class NashFlow:
 
         # Compute resettingEdges
         resettingEdges = [(v, w) for v, w in self.network.edges() if
-                          Utilities.is_greater_tol(self.node_label(w, lowerBoundTime), self.node_label(v, lowerBoundTime) + self.network[v][w][
-                              'transitTime'], TOL)] if lowerBoundTime > 0 else []
+                          Utilities.is_greater_tol(self.node_label(w, lowerBoundTime),
+                                                   self.node_label(v, lowerBoundTime) + self.network[v][w][
+                                                       'transitTime'], TOL)] if lowerBoundTime > 0 else []
 
         interval = FlowInterval(self.network, resettingEdges=resettingEdges, lowerBoundTime=lowerBoundTime,
                                 inflowRate=self.inflowRate, minCapacity=self.minCapacity, counter=self.counter,
@@ -197,8 +198,13 @@ class NashFlow:
             if vTimeUpper < float('inf'):
                 lastQueueSizeTime = next(reversed(self.network[v][w]['queueSize']))
                 lastQueueSize = self.network[v][w]['queueSize'][lastQueueSizeTime]
-                self.network[v][w]['queueSize'][vTimeUpper + self.network[v][w]['transitTime']] = max(0, lastQueueSize + (
-                        inflowVal - self.network[v][w]['outCapacity']) * (vTimeUpper - vTimeLower))
+                self.network[v][w]['queueSize'][vTimeUpper + self.network[v][w]['transitTime']] = max(0,
+                                                                                                      lastQueueSize + (
+                                                                                                              inflowVal -
+                                                                                                              self.network[
+                                                                                                                  v][w][
+                                                                                                                  'outCapacity']) * (
+                                                                                                              vTimeUpper - vTimeLower))
 
             self.animationIntervals[(v, w)].append(((vTimeLower, vTimeUpper), (wTimeLower, wTimeUpper)))
 
@@ -229,7 +235,6 @@ class NashFlow:
                 lastTime = lowerBoundTime
         return lastTime
 
-
     def get_outflow(self, v, w, t):
         """
         :param v: tail of edge
@@ -237,14 +242,13 @@ class NashFlow:
         :param t: time
         :return: f_(v,w)^-(t), i.e. outflow rate of e=(v,w) at time t (picking the newest value
         """
-        if Utilities.is_eq_tol(t,0):
+        if Utilities.is_eq_tol(t, 0):
             return 0
         for wTimeLower, wTimeUpper in self.network[v][w]['outflow']:
             if wTimeLower <= t <= wTimeUpper:
                 # t lies between l_w(theta_k) and l_w(theta_k+1)
                 lastOutflow = self.network[v][w]['outflow'][(wTimeLower, wTimeUpper)]
         return lastOutflow
-
 
     def get_stat_preprocessing(self):
         """Returns strings for preprocessing statistics"""

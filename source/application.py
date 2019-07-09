@@ -45,12 +45,13 @@ class Interface(QtWidgets.QMainWindow, mainWdw.Ui_MainWindow):
         self.plotAnimationCanvasStretchFactor = float(
             self.plotAnimationFrame_general.width()) / self.plotAnimationFrame_general.height()
         self.plotNTFCanvasStretchFactor = float(self.plotNTFFrame_general.width()) / self.plotNTFFrame_general.height()
-        #self.plotQueueCanvasStretchFactor = float(self.plotQueueFrame_general.width()) / self.plotQueueFrame_general.height()
+        # self.plotQueueCanvasStretchFactor = float(self.plotQueueFrame_general.width()) / self.plotQueueFrame_general.height()
 
         self.tfTypeList = ['general', 'spillback']
-        self.gttr('tabWidget', 'spillback').setCurrentIndex(0) # Note: This has to be done first, otherwise self.currentTF is wrong
+        self.gttr('tabWidget', 'spillback').setCurrentIndex(
+            0)  # Note: This has to be done first, otherwise self.currentTF is wrong
         self.tabWidget.setCurrentIndex(0)  # Show General Tab
-        self.gttr('tabWidget', 'general').setCurrentIndex(0) # Show Graph creation Tab
+        self.gttr('tabWidget', 'general').setCurrentIndex(0)  # Show Graph creation Tab
         self.currentTF = self.tfTypeList[self.tabWidget.currentIndex()]  # Currently selected tab information
 
         # Init graphs and other config defaults
@@ -61,7 +62,6 @@ class Interface(QtWidgets.QMainWindow, mainWdw.Ui_MainWindow):
             self.sttr('animationUpperBound', tfType, 1)
             self.sttr('animationRunning', tfType, False)
             self.gttr('inflowLineEdit', tfType).setText('1')  # Default value
-
 
         # Config defaults
         self.outputDirectory = ''
@@ -114,7 +114,7 @@ class Interface(QtWidgets.QMainWindow, mainWdw.Ui_MainWindow):
             self.gttr('timeSlider', tfType).setMinimum(0)
             self.gttr('timeSlider', tfType).setMaximum(99)
             self.gttr('timeSlider', tfType).setValue(0)
-            #self.gttr('timeSlider', tfType).setTickPosition(2) # Set ticks below horizontal slider
+            # self.gttr('timeSlider', tfType).setTickPosition(2) # Set ticks below horizontal slider
             self.gttr('timeSlider', tfType).setTickInterval(1)
 
             # Slider signals
@@ -157,7 +157,6 @@ class Interface(QtWidgets.QMainWindow, mainWdw.Ui_MainWindow):
                 self.load_graph(graphPath=sys.argv[2])
                 # Delete the temporary graph
                 os.remove(sys.argv[2])
-
 
     def gttr(self, variable, tfType=None):
         """
@@ -224,7 +223,7 @@ class Interface(QtWidgets.QMainWindow, mainWdw.Ui_MainWindow):
             self.sttr('plotNTFCanvas', tfType, None)
             self.sttr('NTFPlotList', tfType, None)
 
-            #self.gttr('plotNTFFrameLayout', tfType).addWidget(self.gttr('plotNTFCanvas', tfType))
+            # self.gttr('plotNTFFrameLayout', tfType).addWidget(self.gttr('plotNTFCanvas', tfType))
 
             # Configure plotAnimationFrame to display animation
             self.sttr('plotAnimationFrameLayout', tfType, QtWidgets.QVBoxLayout())
@@ -243,10 +242,10 @@ class Interface(QtWidgets.QMainWindow, mainWdw.Ui_MainWindow):
             self.sttr('plotQueueCanvas', tfType, PlotQueueCanvas())
             self.gttr('plotQueueFrameLayout', tfType).addWidget(self.gttr('plotQueueCanvas', tfType))
 
-
         self.re_init_node_list()
         self.re_init_edge_list()
 
+    # noinspection PyCallByClass,PyCallByClass
     def generate_animation_dialog(self):
         """Show dialog in which new animation range is selected"""
         lowerBoundInput, lowerGiven = QtWidgets.QInputDialog.getText(self, 'Enter the lower bound', 'Starting from:')
@@ -270,7 +269,8 @@ class Interface(QtWidgets.QMainWindow, mainWdw.Ui_MainWindow):
         if upperBoundInput == "":
             upperBoundInput = self.gttr('nashFlow').node_label('t', self.gttr('nashFlow').flowIntervals[-1][1]) \
                 if self.gttr('nashFlow').flowIntervals[-1][1] < float('inf') \
-                else Utilities.round_up(self.gttr('nashFlow').node_label('t', self.gttr('nashFlow').flowIntervals[-1][0]))
+                else Utilities.round_up(
+                self.gttr('nashFlow').node_label('t', self.gttr('nashFlow').flowIntervals[-1][0]))
 
         lowerBound = float(lowerBoundInput) if lowerBoundInput != "" else 0
         upperBound = float(upperBoundInput)
@@ -281,7 +281,8 @@ class Interface(QtWidgets.QMainWindow, mainWdw.Ui_MainWindow):
         self.update_diagrams()  # Update the value diagrams according to the new range
 
         self.gttr('timeSlider').setValue(0)  # Reset slider
-        self.gttr('plotAnimationCanvas').reset_bounds(self.gttr('animationLowerBound'), self.gttr('animationUpperBound'))
+        self.gttr('plotAnimationCanvas').reset_bounds(self.gttr('animationLowerBound'),
+                                                      self.gttr('animationUpperBound'))
         self.gttr('plotQueueCanvas').update_information_callback(self.gttr('plotAnimationCanvas'))
         self.output("Generating animation")
 
@@ -362,14 +363,14 @@ class Interface(QtWidgets.QMainWindow, mainWdw.Ui_MainWindow):
 
             if self.currentTF == 'general':
                 self.capacityLineEdit_general.setText(
-                str(self.gttr('network', 'general')[edge[0]][edge[1]]['outCapacity']))
+                    str(self.gttr('network', 'general')[edge[0]][edge[1]]['outCapacity']))
             elif self.currentTF == 'spillback':
                 self.inCapacityLineEdit_spillback.setText(
-                str(self.gttr('network', 'spillback')[edge[0]][edge[1]]['inCapacity']))
+                    str(self.gttr('network', 'spillback')[edge[0]][edge[1]]['inCapacity']))
                 self.outCapacityLineEdit_spillback.setText(
-                str(self.gttr('network', 'spillback')[edge[0]][edge[1]]['outCapacity']))
+                    str(self.gttr('network', 'spillback')[edge[0]][edge[1]]['outCapacity']))
                 self.storageLineEdit_spillback.setText(
-                str(self.gttr('network', 'spillback')[edge[0]][edge[1]]['storage']))
+                    str(self.gttr('network', 'spillback')[edge[0]][edge[1]]['storage']))
         else:
             self.gttr('transitTimeLineEdit').setText("")
 
@@ -407,10 +408,9 @@ class Interface(QtWidgets.QMainWindow, mainWdw.Ui_MainWindow):
                 return
             if storageText <= transitText * inCapacityText:
                 # This is not allowed and is corrected automatically
-                corrector = 0.1 if storageText/transitText > 0.1 else 0.1*storageText/transitText
-                inCapacityText = storageText/transitText - corrector
+                corrector = 0.1 if storageText / transitText > 0.1 else 0.1 * storageText / transitText
+                inCapacityText = storageText / transitText - corrector
                 self.inCapacityLineEdit_spillback.setText(str(inCapacityText))
-
 
         # Work with actual node IDs, not labels
         labels = nx.get_node_attributes(self.gttr('network'), 'label')
@@ -430,9 +430,11 @@ class Interface(QtWidgets.QMainWindow, mainWdw.Ui_MainWindow):
         else:
             # Add a new edge
             if self.currentTF == 'general':
-                self.gttr('network').add_edge(tail, head, outCapacity=capacityText, transitTime=transitText, inCapacity=float('inf'), storage=float('inf'))
+                self.gttr('network').add_edge(tail, head, outCapacity=capacityText, transitTime=transitText,
+                                              inCapacity=float('inf'), storage=float('inf'))
             elif self.currentTF == 'spillback':
-                self.gttr('network').add_edge(tail, head, inCapacity=inCapacityText, outCapacity=outCapacityText, storage=storageText, transitTime=transitText)
+                self.gttr('network').add_edge(tail, head, inCapacity=inCapacityText, outCapacity=outCapacityText,
+                                              storage=storageText, transitTime=transitText)
 
             self.gttr('graphCreationCanvas').focusEdge = (tail, head)
             self.gttr('graphCreationCanvas').update_edges(added=True, color=True)
@@ -501,15 +503,18 @@ class Interface(QtWidgets.QMainWindow, mainWdw.Ui_MainWindow):
         if self.gttr('plotAnimationCanvas') is not None:
             self.gttr('plotAnimationCanvas').setParent(None)
 
-        self.sttr('animationUpperBound', None, self.gttr('nashFlow').node_label('t', self.gttr('nashFlow').flowIntervals[-1][1]) \
-            if self.gttr('nashFlow').flowIntervals[-1][1] < float('inf') \
-            else Utilities.round_up(self.gttr('nashFlow').node_label('t', self.gttr('nashFlow').flowIntervals[-1][0])))
+        self.sttr('animationUpperBound', None,
+                  self.gttr('nashFlow').node_label('t', self.gttr('nashFlow').flowIntervals[-1][1]) \
+                      if self.gttr('nashFlow').flowIntervals[-1][1] < float('inf') \
+                      else Utilities.round_up(
+                      self.gttr('nashFlow').node_label('t', self.gttr('nashFlow').flowIntervals[-1][0])))
 
-        self.sttr('animationUpperBound', None, self.gttr('animationUpperBound') if self.gttr('animationUpperBound') > 0 else 10)  # This can only happen when infinity is reached
+        self.sttr('animationUpperBound', None, self.gttr('animationUpperBound') if self.gttr(
+            'animationUpperBound') > 0 else 10)  # This can only happen when infinity is reached
 
         self.sttr('plotAnimationCanvas', None, PlotAnimationCanvas(nashflow=self.gttr('nashFlow'), interface=self,
-                                                       upperBound=self.gttr('animationUpperBound'),
-                                                       stretchFactor=self.plotAnimationCanvasStretchFactor))
+                                                                   upperBound=self.gttr('animationUpperBound'),
+                                                                   stretchFactor=self.plotAnimationCanvasStretchFactor))
         self.gttr('plotAnimationFrameLayout').addWidget(self.gttr('plotAnimationCanvas'))
         self.gttr('timeSlider').setMaximum(99)
         self.output("Generating animation")
@@ -546,11 +551,9 @@ class Interface(QtWidgets.QMainWindow, mainWdw.Ui_MainWindow):
         avgTimeStr = "Avg. Time/Interval: " + str(avgTime)
         totalTimeStr = "Total time: " + str(totalTime)
 
-        stringList = [nNodesStr, nEdgesStr, avgNodesStr, avgEdgesStr, avgIPStr, totalIPStr, avgTimeStr, totalTimeStr]
         stringList = [nNodesStr, nEdgesStr, avgIPStr, totalIPStr, avgTimeStr, totalTimeStr]
         statStr = " " + " | ".join(stringList)
         self.statusBarLabel.setText(statStr)
-
 
     def load_graph(self, graphPath=None):
         """
@@ -582,6 +585,7 @@ class Interface(QtWidgets.QMainWindow, mainWdw.Ui_MainWindow):
         self.output("Loading graph: " + str(fopen))
         self.re_init_app(NoNewGraph=True)
 
+    # noinspection PyCallByClass
     def save_graph(self, graphPath=None):
         """
         Save graph instance to '.cg' file
@@ -613,6 +617,7 @@ class Interface(QtWidgets.QMainWindow, mainWdw.Ui_MainWindow):
         with open(fsave, 'wb') as f:
             pickle.dump(self.gttr('network'), f)
 
+    # noinspection PyCallByClass
     def load_nashflow(self):
         """Load NashFlow instance from '.nf' file"""
         # TODO: This has to be adapted to NF Type
@@ -635,6 +640,7 @@ class Interface(QtWidgets.QMainWindow, mainWdw.Ui_MainWindow):
 
         self.tabWidget.setCurrentIndex(1)
 
+    # noinspection PyCallByClass
     def save_nashflow(self):
         """Save Nashflow instance to '.nf' file"""
         dialog = QtWidgets.QFileDialog
@@ -655,13 +661,14 @@ class Interface(QtWidgets.QMainWindow, mainWdw.Ui_MainWindow):
         with open(fsave, 'wb') as f:
             pickle.dump(self.gttr('nashFlow'), f)
 
+    # noinspection PyCallByClass
     def select_output_directory(self):
         """Select output directory for nash flow computation"""
         defaultDir = self.outputDirectory
         dialog = QtWidgets.QFileDialog
         fselect = dialog.getExistingDirectory(self, "Select Directory", defaultDir)
 
-        #fselect = fselect[0]
+        # fselect = fselect[0]
         if len(fselect) == 0:
             return
         fselect = str(fselect)
@@ -670,6 +677,7 @@ class Interface(QtWidgets.QMainWindow, mainWdw.Ui_MainWindow):
             self.gttr('outputDirectoryLineEdit', tfType).setText(fselect)
         self.outputDirectory = fselect
 
+    # noinspection PyCallByClass
     def select_scip_binary(self):
         """Select scip binary"""
         defaultDir = '' if not os.path.isfile(self.scipFile) else os.path.dirname(self.scipFile)
@@ -741,6 +749,7 @@ class Interface(QtWidgets.QMainWindow, mainWdw.Ui_MainWindow):
 
         self.output("Saving config: config.cfg")
 
+    # noinspection PyCallByClass
     def compute_nash_flow(self, nextIntervalOnly=False):
         """
         Computes a nash flow
@@ -752,8 +761,9 @@ class Interface(QtWidgets.QMainWindow, mainWdw.Ui_MainWindow):
         if returnCode != 0:
             # Invalid input has been given
             # Spawn warning
-            QtWidgets.QMessageBox.question(QtWidgets.QWidget(), 'Abort: Input error', self.get_error_message(returnCode),
-                                       QtWidgets.QMessageBox.Ok)
+            QtWidgets.QMessageBox.question(QtWidgets.QWidget(), 'Abort: Input error',
+                                           self.get_error_message(returnCode),
+                                           QtWidgets.QMessageBox.Ok)
             return
 
         # While computing it should not be possible to change showEdgesWithoutFlowCheckBox
@@ -761,7 +771,8 @@ class Interface(QtWidgets.QMainWindow, mainWdw.Ui_MainWindow):
 
         # Get remaining settings
         self.numberOfIntervals = self.gttr('intervalsLineEdit').text()
-        self.templateFile = self.gttr('templateComboBox').currentIndex()    # TODO: Does not work if different algorithm set
+        self.templateFile = self.gttr(
+            'templateComboBox').currentIndex()  # TODO: Does not work if different algorithm set
         inflowRate = float(self.gttr('inflowLineEdit').text())
 
         self.save_config()  # Save config-settings to file
@@ -773,13 +784,16 @@ class Interface(QtWidgets.QMainWindow, mainWdw.Ui_MainWindow):
             self.output("Starting computation of " + numberString + " flow intervals")
 
             if self.currentTF == 'general':
-                self.sttr('nashFlow', None, NashFlow(self.gttr('network'), float(inflowRate), float(self.numberOfIntervals),
-                                         self.outputDirectory,
-                                         self.templateFile, self.scipFile, self.cleanUpEnabled, timeout))
+                self.sttr('nashFlow', None,
+                          NashFlow(self.gttr('network'), float(inflowRate), float(self.numberOfIntervals),
+                                   self.outputDirectory,
+                                   self.templateFile, self.scipFile, self.cleanUpEnabled, timeout))
             elif self.currentTF == 'spillback':
-                self.sttr('nashFlow', None, NashFlow_spillback(self.gttr('network'), float(inflowRate), float(self.numberOfIntervals),
-                                         self.outputDirectory,
-                                         0, self.scipFile, self.cleanUpEnabled, timeout)) # TODO: self.templateFile replaced by 0
+                self.sttr('nashFlow', None,
+                          NashFlow_spillback(self.gttr('network'), float(inflowRate), float(self.numberOfIntervals),
+                                             self.outputDirectory,
+                                             0, self.scipFile, self.cleanUpEnabled,
+                                             timeout))  # TODO: self.templateFile replaced by 0
         else:
             self.output("Starting computation of next flow interval")
         self.gttr('nashFlow').run(nextIntervalOnly)
@@ -808,7 +822,8 @@ class Interface(QtWidgets.QMainWindow, mainWdw.Ui_MainWindow):
                 "%.2f" % interval[1]) + '['
             item = QtWidgets.QListWidgetItem(intervalString)
             item.setBackground(
-                QtGui.QColor(self.gttr('plotAnimationCanvas').NTFColors[index % len(self.gttr('plotAnimationCanvas').NTFColors)]))
+                QtGui.QColor(self.gttr('plotAnimationCanvas').NTFColors[
+                                 index % len(self.gttr('plotAnimationCanvas').NTFColors)]))
             self.gttr('intervalsListWidget').addItem(item)  # Add item to listWidget
 
             plot = PlotNTFCanvas(interval[2].shortestPathNetwork, self, intervalID=index,
@@ -978,28 +993,28 @@ class Interface(QtWidgets.QMainWindow, mainWdw.Ui_MainWindow):
         loadYValues = []
         for x in loadXValues:
             # Compute inflow y
-            for j in range(len(inflowXValues)-1):
-                if inflowXValues[j] <= x <= inflowXValues[j+1]:
-                    if x == inflowXValues[j+1]:
-                        y_i = inflowYValues[j+1]
+            for j in range(len(inflowXValues) - 1):
+                if inflowXValues[j] <= x <= inflowXValues[j + 1]:
+                    if x == inflowXValues[j + 1]:
+                        y_i = inflowYValues[j + 1]
                         break
                     else:
-                        m = float(inflowYValues[j+1]-inflowYValues[j])/(inflowXValues[j+1]-inflowXValues[j])
-                        y_i = inflowYValues[j] + (x-inflowXValues[j])*m
+                        m = float(inflowYValues[j + 1] - inflowYValues[j]) / (inflowXValues[j + 1] - inflowXValues[j])
+                        y_i = inflowYValues[j] + (x - inflowXValues[j]) * m
                         break
             # Compute outflow y
-            for j in range(len(outflowXValues)-1):
-                if outflowXValues[j] <= x <= outflowXValues[j+1]:
-                    if x == outflowXValues[j+1]:
-                        y_o = outflowYValues[j+1]
+            for j in range(len(outflowXValues) - 1):
+                if outflowXValues[j] <= x <= outflowXValues[j + 1]:
+                    if x == outflowXValues[j + 1]:
+                        y_o = outflowYValues[j + 1]
                         break
                     else:
-                        m = float(outflowYValues[j+1]-outflowYValues[j])/(outflowXValues[j+1]-outflowXValues[j])
-                        y_o = outflowYValues[j] + (x-outflowXValues[j])*m
+                        m = float(outflowYValues[j + 1] - outflowYValues[j]) / (
+                                outflowXValues[j + 1] - outflowXValues[j])
+                        y_o = outflowYValues[j] + (x - outflowXValues[j]) * m
                         break
             y = y_i - y_o
             loadYValues.append(y)
-
 
         # Display storage horizontal line
         if self.currentTF == 'general' or self.gttr('network')[v][w]['storage'] == float('inf'):
@@ -1008,9 +1023,10 @@ class Interface(QtWidgets.QMainWindow, mainWdw.Ui_MainWindow):
             storage = self.gttr('network')[v][w]['storage']
 
         self.gttr('plotDiagramCanvas').update_plot(lowerBound, upperBound,
-                                           ["Cumulative Inflow", "Cumulative Outflow", "Queue size", "Load"], inflowXValues,
-                                           inflowYValues, storage, (outflowXValues, outflowYValues),
-                                           (queueXValues, queueYValues), (loadXValues, loadYValues))
+                                                   ["Cumulative Inflow", "Cumulative Outflow", "Queue size", "Load"],
+                                                   inflowXValues,
+                                                   inflowYValues, storage, (outflowXValues, outflowYValues),
+                                                   (queueXValues, queueYValues), (loadXValues, loadYValues))
 
     def update_diagrams(self):
         """Update diagrams of focusEdge or focusNode, depending on whats selected"""
@@ -1049,12 +1065,14 @@ class Interface(QtWidgets.QMainWindow, mainWdw.Ui_MainWindow):
         xVal = float("%.2f" % xVal)
 
         valueTol = 1e-2
-        if not (self.gttr('plotAnimationCanvas').timePoints[0] <= xVal <= self.gttr('plotAnimationCanvas').timePoints[-1]):
+        if not (self.gttr('plotAnimationCanvas').timePoints[0] <= xVal <= self.gttr('plotAnimationCanvas').timePoints[
+            -1]):
             return
 
         try:
             # Check if there already exists a timepoint which is sufficiently close
-            xVal = next(t for t in self.gttr('plotAnimationCanvas').timePoints if Utilities.is_eq_tol(t, xVal, valueTol))
+            xVal = next(
+                t for t in self.gttr('plotAnimationCanvas').timePoints if Utilities.is_eq_tol(t, xVal, valueTol))
         except StopIteration:
             # Add the time point
             self.gttr('plotAnimationCanvas').add_time(xVal)
@@ -1064,6 +1082,7 @@ class Interface(QtWidgets.QMainWindow, mainWdw.Ui_MainWindow):
         if updateNTF:
             self.slider_released()
 
+    # noinspection PyCallByClass
     def export_diagram(self):
         """Export diagram to PDF or PGF"""
         fileType = 'pdf' if self.gttr('exportComboBox').currentIndex() == 0 else 'pgf'
@@ -1085,6 +1104,7 @@ class Interface(QtWidgets.QMainWindow, mainWdw.Ui_MainWindow):
 
         self.gttr('plotDiagramCanvas').export(path=fsave)
 
+    # noinspection PyCallByClass
     def export_animation(self):
         """Export animation to mp4. This requires FFMPEG."""
         fileType = 'mp4'
@@ -1127,7 +1147,7 @@ class Interface(QtWidgets.QMainWindow, mainWdw.Ui_MainWindow):
         Opens ThinFlowComputation Tool
         :param moveGraph: network that should be moved, None if not specified
         """
-        #TODO: This has to been adapted to open tfType correctly
+        # TODO: This has to been adapted to open tfType correctly
         if not moveGraph:
             # Just open the application
             cmd = ['python', 'source/thinFlow_mainControl.py']
@@ -1245,10 +1265,12 @@ class Interface(QtWidgets.QMainWindow, mainWdw.Ui_MainWindow):
             Animation function called by thread
             :param FPS: frames per second
             """
-            currentIntervalIndex = self.gttr('plotAnimationCanvas').get_flowinterval_index_from_tick(self.gttr('timeSlider').value())
+            currentIntervalIndex = self.gttr('plotAnimationCanvas').get_flowinterval_index_from_tick(
+                self.gttr('timeSlider').value())
             self.change_NTF_display(currentIntervalIndex)
 
-            get_next_bound = lambda currentIntervalIndex: self.gttr('nashFlow').flowIntervals[currentIntervalIndex + 1][0] \
+            get_next_bound = lambda currentIntervalIndex: self.gttr('nashFlow').flowIntervals[currentIntervalIndex + 1][
+                0] \
                 if currentIntervalIndex + 1 < len(self.gttr('nashFlow').flowIntervals) else float('inf')
 
             nextBound = get_next_bound(currentIntervalIndex)
@@ -1261,8 +1283,9 @@ class Interface(QtWidgets.QMainWindow, mainWdw.Ui_MainWindow):
                     self.change_NTF_display(currentIntervalIndex)
                     nextBound = get_next_bound(currentIntervalIndex)
 
-                if self.gttr('timeSlider').value() >= 1 and lastTime != self.gttr('plotAnimationCanvas').get_time_from_tick(
-                        self.gttr('timeSlider').value() - 1):
+                if self.gttr('timeSlider').value() >= 1 and lastTime != self.gttr(
+                        'plotAnimationCanvas').get_time_from_tick(
+                    self.gttr('timeSlider').value() - 1):
                     # Necessary to check, as user could click somewhere on the slider
                     currentIntervalIndex = self.gttr('plotAnimationCanvas').get_flowinterval_index_from_tick(
                         self.gttr('timeSlider').value())
@@ -1339,7 +1362,8 @@ class Interface(QtWidgets.QMainWindow, mainWdw.Ui_MainWindow):
             try:
                 for e in network.out_edges('s'):
                     (v, w) = e
-                    if network[v][w]['inCapacity'] < float(self.inflowLineEdit_spillback.text()): #TODO: Should this be <= as in paper? Example from paper doesnt fulfil
+                    if network[v][w]['inCapacity'] < float(
+                            self.inflowLineEdit_spillback.text()):  # TODO: Should this be <= as in paper? Example from paper doesnt fulfil
                         return 6
             except KeyError:
                 pass

@@ -74,12 +74,14 @@ class PlotCanvas(FigureCanvas):
         if not self.onlyNTF:
             if self.type == 'general':
                 return Utilities.join_intersect_dicts(nx.get_edge_attributes(self.network, 'outCapacity'),
-                                                  nx.get_edge_attributes(self.network, 'transitTime'))  # Edge labels
+                                                      nx.get_edge_attributes(self.network,
+                                                                             'transitTime'))  # Edge labels
             elif self.type == 'spillback':
                 return Utilities.join_intersect_dicts(nx.get_edge_attributes(self.network, 'inCapacity'),
                                                       nx.get_edge_attributes(self.network, 'outCapacity'),
                                                       nx.get_edge_attributes(self.network, 'storage'),
-                                                      nx.get_edge_attributes(self.network, 'transitTime'))  # Edge labels
+                                                      nx.get_edge_attributes(self.network,
+                                                                             'transitTime'))  # Edge labels
         else:
             if self.type == 'spillback':
                 return Utilities.join_intersect_dicts(nx.get_edge_attributes(self.network, 'outCapacity'),
@@ -180,10 +182,11 @@ class PlotCanvas(FigureCanvas):
                     if not self.network.has_edge(self.selectedNode, clickedNode):
                         resettingEnabledBool = False if self.onlyNTF else None  # Either 0 or 1. Activated only if onlyNTF
                         if self.type == 'general':
-                            self.network.add_edge(self.selectedNode, clickedNode, transitTime=1, inCapacity=float('inf'), outCapacity=1, storage=float('inf'))
+                            self.network.add_edge(self.selectedNode, clickedNode, transitTime=1,
+                                                  inCapacity=float('inf'), outCapacity=1, storage=float('inf'))
                         elif self.type == 'spillback':
-                            self.network.add_edge(self.selectedNode, clickedNode, transitTime=1, inCapacity=float('inf'), outCapacity=1, storage=float('inf'))
-
+                            self.network.add_edge(self.selectedNode, clickedNode, transitTime=1,
+                                                  inCapacity=float('inf'), outCapacity=1, storage=float('inf'))
 
                         # TODO: inflowBound will lead to problems within TFC
                         '''
@@ -529,7 +532,8 @@ class PlotCanvas(FigureCanvas):
                     if self.type == 'general':
                         lbl = {self.focusEdge: (self.network[v][w]['outCapacity'], self.network[v][w]['transitTime'])}
                     elif self.type == 'spillback':
-                        lbl = {self.focusEdge: (self.network[v][w]['inCapacity'], self.network[v][w]['outCapacity'], self.network[v][w]['transitTime'], self.network[v][w]['storage'])}
+                        lbl = {self.focusEdge: (self.network[v][w]['inCapacity'], self.network[v][w]['outCapacity'],
+                                                self.network[v][w]['transitTime'], self.network[v][w]['storage'])}
                 else:
                     if self.type == 'general':
                         lbl = {self.focusEdge: (self.network[v][w]['outCapacity'])}
@@ -553,7 +557,7 @@ class PlotCanvas(FigureCanvas):
                     s = dst - src
                     # src = src + p * s  # Box at beginning
                     # dst = src + (1 - p) * s  # Box at the end
-                    dst = src # No edge at all
+                    dst = src  # No edge at all
                     edge_pos.append((src, dst))
 
                 edge_pos = np.asarray(edge_pos)
@@ -663,7 +667,8 @@ class PlotCanvas(FigureCanvas):
         self.axes.set_xlim(self.Xlim)
         self.axes.set_ylim(self.Ylim)
 
-    def draw_nodes(self, G,
+    @staticmethod
+    def draw_nodes(G,
                    pos,
                    nodelist=None,
                    node_size=300,

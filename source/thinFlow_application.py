@@ -832,7 +832,8 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
             try:
                 for e in network.out_edges('s'):
                     (v, w) = e
-                    if network[v][w]['inflowBound'] < float(self.inflowLineEdit.text()): #TODO REALLY INFLOWBOUND, NOT CAPACITY?
+                    if network[v][w]['inflowBound'] < float(
+                            self.inflowLineEdit.text()):  # TODO REALLY INFLOWBOUND, NOT CAPACITY?
                         return 6
             except KeyError:
                 pass

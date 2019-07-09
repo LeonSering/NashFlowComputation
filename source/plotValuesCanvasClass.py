@@ -56,6 +56,7 @@ class PlotValuesCanvas(FigureCanvas):
         :param labels: legends
         :param xValues: list of X values
         :param yValues: list of Y values
+        :param storage: storage value
         :param additional_values: list of tuples: more values to plot
         :return: 
         """
@@ -77,7 +78,8 @@ class PlotValuesCanvas(FigureCanvas):
         colorCounter = 1
         for xVals, yVals in additional_values:
             yMin, yMax = min(yMin, min(yVals)), max(yMax, max(yVals))
-            line, = axes.plot(xVals, yVals, linewidth=2, color=self.additionalColors[colorCounter], label=labels[colorCounter])
+            line, = axes.plot(xVals, yVals, linewidth=2, color=self.additionalColors[colorCounter],
+                              label=labels[colorCounter])
             self.plots.append((xVals, yVals, line))
             lines.append(line)
             colorCounter += 1
@@ -115,7 +117,7 @@ class PlotValuesCanvas(FigureCanvas):
         self.lineToHLineDict = dict()
         self.draw_idle()
 
-        self.verticalLine = None    # self.verticalLine is automatically removed by self.figure.clf()
+        self.verticalLine = None  # self.verticalLine is automatically removed by self.figure.clf()
         self.storageHLine = None
 
         self.visibleBool = False
@@ -246,7 +248,7 @@ class PlotValuesCanvas(FigureCanvas):
             hLine.set_color(self.verticalLineColor)
             self.hLines.append(hLine)
             hLineText = axes.text(1.02, y, "%.2f" % y, va='center', ha="left", bbox=dict(facecolor="w", alpha=0.5),
-                          transform=axes.get_yaxis_transform())
+                                  transform=axes.get_yaxis_transform())
             hLineText.set_fontsize(8)
             self.hLinesLabels.append(hLineText)
 

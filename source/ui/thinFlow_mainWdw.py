@@ -38,9 +38,9 @@ class Ui_MainWindow(object):
         sizePolicy.setHeightForWidth(self.groupBox_3.sizePolicy().hasHeightForWidth())
         self.groupBox_3.setSizePolicy(sizePolicy)
         self.groupBox_3.setStyleSheet("QGroupBox { \n"
-"     border: 2px solid rgb(0, 0, 127); \n"
-"     border-radius: 1px; \n"
-" } ")
+                                      "     border: 2px solid rgb(0, 0, 127); \n"
+                                      "     border-radius: 1px; \n"
+                                      " } ")
         self.groupBox_3.setObjectName("groupBox_3")
         self.gridLayout_4 = QtWidgets.QGridLayout(self.groupBox_3)
         self.gridLayout_4.setObjectName("gridLayout_4")
@@ -425,7 +425,8 @@ class Ui_MainWindow(object):
         self.actionOpen_NashFlowComputation = QtWidgets.QAction(MainWindow)
         self.actionOpen_NashFlowComputation.setObjectName("actionOpen_NashFlowComputation")
         self.actionMove_current_graph_to_NashFlowComputation = QtWidgets.QAction(MainWindow)
-        self.actionMove_current_graph_to_NashFlowComputation.setObjectName("actionMove_current_graph_to_NashFlowComputation")
+        self.actionMove_current_graph_to_NashFlowComputation.setObjectName(
+            "actionMove_current_graph_to_NashFlowComputation")
         self.menuFile.addAction(self.actionNew_graph)
         self.menuFile.addAction(self.actionLoad_graph)
         self.menuFile.addAction(self.actionSave_graph)
@@ -526,7 +527,8 @@ class Ui_MainWindow(object):
         self.actionLoad_Thinflow.setText(_translate("MainWindow", "Load Thinflow"))
         self.actionSave_Thinflow.setText(_translate("MainWindow", "Save Thinflow"))
         self.actionOpen_NashFlowComputation.setText(_translate("MainWindow", "Open NashFlowComputation"))
-        self.actionMove_current_graph_to_NashFlowComputation.setText(_translate("MainWindow", "Move current graph to NashFlowComputation"))
+        self.actionMove_current_graph_to_NashFlowComputation.setText(
+            _translate("MainWindow", "Move current graph to NashFlowComputation"))
 
 
 import icons_rc

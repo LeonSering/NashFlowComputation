@@ -15,10 +15,12 @@ from source.utilitiesClass import Utilities
 
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 
+
 # ======================================================================================================================
 
 class PlotQueueCanvas(FigureCanvas):
     """Class to plot queues"""
+
     def __init__(self):
         self.figure = figure.Figure()
         stretchFactor = 0.1
@@ -26,7 +28,7 @@ class PlotQueueCanvas(FigureCanvas):
         self.Ylim = (0, 100)
         super(PlotQueueCanvas, self).__init__(self.figure)  # Call parents constructor
 
-        self.network = nx.DiGraph() # Has no relation to graph we're working on.
+        self.network = nx.DiGraph()  # Has no relation to graph we're working on.
         self.src, self.dst = (0, 90), (0, 10)
         self.network.add_nodes_from(
             [('s', {'position': self.src, 'label': 's'}), ('t', {'position': self.dst, 'label': 't'})])
@@ -57,7 +59,6 @@ class PlotQueueCanvas(FigureCanvas):
             obj = getattr(callback, attrName)
             setattr(self, attrName, obj)
 
-
     def time_changed(self, sliderVal):
         """
         Update the animation given a time index
@@ -84,9 +85,9 @@ class PlotQueueCanvas(FigureCanvas):
         if Utilities.is_eq_tol(totalFlowOnQueue, 0) or Utilities.is_eq_tol(self.maxQueueSize, 0):
             return
 
-        flowRatio = [max(0, float(self.flowOnQueue[edge][fk][time])/totalFlowOnQueue)
-                      for fk in range(len(self.nashFlow.flowIntervals))]
-        totalRatio = totalFlowOnQueue/float(self.maxQueueSize)
+        flowRatio = [max(0, float(self.flowOnQueue[edge][fk][time]) / totalFlowOnQueue)
+                     for fk in range(len(self.nashFlow.flowIntervals))]
+        totalRatio = totalFlowOnQueue / float(self.maxQueueSize)
 
         delta = np.array([0, radius])
         src = np.array(self.src)
@@ -111,7 +112,7 @@ class PlotQueueCanvas(FigureCanvas):
             boxes.append(rec)
 
             lastProportion -= (totalRatio * flowRatio[fk])
-        d = np.sqrt(np.sum(((dst - src) * (1-totalRatio)) ** 2))
+        d = np.sqrt(np.sum(((dst - src) * (1 - totalRatio)) ** 2))
         lastRec = Rectangle(src - delta,
                             width=d,
                             height=radius * 2,
@@ -145,11 +146,12 @@ class PlotQueueCanvas(FigureCanvas):
         # Plot Queue
         color = ['black']
         self.bgBox = self.draw_edges(self.network, pos=positions, ax=self.axes,
-                                                            arrow=True,
-                                                            edge_color=color, width=self.edgeWidthSize)
+                                     arrow=True,
+                                     edge_color=color, width=self.edgeWidthSize)
         self.draw_idle()
 
-    def draw_edges(self, G, pos,
+    @staticmethod
+    def draw_edges(G, pos,
                    edgelist=None,
                    width=1.0,
                    edge_color='k',
@@ -165,16 +167,16 @@ class PlotQueueCanvas(FigureCanvas):
         """Workaround to call specific edge drawing function"""
 
         edges, boxes, tubes = Utilities.draw_animation_edges(G, pos,
-                   edgelist,
-                   width,
-                   edge_color,
-                   style,
-                   alpha,
-                   edge_cmap,
-                   edge_vmin,
-                   edge_vmax,
-                   ax,
-                   arrows,
-                   label)
+                                                             edgelist,
+                                                             width,
+                                                             edge_color,
+                                                             style,
+                                                             alpha,
+                                                             edge_cmap,
+                                                             edge_vmin,
+                                                             edge_vmax,
+                                                             ax,
+                                                             arrows,
+                                                             label)
 
         return boxes
