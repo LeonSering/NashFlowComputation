@@ -1339,7 +1339,7 @@ class Interface(QtWidgets.QMainWindow, mainWdw.Ui_MainWindow):
         elif network.out_edges('t'):
             # Edges going out from t
             return 2
-        for (v, d) in network.in_degree().items():
+        for (v, d) in network.in_degree():
             if d == 0 and v != 's':
                 # Non-reachable node found
                 return 3
