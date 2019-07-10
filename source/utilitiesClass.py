@@ -239,16 +239,16 @@ class Utilities:
         else:
             lw = width
 
-        if not cb.is_string_like(edge_color) \
+        if not cb.is_scalar_or_string(edge_color) \
                 and cb.iterable(edge_color) \
                 and len(edge_color) == len(edge_pos):
-            if numpy.alltrue([cb.is_string_like(c)
+            if numpy.alltrue([cb.is_scalar_or_string(c)
                               for c in edge_color]):
                 # (should check ALL elements)
                 # list of color letters such as ['k','r','k',...]
                 edge_colors = tuple([colorConverter.to_rgba(c, alpha)
                                      for c in edge_color])
-            elif numpy.alltrue([not cb.is_string_like(c)
+            elif numpy.alltrue([not cb.is_scalar_or_string(c)
                                 for c in edge_color]):
                 # If color specs are given as (rgb) or (rgba) tuples, we're OK
                 if numpy.alltrue([cb.iterable(c) and len(c) in (3, 4)
@@ -260,7 +260,7 @@ class Utilities:
             else:
                 raise ValueError('edge_color must consist of either color names or numbers')
         else:
-            if cb.is_string_like(edge_color) or len(edge_color) == 1:
+            if cb.is_scalar_or_string(edge_color) or len(edge_color) == 1:
                 edge_colors = (colorConverter.to_rgba(edge_color, alpha),)
             else:
                 raise ValueError(
@@ -360,16 +360,16 @@ class Utilities:
         else:
             lw = width
 
-        if not cb.is_string_like(edge_color) \
+        if not cb.is_scalar_or_string(edge_color) \
                 and cb.iterable(edge_color) \
                 and len(edge_color) == len(edge_pos):
-            if numpy.alltrue([cb.is_string_like(c)
+            if numpy.alltrue([cb.is_scalar_or_string(c)
                               for c in edge_color]):
                 # (should check ALL elements)
                 # list of color letters such as ['k','r','k',...]
                 edge_colors = tuple([colorConverter.to_rgba(c, alpha)
                                      for c in edge_color])
-            elif numpy.alltrue([not cb.is_string_like(c)
+            elif numpy.alltrue([not cb.is_scalar_or_string(c)
                                 for c in edge_color]):
                 # If color specs are given as (rgb) or (rgba) tuples, we're OK
                 if numpy.alltrue([cb.iterable(c) and len(c) in (3, 4)
@@ -381,7 +381,7 @@ class Utilities:
             else:
                 raise ValueError('edge_color must consist of either color names or numbers')
         else:
-            if cb.is_string_like(edge_color) or len(edge_color) == 1:
+            if cb.is_scalar_or_string(edge_color) or len(edge_color) == 1:
                 edge_colors = (colorConverter.to_rgba(edge_color, alpha),)
             else:
                 raise ValueError(
