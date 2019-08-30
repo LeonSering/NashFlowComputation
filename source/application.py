@@ -12,7 +12,7 @@ import pickle
 import threading
 import time
 import networkx as nx
-from warnings import filterwarnings
+import warnings
 import subprocess
 from tempfile import gettempdir
 import sys
@@ -28,9 +28,8 @@ from source.ui import mainWdw
 from source.utilitiesClass import Utilities
 
 # =======================================================================================================================
-filterwarnings('ignore')  # For the moment: ignore warnings as pyplot.hold is deprecated
+warnings.filterwarnings('ignore')  # Suppress GTK-Warnings
 QtCore.QCoreApplication.setAttribute(QtCore.Qt.AA_X11InitThreads)  # This is necessary if threads access the GUI
-
 
 class Interface(QtWidgets.QMainWindow, mainWdw.Ui_MainWindow):
     """Controls GUI"""
@@ -565,7 +564,6 @@ class Interface(QtWidgets.QMainWindow, mainWdw.Ui_MainWindow):
             dialog = QtWidgets.QFileDialog
             # noinspection PyCallByClass,PyCallByClass
             fopen = dialog.getOpenFileName(self, "Select File", self.defaultLoadSaveDir, "network files (*.cg)")
-
             fopen = fopen[0]
             if len(fopen) == 0:
                 return

@@ -8,7 +8,10 @@
 if __name__ == '__main__':
     import os
     import sys
+    import warnings
     from source import application
+
+    warnings.filterwarnings('ignore')
 
     cwd = os.getcwd()
     if os.path.basename(cwd) == 'source':
