@@ -388,8 +388,8 @@ class Interface(QtWidgets.QMainWindow, mainWdw.Ui_MainWindow):
             return
         focusEdge = self.gttr('graphCreationCanvas').focusEdge
 
-        tailLabel = str(focusEdge[0])
-        headLabel = str(focusEdge[1])
+        tail = str(focusEdge[0])
+        head = str(focusEdge[1])
         transitText = float(self.gttr('transitTimeLineEdit').text())
 
         if self.currentTF == 'general':
@@ -402,7 +402,7 @@ class Interface(QtWidgets.QMainWindow, mainWdw.Ui_MainWindow):
             storageText = float(self.storageLineEdit_spillback.text())
             if inCapacityText <= 0 or outCapacityText <= 0 or transitText < 0 or storageText <= 0:
                 return
-            elif tailLabel == 's' and storageText != float('inf'):
+            elif tail == 's' and storageText != float('inf'):
                 # This has to be satisfied
                 return
             if storageText <= transitText * inCapacityText:
@@ -410,11 +410,6 @@ class Interface(QtWidgets.QMainWindow, mainWdw.Ui_MainWindow):
                 corrector = 0.1 if storageText / transitText > 0.1 else 0.1 * storageText / transitText
                 inCapacityText = storageText / transitText - corrector
                 self.inCapacityLineEdit_spillback.setText(str(inCapacityText))
-
-        # Work with actual node IDs, not labels
-        labels = nx.get_node_attributes(self.gttr('network'), 'label')
-        tail = list(labels.keys())[list(labels.values()).index(tailLabel)]
-        head = list(labels.keys())[list(labels.values()).index(headLabel)]
 
         if self.gttr('network').has_edge(tail, head):
             # Update the edges attributes
