@@ -49,15 +49,17 @@ class PlotNTFCanvas(PlotCanvas):
         labelDict = {}
         for node in self.network.nodes():
             labelList = []
-            attributeList = [self.NTFNodeLabelDict[node], self.NTFNodeSpillbackFactorDict[node]] \
-                            if self.showSpillBackFactor else [self.NTFNodeLabelDict[node]]
-
-            for val in attributeList:
-                if val != int(val):
+            val = self.NTFNodeLabelDict[node]
+            if val != int(val):
+                entry = float("{0:.2f}".format(val))
+            else:
+                entry = int(val)
+            labelList.append(entry)
+            if self.showSpillBackFactor:
+                val = self.NTFNodeSpillbackFactorDict[node]
+                if val < 1:
                     entry = float("{0:.2f}".format(val))
-                else:
-                    entry = int(val)
-                labelList.append(entry)
+                    labelList.append(entry)
             labelDict[node] = tuple(labelList) if len(labelList) > 1 else labelList[0]
         return labelDict
 
