@@ -71,23 +71,26 @@ class PlotCanvas(FigureCanvas):
 
     def get_edge_labels(self):
         """Returns dict of edge labels"""
-        if not self.onlyNTF:
-            if self.type == 'general':
-                return Utilities.join_intersect_dicts(nx.get_edge_attributes(self.network, 'outCapacity'),
-                                                      nx.get_edge_attributes(self.network,
-                                                                             'transitTime'))  # Edge labels
-            elif self.type == 'spillback':
-                return Utilities.join_intersect_dicts(nx.get_edge_attributes(self.network, 'inCapacity'),
-                                                      nx.get_edge_attributes(self.network, 'outCapacity'),
-                                                      nx.get_edge_attributes(self.network, 'storage'),
-                                                      nx.get_edge_attributes(self.network,
-                                                                             'transitTime'))  # Edge labels
-        else:
-            if self.type == 'spillback':
-                return Utilities.join_intersect_dicts(nx.get_edge_attributes(self.network, 'outCapacity'),
-                                                      nx.get_edge_attributes(self.network,
-                                                                             'inflowBound'))  # Edge labels
-            return nx.get_edge_attributes(self.network, 'outCapacity')
+        if self.type == 'general':
+            attributes = ['outCapacity', 'transitTime'] if not self.onlyNTF else ['outCapacity']
+        elif self.type == 'spillback':
+            attributes = ['inCapacity', 'outCapacity', 'storage', 'transitTime'] if not self.onlyNTF \
+                            else ['outCapacity', 'inflowBound']
+        multipleBool = (len(attributes) > 1)
+        attributeList = [nx.get_edge_attributes(self.network, attr) for attr in attributes]
+        labelDict = Utilities.join_intersect_dicts(*attributeList)
+
+        # Integer values should be displayed in shortest possible way
+        for key, valTuple in labelDict.items():
+            if not multipleBool:
+                if valTuple != float('inf') and valTuple == int(valTuple):
+                    labelDict[key] = int(valTuple)
+            else:
+                newTuple = []
+                for val in valTuple:
+                    newTuple.append(int(val) if (val != float('inf') and int(val) == val) else val)
+                labelDict[key] = tuple(newTuple)
+        return labelDict
 
     def on_click(self, event):
         """

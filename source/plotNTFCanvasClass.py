@@ -19,19 +19,17 @@ class PlotNTFCanvas(PlotCanvas):
     def __init__(self, graph, interface, intervalID, stretchFactor, showNoFlowEdges=True, onlyNTF=False):
         self.figure = matplotlib.figure.Figure()
         self.onlyNTF = onlyNTF  # If this is true, then PlotCanvas belongs to Thinflow Computation App
-        self.tfType = 'general'
+        self.tfType = interface.currentTF
         if nx.number_of_nodes(graph) != 0:
             # Graph is not empty. Otherwise dont do stuff because the call was made by thinFlow_application initialization
             if not self.onlyNTF:
                 # We have a regular nashFlow instance
                 flowIntervalInstance = interface.gttr('nashFlow').flowIntervals[intervalID][2]
-                self.showSpillBackFactor = False
             else:
                 # We just have a flowInterval instance
-                self.tfType = interface.currentTF
                 flowIntervalInstance = interface.gttr('interval')
-                self.NTFNodeSpillbackFactorDict = flowIntervalInstance.NTFNodeSpillbackFactorDict if self.tfType == 'spillback' else None
-                self.showSpillBackFactor = (self.onlyNTF and self.tfType == 'spillback')
+            self.NTFNodeSpillbackFactorDict = flowIntervalInstance.NTFNodeSpillbackFactorDict if self.tfType == 'spillback' else None
+            self.showSpillBackFactor = (self.tfType == 'spillback')
             self.NTFNodeLabelDict = flowIntervalInstance.NTFNodeLabelDict
             self.NTFEdgeFlowDict = flowIntervalInstance.NTFEdgeFlowDict
 
@@ -47,19 +45,32 @@ class PlotNTFCanvas(PlotCanvas):
         """Returns additional node labels"""
         if nx.number_of_nodes(self.network) == 0:
             return {}
-        if self.showSpillBackFactor:
-            return {
-                node: (
-                    float("%.2f" % self.NTFNodeLabelDict[node]), float("%.2f" % self.NTFNodeSpillbackFactorDict[node]))
-                for
-                node in self.network.nodes()}
-        else:
-            return {node: "%.2f" % self.NTFNodeLabelDict[node] for
-                    node in self.network.nodes()}
+
+        labelDict = {}
+        for node in self.network.nodes():
+            labelList = []
+            attributeList = [self.NTFNodeLabelDict[node], self.NTFNodeSpillbackFactorDict[node]] \
+                            if self.showSpillBackFactor else [self.NTFNodeLabelDict[node]]
+
+            for val in attributeList:
+                if val != int(val):
+                    entry = float("{0:.2f}".format(val))
+                else:
+                    entry = int(val)
+                labelList.append(entry)
+            labelDict[node] = tuple(labelList) if len(labelList) > 1 else labelList[0]
+        return labelDict
 
     def get_edge_labels(self):
         """Returns edge labels"""
-        return {edge: "%.2f" % self.NTFEdgeFlowDict[edge] for edge in self.network.edges()}
+        labelDict = {}
+        for edge in self.network.edges():
+            if self.NTFEdgeFlowDict[edge] != int(self.NTFEdgeFlowDict[edge]):
+                val = "{0:.2f}".format(self.NTFEdgeFlowDict[edge])
+            else:
+                val = str(int(self.NTFEdgeFlowDict[edge]))
+            labelDict[edge] = val
+        return labelDict
 
     def on_click(self, event):
         """

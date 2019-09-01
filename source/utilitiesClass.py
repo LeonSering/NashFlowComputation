@@ -153,8 +153,10 @@ class Utilities:
         return minAttr
 
     @staticmethod
-    def join_intersect_dicts(dict1, dict2, *more_dicts):
+    def join_intersect_dicts(dict1, dict2=None, *more_dicts):
         """Intersect two or more dict"""
+        if not dict2:
+            return dict1
         if len(more_dicts) == 0:
             return {key: (dict1[key], dict2[key]) for key in dict1 if key in dict2}
         else:
