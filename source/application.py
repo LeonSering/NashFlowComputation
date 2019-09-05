@@ -508,7 +508,7 @@ class Interface(QtWidgets.QMainWindow, mainWdw.Ui_MainWindow):
 
         self.sttr('plotAnimationCanvas', None, PlotAnimationCanvas(nashflow=self.gttr('nashFlow'), interface=self,
                                                                    upperBound=self.gttr('animationUpperBound'),
-                                                                   stretchFactor=self.plotAnimationCanvasStretchFactor))
+                                                                   stretchFactor=self.plotCanvasStretchFactor))
         self.gttr('plotAnimationFrameLayout').addWidget(self.gttr('plotAnimationCanvas'))
         self.gttr('timeSlider').setMaximum(99)
         self.output("Generating animation")
@@ -820,7 +820,7 @@ class Interface(QtWidgets.QMainWindow, mainWdw.Ui_MainWindow):
             self.gttr('intervalsListWidget').addItem(item)  # Add item to listWidget
 
             plot = PlotNTFCanvas(interval[2].shortestPathNetwork, self, intervalID=index,
-                                 stretchFactor=self.plotNTFCanvasStretchFactor,
+                                 stretchFactor=self.plotCanvasStretchFactor,
                                  showNoFlowEdges=self.gttr('showEdgesWithoutFlowCheckBox').isChecked())
             # Note: this could create problems if user changes showEdgesWithoutFlowCheckBox between interval computations
             self.gttr('NTFPlotList').append(plot)  # Add NTF Plot to List
