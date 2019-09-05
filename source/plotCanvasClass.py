@@ -35,11 +35,12 @@ class PlotCanvas(FigureCanvas):
         self.type = type  # 'general' or 'spillback'
 
         # Visualization Settings
-        self.Xlim = (stretchFactor * (-100), stretchFactor * 100)
-        self.Ylim = (-100, 100)
+        sqSize = 120
+        self.Xlim = (stretchFactor * (-sqSize), stretchFactor * sqSize)
+        self.Ylim = (-sqSize, sqSize)
         self.nodeSize = 24 ** 2
-        self.nodeLabelFontSize = 12  # float but passed as int
-        self.edgeLabelFontSize = 10  # float but passed as int
+        self.nodeLabelFontSize = 9  # float but passed as int
+        self.edgeLabelFontSize = 7  # float but passed as int
         self.edgeWidthSize = 4
 
         # Only one of them can be not None

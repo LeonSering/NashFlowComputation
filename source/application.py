@@ -191,7 +191,7 @@ class Interface(QtWidgets.QMainWindow, mainWdw.Ui_MainWindow):
         """
         network = nx.DiGraph()
         network.add_nodes_from(
-            [('s', {'position': (-90, 0), 'label': 's'}), ('t', {'position': (90, 0), 'label': 't'})])
+            [('s', {'position': (-200, 0), 'label': 's'}), ('t', {'position': (200, 0), 'label': 't'})])
         network.graph['lastID'] = network.number_of_nodes() - 2  # Keep track of next nodes ID
         network.graph['inflowRate'] = 1  # Default inflowrate for new networks
         return network
@@ -203,7 +203,7 @@ class Interface(QtWidgets.QMainWindow, mainWdw.Ui_MainWindow):
             self.sttr('plotFrameLayout', tfType, QtWidgets.QVBoxLayout())
             self.gttr('plotFrame', tfType).setLayout(self.gttr('plotFrameLayout', tfType))
             self.sttr('graphCreationCanvas', tfType, PlotCanvas(self.gttr('network', tfType), self,
-                                                                stretchFactor=1.57, onlyNTF=False,
+                                                                stretchFactor=self.plotCanvasStretchFactor, onlyNTF=False,
                                                                 type=tfType))  # Initialize PlotCanvas
             self.gttr('plotFrameLayout', tfType).addWidget(self.gttr('graphCreationCanvas', tfType))
 
