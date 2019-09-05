@@ -389,7 +389,8 @@ class PlotCanvas(FigureCanvas):
             add_tuple_offset = lambda a: (a[0] + offset[0], a[1] + offset[1])
             movedPositions = {node: add_tuple_offset(positions[node]) for node in positions}
             self.additionalNodeLabelCollection = draw_networkx_labels(self.network, pos=movedPositions, ax=self.axes,
-                                                                      labels=additionalNodeLabels)
+                                                                      labels=additionalNodeLabels,
+                                                                      font_size=nodeLabelSize)
         else:
             self.additionalNodeLabelCollection = {}
 
