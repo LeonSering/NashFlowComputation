@@ -73,7 +73,7 @@ class PlotAnimationCanvas(PlotCanvas):
         PlotCanvas.__init__(self, graph=self.network, interface=interface, stretchFactor=stretchFactor)  # Call parents constructor
 
         positions = get_node_attributes(self.network, 'position')
-        offset = (0, 8)
+        offset = (0, 15)
         add_tuple_offset = lambda a: (a[0] + offset[0], a[1] + offset[1])
         self.movedPositions = {node: add_tuple_offset(positions[node]) for node in positions}
         self.edgeWidthSize = 6

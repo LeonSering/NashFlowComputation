@@ -385,7 +385,7 @@ class PlotCanvas(FigureCanvas):
         additionalNodeLabels = self.get_additional_node_labels()
         if additionalNodeLabels:
             # Plot Nash Flow Node Labels
-            offset = (0, 8)
+            offset = (0, 15)
             add_tuple_offset = lambda a: (a[0] + offset[0], a[1] + offset[1])
             movedPositions = {node: add_tuple_offset(positions[node]) for node in positions}
             self.additionalNodeLabelCollection = draw_networkx_labels(self.network, pos=movedPositions, ax=self.axes,
