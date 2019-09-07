@@ -6,8 +6,8 @@
 # ===========================================================================
 
 
-from PyQt4 import QtGui, QtCore
-import ConfigParser
+from PyQt5 import QtGui, QtCore, QtWidgets
+import configparser
 import os
 import pickle
 import sys
@@ -32,12 +32,12 @@ filterwarnings('ignore')  # For the moment: ignore warnings as pyplot.hold is de
 QtCore.QCoreApplication.setAttribute(QtCore.Qt.AA_X11InitThreads)  # This is necessary if threads access the GUI
 
 
-class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
+class Interface(QtWidgets.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
     """Controls GUI"""
 
     def __init__(self):
         """Initialization of Class and GUI"""
-        QtGui.QMainWindow.__init__(self)
+        QtWidgets.QMainWindow.__init__(self)
         self.setupUi(self)
 
         # Scaling factors of frames, to avoid distortion
@@ -62,13 +62,13 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
         self.defaultLoadSaveDir = ''
         self.cleanUpEnabled = True
 
-        self.configFile = ConfigParser.RawConfigParser()  # This is the parser, not to confuse with the actual config.txt File, which cannot be specified
+        self.configFile = configparser.RawConfigParser()  # This is the parser, not to confuse with the actual config.txt File, which cannot be specified
 
         # Initializations
         self.load_config()  # Try to load configuration file
 
         # Signal configuration
-        self.tabWidget.connect(self.tabWidget, QtCore.SIGNAL("currentChanged(int)"), self.tabSwitched)
+        self.tabWidget.currentChanged.connect(self.tabSwitched)
 
         for tfType in self.tfTypeList:
             self.gttr('updateNodeButton', tfType).clicked.connect(self.update_node)
@@ -100,7 +100,7 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
         self.actionNew_graph.triggered.connect(self.re_init_app)
         self.actionLoad_graph.triggered.connect(self.load_graph)
         self.actionSave_graph.triggered.connect(self.save_graph)
-        self.actionExit.triggered.connect(QtGui.QApplication.quit)
+        self.actionExit.triggered.connect(QtWidgets.QApplication.quit)
         self.actionLoad_Thinflow.triggered.connect(self.load_thinflow)
         self.actionSave_Thinflow.triggered.connect(self.save_thinflow)
         self.actionOpen_NashFlowComputation.triggered.connect(self.open_nfc)
@@ -108,7 +108,7 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
         # TO BE DONE LATER
         # self.actionOpen_manual.triggered.connect(self.show_help)
 
-        QtGui.QShortcut(QtGui.QKeySequence(QtCore.Qt.Key_Delete), self).activated.connect(
+        QtWidgets.QShortcut(QtGui.QKeySequence(QtCore.Qt.Key_Delete), self).activated.connect(
             self.pressed_delete)  # Pressed Delete
 
         self.tabWidget.setCurrentIndex(0)  # Show General Tab
@@ -151,15 +151,15 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
         """Initialization of Tabs"""
         for tfType in self.tfTypeList:
             # Configure plotFrame to display plots of graphs
-            self.sttr('plotFrameLayout', tfType, QtGui.QVBoxLayout())
+            self.sttr('plotFrameLayout', tfType, QtWidgets.QVBoxLayout())
             self.gttr('plotFrame', tfType).setLayout(self.gttr('plotFrameLayout', tfType))
             self.sttr('graphCreationCanvas', tfType, PlotCanvas(self.gttr('network', tfType), self,
-                                                                stretchFactor=1.57, onlyNTF=True,
+                                                                stretchFactor=self.plotCanvasStretchFactor, onlyNTF=True,
                                                                 type=tfType))  # Initialize PlotCanvas
             self.gttr('plotFrameLayout', tfType).addWidget(self.gttr('graphCreationCanvas', tfType))
 
             # Configure plotNTFFrame
-            self.sttr('plotNTFFrameLayout', tfType, QtGui.QVBoxLayout())
+            self.sttr('plotNTFFrameLayout', tfType, QtWidgets.QVBoxLayout())
             self.gttr('plotNTFFrame', tfType).setLayout(self.gttr('plotNTFFrameLayout', tfType))
 
             # Add empty graph to plotNTFCanvas to not destroy layout
@@ -200,7 +200,7 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
             tfType = self.currentTF
 
         nodeString = 'Node ' + str(node) + ': ' + self.gttr('network', tfType).node[node]['label']
-        item = QtGui.QListWidgetItem(nodeString)
+        item = QtWidgets.QListWidgetItem(nodeString)
         self.gttr('nodeToListItem', tfType)[node] = item
         self.gttr('nodeSelectionListWidget', tfType).addItem(item)  # Add item to listWidget
 
@@ -216,7 +216,7 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
         v, w = edge
         edgeString = 'Edge: ' + str(
             (self.gttr('network', tfType).node[v]['label'], self.gttr('network', tfType).node[w]['label']))
-        item = QtGui.QListWidgetItem(edgeString)
+        item = QtWidgets.QListWidgetItem(edgeString)
         self.gttr('edgeToListItem')[edge] = item
         self.gttr('edgeSelectionListWidget', tfType).addItem(item)
 
@@ -413,7 +413,7 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
     def select_output_directory(self):
         """Select output directory for thin flow computation"""
         defaultDir = self.outputDirectory
-        dialog = QtGui.QFileDialog
+        dialog = QtWidgets.QFileDialog
         fselect = dialog.getExistingDirectory(self, "Select Directory", defaultDir)
 
         if os.name != 'posix':
@@ -427,7 +427,7 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
     def select_scip_binary(self):
         """Select scip binary"""
         defaultDir = '' if not os.path.isfile(self.scipFile) else os.path.dirname(self.scipFile)
-        dialog = QtGui.QFileDialog
+        dialog = QtWidgets.QFileDialog
         fselect = dialog.getOpenFileName(self, "Select File", defaultDir)
 
         if os.name != 'posix':
@@ -578,7 +578,7 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
     def load_graph(self, graphPath=None):
         """Load graph instance from '.cg' file"""
         if not graphPath:
-            dialog = QtGui.QFileDialog
+            dialog = QtWidgets.QFileDialog
             fopen = dialog.getOpenFileName(self, "Select File", self.defaultLoadSaveDir, "network files (*.cg)")
 
             if os.name != 'posix':  # For Windows
@@ -618,7 +618,7 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
 
     def load_thinflow(self):
         """Load thinflow '.tf' file"""
-        dialog = QtGui.QFileDialog
+        dialog = QtWidgets.QFileDialog
         fopen = dialog.getOpenFileName(self, "Select File", self.defaultLoadSaveDir, "thinflow files (*.tf)")
 
         if os.name != 'posix':  # For Windows
@@ -650,7 +650,7 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
         self.gttr('network').graph['inflowRate'] = float(self.inflowLineEdit.text())
 
         if not graphPath:
-            dialog = QtGui.QFileDialog
+            dialog = QtWidgets.QFileDialog
             fsave = dialog.getSaveFileName(self, "Select File", self.defaultLoadSaveDir, "network files (*.cg)")
 
             if os.name != 'posix':
@@ -676,7 +676,7 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
 
     def save_thinflow(self):
         """Save thinflow to '.tf' file"""
-        dialog = QtGui.QFileDialog
+        dialog = QtWidgets.QFileDialog
         fsave = dialog.getSaveFileName(self, "Select File", self.defaultLoadSaveDir, "thinflow files (*.tf)")
 
         if os.name != 'posix':
@@ -735,8 +735,8 @@ class Interface(QtGui.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
         if returnCode != 0:
             # Invalid input has been given
             # Spawn warning
-            QtGui.QMessageBox.question(QtGui.QWidget(), 'Abort: Input error', self.get_error_message(returnCode),
-                                       QtGui.QMessageBox.Ok)
+            QtWidgets.QMessageBox.question(QtWidgets.QWidget(), 'Abort: Input error', self.get_error_message(returnCode),
+                                       QtWidgets.QMessageBox.Ok)
             return
 
         # Drop current NTF plot

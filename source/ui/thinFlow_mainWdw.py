@@ -1,13 +1,12 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'thinFlow_mainWdw_Leon.ui'
+# Form implementation generated from reading ui file 'thinFlow_mainWdw.ui'
 #
-# Created by: PyQt5 UI code generator 5.12.1
+# Created by: PyQt5 UI code generator 5.10.1
 #
 # WARNING! All changes made in this file will be lost!
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -38,9 +37,9 @@ class Ui_MainWindow(object):
         sizePolicy.setHeightForWidth(self.groupBox_3.sizePolicy().hasHeightForWidth())
         self.groupBox_3.setSizePolicy(sizePolicy)
         self.groupBox_3.setStyleSheet("QGroupBox { \n"
-                                      "     border: 2px solid rgb(0, 0, 127); \n"
-                                      "     border-radius: 1px; \n"
-                                      " } ")
+"     border: 2px solid rgb(0, 0, 127); \n"
+"     border-radius: 1px; \n"
+" } ")
         self.groupBox_3.setObjectName("groupBox_3")
         self.gridLayout_4 = QtWidgets.QGridLayout(self.groupBox_3)
         self.gridLayout_4.setObjectName("gridLayout_4")
@@ -403,7 +402,7 @@ class Ui_MainWindow(object):
         self.verticalLayout.addWidget(self.splitter)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menuBar = QtWidgets.QMenuBar(MainWindow)
-        self.menuBar.setGeometry(QtCore.QRect(0, 0, 1043, 30))
+        self.menuBar.setGeometry(QtCore.QRect(0, 0, 1043, 22))
         self.menuBar.setObjectName("menuBar")
         self.menuFile = QtWidgets.QMenu(self.menuBar)
         self.menuFile.setObjectName("menuFile")
@@ -425,8 +424,7 @@ class Ui_MainWindow(object):
         self.actionOpen_NashFlowComputation = QtWidgets.QAction(MainWindow)
         self.actionOpen_NashFlowComputation.setObjectName("actionOpen_NashFlowComputation")
         self.actionMove_current_graph_to_NashFlowComputation = QtWidgets.QAction(MainWindow)
-        self.actionMove_current_graph_to_NashFlowComputation.setObjectName(
-            "actionMove_current_graph_to_NashFlowComputation")
+        self.actionMove_current_graph_to_NashFlowComputation.setObjectName("actionMove_current_graph_to_NashFlowComputation")
         self.menuFile.addAction(self.actionNew_graph)
         self.menuFile.addAction(self.actionLoad_graph)
         self.menuFile.addAction(self.actionSave_graph)
@@ -439,7 +437,7 @@ class Ui_MainWindow(object):
         self.menuBar.addAction(self.menuOptions.menuAction())
 
         self.retranslateUi(MainWindow)
-        self.tabWidget.setCurrentIndex(1)
+        self.tabWidget.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
         MainWindow.setTabOrder(self.tabWidget, self.tailLineEdit_general)
         MainWindow.setTabOrder(self.tailLineEdit_general, self.headLineEdit_general)
@@ -527,8 +525,5 @@ class Ui_MainWindow(object):
         self.actionLoad_Thinflow.setText(_translate("MainWindow", "Load Thinflow"))
         self.actionSave_Thinflow.setText(_translate("MainWindow", "Save Thinflow"))
         self.actionOpen_NashFlowComputation.setText(_translate("MainWindow", "Open NashFlowComputation"))
-        self.actionMove_current_graph_to_NashFlowComputation.setText(
-            _translate("MainWindow", "Move current graph to NashFlowComputation"))
+        self.actionMove_current_graph_to_NashFlowComputation.setText(_translate("MainWindow", "Move current graph to NashFlowComputation"))
 
-
-import icons_rc
