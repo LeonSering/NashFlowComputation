@@ -336,7 +336,7 @@ class Interface(QtWidgets.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
                 str(self.gttr('network')[edge[0]][edge[1]]['outCapacity']))
 
             if self.currentTF == 'spillback':
-                self.boundLineEdit_spillback.setText(str(self.gttr('network')[edge[0]][edge[1]]['inflowBound']))
+                self.boundLineEdit_spillback.setText(str(self.gttr('network')[edge[0]][edge[1]]['TFC']['inflowBound']))
 
         else:
             self.gttr('tailLineEdit').setText("")
@@ -375,7 +375,7 @@ class Interface(QtWidgets.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
             # Update the edges attributes
             self.gttr('network')[tail][head]['outCapacity'] = capacityText
             if boundText is not None:
-                self.gttr('network', 'spillback')[tail][head]['inflowBound'] = boundText
+                self.gttr('network', 'spillback')[tail][head]['TFC']['inflowBound'] = boundText
             self.gttr('graphCreationCanvas').update_edges()
         else:
             # Add a new edge
@@ -416,8 +416,7 @@ class Interface(QtWidgets.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
         dialog = QtWidgets.QFileDialog
         fselect = dialog.getExistingDirectory(self, "Select Directory", defaultDir)
 
-        if os.name != 'posix':
-            fselect = fselect[0]
+        #fselect = fselect[0]
         if len(fselect) == 0:
             return
         fselect = str(fselect)
@@ -430,8 +429,7 @@ class Interface(QtWidgets.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
         dialog = QtWidgets.QFileDialog
         fselect = dialog.getOpenFileName(self, "Select File", defaultDir)
 
-        if os.name != 'posix':
-            fselect = fselect[0]
+        fselect = fselect[0]
         if len(fselect) == 0:
             return
         fselect = str(fselect)
@@ -447,7 +445,7 @@ class Interface(QtWidgets.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
         self.configFile.set('Settings', 'defaultloadsavedir', self.defaultLoadSaveDir)
         self.configFile.set('Settings', 'timeoutactivated', self.timeoutActivated)
 
-        with open('thinFlow_config.cfg', 'wb') as configfile:
+        with open('thinFlow_config.cfg', 'w') as configfile:
             self.configFile.write(configfile)
 
     def change_cleanup_state(self):
@@ -490,7 +488,7 @@ class Interface(QtWidgets.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
             self.gttr('resettingSwitchButton').setEnabled(False)
         else:
             # Turn button on, adjust Label accordingly
-            resettingStatusBool = self.gttr('network')[edge[0]][edge[1]]['resettingEnabled']
+            resettingStatusBool = self.gttr('network')[edge[0]][edge[1]]['TFC']['resettingEnabled']
             resettingSwitchButtonLabel = "On" if resettingStatusBool else "Off"
             self.gttr('resettingSwitchButton').setText(resettingSwitchButtonLabel)
             self.gttr('resettingSwitchButton').setEnabled(True)
@@ -550,8 +548,7 @@ class Interface(QtWidgets.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
             return
 
         # Change resettingEnabled Boolean
-        self.gttr('network')[edge[0]][edge[1]]['resettingEnabled'] = not self.gttr('network')[edge[0]][edge[1]][
-            'resettingEnabled']
+        self.gttr('network')[edge[0]][edge[1]]['TFC']['resettingEnabled'] = not self.gttr('network')[edge[0]][edge[1]]['TFC']['resettingEnabled']
         self.adjust_resettingSwitchButton(edge)  # Change button accordingly
 
         # Update display
@@ -581,8 +578,7 @@ class Interface(QtWidgets.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
             dialog = QtWidgets.QFileDialog
             fopen = dialog.getOpenFileName(self, "Select File", self.defaultLoadSaveDir, "network files (*.cg)")
 
-            if os.name != 'posix':  # For Windows
-                fopen = fopen[0]
+            fopen = fopen[0]
             if len(fopen) == 0:
                 return
             fopen = str(fopen)
@@ -597,9 +593,9 @@ class Interface(QtWidgets.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
         for edge in network.edges():
             v, w = edge
             try:
-                property = network[v][w]['resettingEnabled']
+                property = network[v][w]['TFC']
             except KeyError:
-                network[v][w]['resettingEnabled'] = None
+                network[v][w]['TFC']['resettingEnabled'] = None
 
         if not graphPath:
             self.defaultLoadSaveDir = os.path.dirname(fopen)
@@ -621,8 +617,7 @@ class Interface(QtWidgets.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
         dialog = QtWidgets.QFileDialog
         fopen = dialog.getOpenFileName(self, "Select File", self.defaultLoadSaveDir, "thinflow files (*.tf)")
 
-        if os.name != 'posix':  # For Windows
-            fopen = fopen[0]
+        fopen = fopen[0]
         if len(fopen) == 0:
             return
         fopen = str(fopen)
@@ -653,8 +648,7 @@ class Interface(QtWidgets.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
             dialog = QtWidgets.QFileDialog
             fsave = dialog.getSaveFileName(self, "Select File", self.defaultLoadSaveDir, "network files (*.cg)")
 
-            if os.name != 'posix':
-                fsave = fsave[0]
+            fsave = fsave[0]
             if len(fsave) == 0:
                 return
             fsave = str(fsave)
@@ -679,8 +673,7 @@ class Interface(QtWidgets.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
         dialog = QtWidgets.QFileDialog
         fsave = dialog.getSaveFileName(self, "Select File", self.defaultLoadSaveDir, "thinflow files (*.tf)")
 
-        if os.name != 'posix':
-            fsave = fsave[0]
+        fsave = fsave[0]
         if len(fsave) == 0:
             return
         fsave = str(fsave)
@@ -743,7 +736,7 @@ class Interface(QtWidgets.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
         self.re_init_NTF_frame()
 
         # Get necessary data
-        resettingEdges = [edge for edge in network.edges() if network[edge[0]][edge[1]]['resettingEnabled']]
+        resettingEdges = [edge for edge in network.edges() if network[edge[0]][edge[1]]['TFC']['resettingEnabled']]
         lowerBoundTime = 0  # No needed for different times as only one flowInterval is being computed
         inflowRate = float(self.inflowLineEdit.text())
         minCapacity = Utilities.compute_min_attr_of_network(network)
@@ -755,7 +748,7 @@ class Interface(QtWidgets.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
                                         'algorithm_' + str(self.templateFile + 1) + '.zpl')
         elif self.currentTF == 'spillback':
             templateFile = os.path.join(os.getcwd(), 'templates',
-                                        'algorithm_spillback.zpl')
+                                        'algorithm_spillback_' + str(self.templateFile + 1) + '.zpl')
         scipFile = self.scipFile
         timeout = float(self.timeoutLineEdit.text())
 
@@ -767,17 +760,23 @@ class Interface(QtWidgets.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
                                                  outputDirectory=rootPath, templateFile=templateFile, scipFile=scipFile,
                                                  timeout=timeout)
         elif self.currentTF == 'spillback':
+            fullEdges = []
+            minInflowBound = float('inf')
+            for e in network.edges():
+                (v, w) = e
+                minInflowBound = min(minInflowBound, network[v][w]['TFC']['inflowBound'])
             self.interval_spillback = FlowInterval_spillback(network, resettingEdges=resettingEdges,
-                                                             lowerBoundTime=lowerBoundTime,
+                                                             fullEdges=fullEdges,lowerBoundTime=lowerBoundTime,
                                                              inflowRate=inflowRate, minCapacity=minCapacity,
                                                              counter=counter,
                                                              outputDirectory=rootPath, templateFile=templateFile,
                                                              scipFile=scipFile,
-                                                             timeout=timeout)
+                                                             timeout=timeout, minInflowBound=minInflowBound)
 
         # Set shortest path network manually to entire graph (is the deepcopy really needed?)
         interval = self.gttr('interval')
         interval.shortestPathNetwork = deepcopy(network)
+        self.interval_spillback.transfer_inflowBound(interval.shortestPathNetwork)
 
         self.advancedAlgo = (templateFile == 2)  # If true, then advanced backtracking with preprocessing is performed
 
@@ -815,7 +814,10 @@ class Interface(QtWidgets.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
 
         if self.currentTF == 'spillback':
             try:
-                m = min(nx.get_edge_attributes(network, 'inflowBound').values())
+                m = float('inf')
+                for edge in network.edges():
+                    (v, w) = edge
+                    m = min(m, network[v][w]['TFC']['inflowBound'])
                 if m <= 0:
                     return 4
             except KeyError:
@@ -832,7 +834,7 @@ class Interface(QtWidgets.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
             try:
                 for e in network.out_edges('s'):
                     (v, w) = e
-                    if network[v][w]['inflowBound'] < float(
+                    if network[v][w]['TFC']['inflowBound'] < float(
                             self.inflowLineEdit.text()):  # TODO REALLY INFLOWBOUND, NOT CAPACITY?
                         return 6
             except KeyError:

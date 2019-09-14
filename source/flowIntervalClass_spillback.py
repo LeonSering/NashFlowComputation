@@ -46,6 +46,12 @@ class FlowInterval_spillback(FlowInterval):
     def set_minInflowBound(self, val):
         self.minInflowBound = val
 
+    def transfer_inflowBound(self, network):
+        # Transfers all entries of the form ['TFC']['inflowBound'] to ['inflowBound'] to assure compability
+        for e in network.edges():
+            (v, w) = e
+            network[v][w]['inflowBound'] = network[v][w]['TFC']['inflowBound']
+
     def get_ntf(self):
         """Standard way to get sNTF. Uses preprocessing"""
         self.counter = 0
