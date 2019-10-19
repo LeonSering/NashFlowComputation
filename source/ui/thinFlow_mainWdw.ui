@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1043</width>
-    <height>991</height>
+    <width>885</width>
+    <height>603</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -229,43 +229,23 @@
                <enum>QLayout::SetDefaultConstraint</enum>
               </property>
               <item row="0" column="0">
-               <widget class="QLabel" name="label_5">
-                <property name="text">
-                 <string>Tail</string>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="1">
-               <widget class="QLineEdit" name="tailLineEdit_general"/>
-              </item>
-              <item row="1" column="0">
-               <widget class="QLabel" name="label_4">
-                <property name="text">
-                 <string>Head</string>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="1">
-               <widget class="QLineEdit" name="headLineEdit_general"/>
-              </item>
-              <item row="2" column="0">
                <widget class="QLabel" name="label_7">
                 <property name="text">
                  <string>Capacity</string>
                 </property>
                </widget>
               </item>
-              <item row="2" column="1">
+              <item row="0" column="1">
                <widget class="QLineEdit" name="capacityLineEdit_general"/>
               </item>
-              <item row="3" column="0">
+              <item row="1" column="0">
                <widget class="QLabel" name="label_6">
                 <property name="text">
                  <string>Resetting</string>
                 </property>
                </widget>
               </item>
-              <item row="3" column="1">
+              <item row="1" column="1">
                <widget class="QPushButton" name="resettingSwitchButton_general">
                 <property name="enabled">
                  <bool>false</bool>
@@ -280,7 +260,7 @@
             <item>
              <widget class="QPushButton" name="updateEdgeButton_general">
               <property name="text">
-               <string>Add/Upd. edge</string>
+               <string>Update edge</string>
               </property>
               <property name="autoDefault">
                <bool>false</bool>
@@ -366,39 +346,33 @@
                <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
               </property>
               <item row="0" column="0">
-               <widget class="QLabel" name="label_10">
+               <widget class="QLabel" name="label_14">
                 <property name="text">
-                 <string>Tail</string>
+                 <string>Capacity</string>
                 </property>
                </widget>
               </item>
               <item row="0" column="1">
-               <widget class="QLineEdit" name="tailLineEdit_spillback"/>
+               <widget class="QLineEdit" name="capacityLineEdit_spillback"/>
               </item>
               <item row="1" column="0">
-               <widget class="QLabel" name="label_13">
+               <widget class="QLabel" name="label_19">
                 <property name="text">
-                 <string>Head</string>
+                 <string>Flow bound</string>
                 </property>
                </widget>
               </item>
               <item row="1" column="1">
-               <widget class="QLineEdit" name="headLineEdit_spillback"/>
-              </item>
-              <item row="2" column="1">
-               <widget class="QLineEdit" name="capacityLineEdit_spillback"/>
-              </item>
-              <item row="3" column="1">
                <widget class="QLineEdit" name="boundLineEdit_spillback"/>
               </item>
-              <item row="4" column="0">
+              <item row="2" column="0">
                <widget class="QLabel" name="label_15">
                 <property name="text">
                  <string>Resetting</string>
                 </property>
                </widget>
               </item>
-              <item row="4" column="1">
+              <item row="2" column="1">
                <widget class="QPushButton" name="resettingSwitchButton_spillback">
                 <property name="enabled">
                  <bool>false</bool>
@@ -408,26 +382,12 @@
                 </property>
                </widget>
               </item>
-              <item row="3" column="0">
-               <widget class="QLabel" name="label_19">
-                <property name="text">
-                 <string>Flow bound</string>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="0">
-               <widget class="QLabel" name="label_14">
-                <property name="text">
-                 <string>Capacity</string>
-                </property>
-               </widget>
-              </item>
              </layout>
             </item>
             <item>
              <widget class="QPushButton" name="updateEdgeButton_spillback">
               <property name="text">
-               <string>Add/Upd. edge</string>
+               <string>Update edge</string>
               </property>
               <property name="autoDefault">
                <bool>false</bool>
@@ -758,7 +718,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1043</width>
+     <width>885</width>
      <height>22</height>
     </rect>
    </property>
@@ -826,8 +786,6 @@
  </widget>
  <tabstops>
   <tabstop>tabWidget</tabstop>
-  <tabstop>tailLineEdit_general</tabstop>
-  <tabstop>headLineEdit_general</tabstop>
   <tabstop>capacityLineEdit_general</tabstop>
   <tabstop>resettingSwitchButton_general</tabstop>
   <tabstop>updateEdgeButton_general</tabstop>

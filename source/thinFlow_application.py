@@ -19,13 +19,13 @@ from tempfile import gettempdir
 import subprocess
 import threading
 
-from plotCanvasClass import PlotCanvas
-from plotNTFCanvasClass import PlotNTFCanvas
-from ui import thinFlow_mainWdw
-from utilitiesClass import Utilities
-from application import Interface as app_Interface
-from flowIntervalClass import FlowInterval
-from flowIntervalClass_spillback import FlowInterval_spillback
+from source.plotCanvasClass import PlotCanvas
+from source.plotNTFCanvasClass import PlotNTFCanvas
+from source.ui import thinFlow_mainWdw
+from source.utilitiesClass import Utilities
+from source.application import Interface as app_Interface
+from source.flowIntervalClass import FlowInterval
+from source.flowIntervalClass_spillback import FlowInterval_spillback
 
 # =======================================================================================================================
 filterwarnings('ignore')  # For the moment: ignore warnings as pyplot.hold is deprecated
@@ -81,8 +81,6 @@ class Interface(QtWidgets.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
             self.gttr('resettingSwitchButton', tfType).clicked.connect(self.change_resetting)
 
             # Keyboard shortcuts
-            self.gttr('tailLineEdit', tfType).returnPressed.connect(self.update_add_edge)
-            self.gttr('headLineEdit', tfType).returnPressed.connect(self.update_add_edge)
             self.gttr('capacityLineEdit', tfType).returnPressed.connect(self.update_add_edge)
             self.gttr('nodeNameLineEdit', tfType).returnPressed.connect(self.update_node)
             self.gttr('nodeXLineEdit', tfType).returnPressed.connect(self.update_node)
@@ -330,8 +328,6 @@ class Interface(QtWidgets.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
         """Update display of the properties of the currently focussed edge focusEdge, if existing"""
         edge = self.gttr('graphCreationCanvas').focusEdge
         if edge is not None:
-            self.gttr('tailLineEdit').setText(self.gttr('network').node[edge[0]]['label'])
-            self.gttr('headLineEdit').setText(self.gttr('network').node[edge[1]]['label'])
             self.gttr('capacityLineEdit').setText(
                 str(self.gttr('network')[edge[0]][edge[1]]['outCapacity']))
 
@@ -339,8 +335,6 @@ class Interface(QtWidgets.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
                 self.boundLineEdit_spillback.setText(str(self.gttr('network')[edge[0]][edge[1]]['TFC']['inflowBound']))
 
         else:
-            self.gttr('tailLineEdit').setText("")
-            self.gttr('headLineEdit').setText("")
             self.gttr('capacityLineEdit').setText("")
 
             if self.currentTF == 'spillback':
@@ -351,18 +345,15 @@ class Interface(QtWidgets.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
         self.adjust_resettingSwitchButton(edge)
 
     def update_add_edge(self):
-        """Add an edge or update attributes of focusNode, if existing"""
+        """Update attributes of focusEdge, if existing"""
         if self.gttr('graphCreationCanvas').focusEdge is None:
             return
-        tailLabel = str(self.gttr('tailLineEdit').text())
-        headLabel = str(self.gttr('headLineEdit').text())
+        focusEdge = self.gttr('graphCreationCanvas').focusEdge
         capacityText = float(self.gttr('capacityLineEdit').text())
         boundText = float(self.boundLineEdit_spillback.text()) if self.currentTF == 'spillback' else None
 
-        # Work with actual node IDs, not labels
-        labels = nx.get_node_attributes(self.gttr('network'), 'label')
-        tail = list(labels.keys())[list(labels.values()).index(tailLabel)]
-        head = list(labels.keys())[list(labels.values()).index(headLabel)]
+        tail = str(focusEdge[0])
+        head = str(focusEdge[1])
 
         if capacityText <= 0:
             # This is not allowed

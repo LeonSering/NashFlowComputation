@@ -383,7 +383,7 @@ class Interface(QtWidgets.QMainWindow, mainWdw.Ui_MainWindow):
         self.setFocus()  # Focus has to leave LineEdits
 
     def update_add_edge(self):
-        """Add an edge or update attributes of focusNode, if existing"""
+        """Add an edge or update attributes of focusEdge, if existing"""
         if self.gttr('graphCreationCanvas').focusEdge is None:
             return
         focusEdge = self.gttr('graphCreationCanvas').focusEdge
