@@ -225,29 +225,34 @@ class Interface(QtWidgets.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
         self.configFile.set('Settings', 'templatefile', '0')
         self.configFile.set('Settings', 'scippath', '')
         self.configFile.set('Settings', 'cleanup', 'True')
+        self.configFile.set('Settings', 'intervals', '-1')
         self.configFile.set('Settings', 'defaultloadsavedir', '')
         self.configFile.set('Settings', 'timeoutactivated', 'True')
+        self.configFile.set('Settings', 'timeoutTime', '300')
 
         try:
-            self.configFile.read('thinFlow_config.cfg')
-
+            cfgLocation = os.path.join(os.pardir, 'config.cfg')
+            self.configFile.read(cfgLocation)
             self.outputDirectory = self.configFile.get('Settings', 'outputdir')
-            self.outputDirectoryLineEdit.setText(self.outputDirectory)
             self.templateFile = int(self.configFile.get('Settings', 'templatefile'))
-            self.templateComboBox.setCurrentIndex(self.templateFile)
             self.scipFile = self.configFile.get('Settings', 'scippath')
-            self.scipPathLineEdit.setText(self.scipFile)
-
             self.cleanUpEnabled = (self.configFile.get('Settings', 'cleanup') == 'True')
-            self.cleanUpCheckBox.setChecked(self.cleanUpEnabled)
-
             self.defaultLoadSaveDir = self.configFile.get('Settings', 'defaultloadsavedir')
-
             self.timeoutActivated = (self.configFile.get('Settings', 'timeoutactivated') == 'True')
+            timeoutTime = self.configFile.get('Settings', 'timeoutTime')
+
+            self.outputDirectoryLineEdit.setText(self.outputDirectory)
+            self.templateComboBox.setCurrentIndex(self.templateFile)
+            self.scipPathLineEdit.setText(self.scipFile)
+            self.cleanUpCheckBox.setChecked(self.cleanUpEnabled)
             self.activateTimeoutCheckBox.setChecked(self.timeoutActivated)
+            self.timeoutLineEdit.setText(timeoutTime)
             self.change_timeout_state()
 
+            # Load this in the end as this could fail, uses variable which is not part of TFC
+            self.numberOfIntervals = self.configFile.get('Settings', 'intervals')
         except Exception:
+            self.numberOfIntervals = -1
             return
 
     def change_timeout_state(self):
@@ -435,8 +440,12 @@ class Interface(QtWidgets.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
         self.configFile.set('Settings', 'cleanup', self.cleanUpEnabled)
         self.configFile.set('Settings', 'defaultloadsavedir', self.defaultLoadSaveDir)
         self.configFile.set('Settings', 'timeoutactivated', self.timeoutActivated)
+        timeoutTime = str(self.timeoutLineEdit.text())
+        self.configFile.set('Settings', 'timeoutTime', timeoutTime)
+        self.configFile.set('Settings', 'intervals', str(self.numberOfIntervals))
 
-        with open('thinFlow_config.cfg', 'w') as configfile:
+        cfgLocation = os.path.join(os.pardir, 'config.cfg')
+        with open(cfgLocation, 'w') as configfile:
             self.configFile.write(configfile)
 
     def change_cleanup_state(self):
@@ -711,9 +720,7 @@ class Interface(QtWidgets.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
 
     def compute_NTF(self):
         """Computes NTF in current tab"""
-
         network = self.gttr('network')
-
         # Validate input
         returnCode = self.validate_thinflow_input(network)
         if returnCode != 0:
@@ -733,13 +740,17 @@ class Interface(QtWidgets.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
         minCapacity = Utilities.compute_min_attr_of_network(network)
         counter = "Standalone"
         rootPath = self.outputDirectory
+        self.templateFile = self.templateComboBox.currentIndex()  # TODO: Does not work if different algorithm set? (Copied from application)
 
         if self.currentTF == 'general':
             templateFile = os.path.join(os.getcwd(), 'templates',
                                         'algorithm_' + str(self.templateFile + 1) + '.zpl')
         elif self.currentTF == 'spillback':
+            # TODO: At the moment only one script available
+            #templateFile = os.path.join(os.getcwd(), 'templates',
+            #                            'algorithm_spillback_' + str(self.templateFile + 1) + '.zpl')
             templateFile = os.path.join(os.getcwd(), 'templates',
-                                        'algorithm_spillback_' + str(self.templateFile + 1) + '.zpl')
+                                        'algorithm_spillback_1.zpl')
         scipFile = self.scipFile
         timeout = float(self.timeoutLineEdit.text())
 
@@ -767,9 +778,10 @@ class Interface(QtWidgets.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
         # Set shortest path network manually to entire graph (is the deepcopy really needed?)
         interval = self.gttr('interval')
         interval.shortestPathNetwork = deepcopy(network)
-        self.interval_spillback.transfer_inflowBound(interval.shortestPathNetwork)
+        if self.currentTF == 'spillback':
+            interval.transfer_inflowBound(interval.shortestPathNetwork)
 
-        self.advancedAlgo = (templateFile == 2)  # If true, then advanced backtracking with preprocessing is performed
+        self.advancedAlgo = (self.templateFile == 2)  # If true, then advanced backtracking with preprocessing is performed
 
         if self.currentTF == 'general':
             if self.advancedAlgo:
