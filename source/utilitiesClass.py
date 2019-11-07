@@ -5,16 +5,15 @@
 # Description:  Class containing utility functions
 # ===========================================================================
 
-import matplotlib
+import bisect
 import os
 import time
+
+import matplotlib
+import networkx as nx
+import numpy as np
 from matplotlib.collections import PatchCollection
 from matplotlib.patches import Rectangle, Circle
-
-import networkx as nx
-
-import numpy as np
-import bisect
 
 # ======================================================================================================================
 

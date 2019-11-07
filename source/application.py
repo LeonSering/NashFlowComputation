@@ -5,27 +5,28 @@
 # Description:  Interface class; controlling signals/slots & communication between widgets
 # ===========================================================================
 
-from PyQt5 import QtGui, QtCore, QtWidgets
 import configparser
 import os
 import pickle
+import subprocess
+import sys
 import threading
 import time
-import networkx as nx
 import warnings
-import subprocess
 from tempfile import gettempdir
-import sys
 
-from source.nashFlowClass import NashFlow
-from source.nashFlowClass_spillback import NashFlow_spillback
-from source.plotAnimationCanvasClass import PlotAnimationCanvas
-from source.plotCanvasClass import PlotCanvas
-from source.plotNTFCanvasClass import PlotNTFCanvas
-from source.plotValuesCanvasClass import PlotValuesCanvas
-from source.plotQueueCanvasClass import PlotQueueCanvas
-from source.ui import mainWdw
-from source.utilitiesClass import Utilities
+import networkx as nx
+from PyQt5 import QtGui, QtCore, QtWidgets
+
+from .nashFlowClass import NashFlow
+from .nashFlowClass_spillback import NashFlow_spillback
+from .plotAnimationCanvasClass import PlotAnimationCanvas
+from .plotCanvasClass import PlotCanvas
+from .plotNTFCanvasClass import PlotNTFCanvas
+from .plotQueueCanvasClass import PlotQueueCanvas
+from .plotValuesCanvasClass import PlotValuesCanvas
+from .ui import mainWdw
+from .utilitiesClass import Utilities
 
 # =======================================================================================================================
 warnings.filterwarnings('ignore')  # Suppress GTK-Warnings
@@ -404,6 +405,7 @@ class Interface(QtWidgets.QMainWindow, mainWdw.Ui_MainWindow):
                 return
             elif tail == 's' and storageText != float('inf'):
                 # This has to be satisfied
+                # TODO: raise messagebox or warning? for all other such situations as well
                 return
             if storageText <= transitText * inCapacityText:
                 # This is not allowed and is corrected automatically
@@ -480,6 +482,8 @@ class Interface(QtWidgets.QMainWindow, mainWdw.Ui_MainWindow):
 
         self.re_init_node_list()
         self.re_init_edge_list()
+
+        #self.gttr('graphCreationCanvas').correct_edge_label_transangle()
 
     def re_init_nashflow_app(self):
         """Clears the nashflow tab for new nashflow computation"""
@@ -1375,3 +1379,5 @@ class Interface(QtWidgets.QMainWindow, mainWdw.Ui_MainWindow):
         }
 
         return errorDescription[errorCode]
+
+

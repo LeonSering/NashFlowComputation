@@ -9,7 +9,8 @@ import os
 import re
 import subprocess
 from shutil import copy
-from source.utilitiesClass import Utilities
+
+from .utilitiesClass import Utilities
 
 PRINT_TO_CONSOLE = False
 

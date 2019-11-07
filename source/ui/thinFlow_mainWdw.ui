@@ -44,10 +44,7 @@
             </sizepolicy>
            </property>
            <property name="styleSheet">
-            <string notr="true">QGroupBox { 
-     border: 2px solid rgb(0, 0, 127); 
-     border-radius: 1px; 
- } </string>
+            <string notr="true"/>
            </property>
            <property name="title">
             <string>Node</string>

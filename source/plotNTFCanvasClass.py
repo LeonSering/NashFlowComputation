@@ -6,11 +6,11 @@
 # ===========================================================================
 
 import matplotlib.figure
-
 import networkx as nx
 
-from source.plotCanvasClass import PlotCanvas
-from source.utilitiesClass import Utilities
+from .plotCanvasClass import PlotCanvas
+from .utilitiesClass import Utilities
+
 
 # ======================================================================================================================
 

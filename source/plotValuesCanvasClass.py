@@ -6,10 +6,10 @@
 # ===========================================================================
 
 import matplotlib
-from matplotlib import figure, widgets
-from source.utilitiesClass import Utilities
-
+from matplotlib import figure
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+
+from .utilitiesClass import Utilities
 
 
 # ======================================================================================================================

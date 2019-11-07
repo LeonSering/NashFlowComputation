@@ -8,7 +8,7 @@
 if __name__ == '__main__':
     import os
     import sys
-    import thinFlow_application as application
+    import source.thinFlow_application as application
 
     cwd = os.getcwd()
     if os.path.basename(cwd) != 'source':

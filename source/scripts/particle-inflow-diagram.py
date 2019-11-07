@@ -4,14 +4,11 @@
 # File:        diagram.py
 # Description: Skript to create a inflo-time-diagram
 # =========================================================================
-import os
 import pickle
-import networkx as nx
 import matplotlib.pyplot as plt
 from matplotlib import collections  as mc
 import numpy as np
 from source.nashFlowClass import NashFlow
-from source.flowIntervalClass import FlowInterval
 import time
 
 # PARAMETERS

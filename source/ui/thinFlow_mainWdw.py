@@ -36,10 +36,7 @@ class Ui_MainWindow(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.groupBox_3.sizePolicy().hasHeightForWidth())
         self.groupBox_3.setSizePolicy(sizePolicy)
-        self.groupBox_3.setStyleSheet("QGroupBox { \n"
-"     border: 2px solid rgb(0, 0, 127); \n"
-"     border-radius: 1px; \n"
-" } ")
+        self.groupBox_3.setStyleSheet("")
         self.groupBox_3.setObjectName("groupBox_3")
         self.gridLayout_4 = QtWidgets.QGridLayout(self.groupBox_3)
         self.gridLayout_4.setObjectName("gridLayout_4")

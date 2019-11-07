@@ -5,12 +5,13 @@
 # Description:  Class NashFlow maintains list of FlowInterval instances; coordinates computation of dynamic equilibrium
 # ===========================================================================
 
-from collections import OrderedDict
-from shutil import rmtree
 import os
 import time
-from source.flowIntervalClass import FlowInterval
-from source.utilitiesClass import Utilities
+from collections import OrderedDict
+from shutil import rmtree
+
+from .flowIntervalClass import FlowInterval
+from .utilitiesClass import Utilities
 
 # ======================================================================================================================
 

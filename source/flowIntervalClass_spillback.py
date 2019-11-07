@@ -5,10 +5,11 @@
 # Description:  FlowInterval class managing one alpha-extension for Spillback Flows
 # ===========================================================================
 
-from source.flowIntervalClass import FlowInterval
-from source.normalizedThinFlowClass_spillback import NormalizedThinFlow_spillback
-from source.utilitiesClass import Utilities
 from itertools import combinations
+
+from .flowIntervalClass import FlowInterval
+from .normalizedThinFlowClass_spillback import NormalizedThinFlow_spillback
+from .utilitiesClass import Utilities
 
 # =======================================================================================================================
 

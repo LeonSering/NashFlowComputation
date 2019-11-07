@@ -5,18 +5,17 @@
 # Description:  Class to extend plotCanvas in order to visualize animation
 # ===========================================================================
 
-from source.plotCanvasClass import PlotCanvas
-from networkx import draw_networkx_labels, get_node_attributes
-from source.utilitiesClass import Utilities
 from bisect import insort
-import os
-from tempfile import gettempdir
+
 import numpy as np
-import matplotlib
-from matplotlib.patches import Rectangle
+from matplotlib.animation import FFMpegFileWriter
 from matplotlib.collections import PatchCollection, LineCollection
 from matplotlib.colors import colorConverter
-from matplotlib.animation import FFMpegFileWriter
+from networkx import draw_networkx_labels, get_node_attributes
+
+from .plotCanvasClass import PlotCanvas
+from .utilitiesClass import Utilities
+
 
 # ======================================================================================================================
 

@@ -6,26 +6,27 @@
 # ===========================================================================
 
 
-from PyQt5 import QtGui, QtCore, QtWidgets
 import configparser
 import os
 import pickle
-import sys
-from shutil import rmtree
-from copy import deepcopy
-import networkx as nx
-from warnings import filterwarnings
-from tempfile import gettempdir
 import subprocess
+import sys
 import threading
+from copy import deepcopy
+from shutil import rmtree
+from tempfile import gettempdir
+from warnings import filterwarnings
 
-from source.plotCanvasClass import PlotCanvas
-from source.plotNTFCanvasClass import PlotNTFCanvas
-from source.ui import thinFlow_mainWdw
-from source.utilitiesClass import Utilities
-from source.application import Interface as app_Interface
-from source.flowIntervalClass import FlowInterval
-from source.flowIntervalClass_spillback import FlowInterval_spillback
+import networkx as nx
+from PyQt5 import QtGui, QtCore, QtWidgets
+
+from .application import Interface as app_Interface
+from .flowIntervalClass import FlowInterval
+from .flowIntervalClass_spillback import FlowInterval_spillback
+from .plotCanvasClass import PlotCanvas
+from .plotNTFCanvasClass import PlotNTFCanvas
+from .ui import thinFlow_mainWdw
+from .utilitiesClass import Utilities
 
 # =======================================================================================================================
 filterwarnings('ignore')  # For the moment: ignore warnings as pyplot.hold is deprecated

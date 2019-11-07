@@ -4,16 +4,16 @@
 # File:         flowIntervalClass.py
 # Description:  FlowInterval class managing one alpha-extension
 # ===========================================================================
-from itertools import combinations
-from collections import deque
 import os
-import threading
-import time
 import signal
 import subprocess
+import threading
+import time
+from collections import deque
+from itertools import combinations
 
-from source.normalizedThinFlowClass import NormalizedThinFlow
-from source.utilitiesClass import Utilities
+from .normalizedThinFlowClass import NormalizedThinFlow
+from .utilitiesClass import Utilities
 
 # =======================================================================================================================
 
