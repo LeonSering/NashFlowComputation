@@ -29,6 +29,8 @@ class PlotNTFCanvas(PlotCanvas):
                 # We just have a flowInterval instance
                 flowIntervalInstance = interface.gttr('interval')
             self.NTFNodeSpillbackFactorDict = flowIntervalInstance.NTFNodeSpillbackFactorDict if self.tfType == 'spillback' else None
+            self.NTFEdgeInflowBoundDict = nx.get_edge_attributes(flowIntervalInstance.shortestPathNetwork, 'inflowBound')\
+                if self.tfType == 'spillback' else None
             self.showSpillBackFactor = (self.tfType == 'spillback')
             self.NTFNodeLabelDict = flowIntervalInstance.NTFNodeLabelDict
             self.NTFEdgeFlowDict = flowIntervalInstance.NTFEdgeFlowDict
@@ -67,11 +69,24 @@ class PlotNTFCanvas(PlotCanvas):
         """Returns edge labels"""
         labelDict = {}
         for edge in self.network.edges():
+            labelList = []
+            # Add inflow bound b^+_e
+            if self.showSpillBackFactor:
+                if self.NTFEdgeInflowBoundDict[edge] < float('inf'):
+                    if self.NTFEdgeInflowBoundDict[edge] != int(self.NTFEdgeInflowBoundDict[edge]):
+                        inflowBoundVal = float("{0:.2f}".format(self.NTFEdgeInflowBoundDict[edge]))
+                    else:
+                        inflowBoundVal = int(self.NTFEdgeInflowBoundDict[edge])
+                    labelList.append(inflowBoundVal)
+
+            # Add flow value x'_e
             if self.NTFEdgeFlowDict[edge] != int(self.NTFEdgeFlowDict[edge]):
-                val = "{0:.2f}".format(self.NTFEdgeFlowDict[edge])
+                flowVal = float("{0:.2f}".format(self.NTFEdgeFlowDict[edge]))
             else:
-                val = str(int(self.NTFEdgeFlowDict[edge]))
-            labelDict[edge] = val
+                flowVal = int(self.NTFEdgeFlowDict[edge])
+            labelList.append(flowVal)
+
+            labelDict[edge] = tuple(labelList) if len(labelList) > 1 else labelList[0]
         return labelDict
 
     def on_click(self, event):

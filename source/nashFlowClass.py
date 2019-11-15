@@ -241,7 +241,7 @@ class NashFlow:
         :param v: tail of edge
         :param w: head of edge
         :param t: time
-        :return: f_(v,w)^-(t), i.e. outflow rate of e=(v,w) at time t (picking the newest value
+        :return: f_(v,w)^-(t), i.e. outflow rate of e=(v,w) at time t (picking the newest value)
         """
         if Utilities.is_eq_tol(t, 0):
             return 0
