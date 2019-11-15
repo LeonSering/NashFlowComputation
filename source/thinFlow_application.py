@@ -579,9 +579,9 @@ class Interface(QtWidgets.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
             return
 
         # Change activeEnabled Boolean
-        self.gttr('network')[edge[0]][edge[1]]['TFC']['active'] = not self.gttr('network')[edge[0]][edge[1]]['TFC']['active']
+        v, w = edge
+        self.gttr('network')[v][w]['TFC']['active'] = not self.gttr('network')[v][w]['TFC']['active']
         self.adjust_activeSwitchButton(edge)  # Change button accordingly
-
         # Update display
         self.gttr('graphCreationCanvas').update_edges(color=True)
 
