@@ -195,14 +195,17 @@ class PlotCanvas(FigureCanvas):
                     # Add the corresponding edge, if valid
                     if not self.network.has_edge(self.selectedNode, clickedNode):
                         resettingEnabledBool = False if self.onlyNTF else None  # Either 0 or 1. Activated only if onlyNTF
+                        activeEnabledBool = True if self.onlyNTF else None  # Either 0 or 1. Activated only if onlyNTF
                         if self.type == 'general':
                             self.network.add_edge(self.selectedNode, clickedNode, transitTime=1,
                                                   inCapacity=float('inf'), outCapacity=1, storage=float('inf'),
-                                                  TFC={'resettingEnabled':resettingEnabledBool})
+                                                  TFC={'resettingEnabled':resettingEnabledBool,
+                                                       'active':activeEnabledBool})
                         elif self.type == 'spillback':
                             self.network.add_edge(self.selectedNode, clickedNode, transitTime=1,
                                                   inCapacity=float('inf'), outCapacity=1, storage=float('inf'),
-                                                  TFC={'resettingEnabled':resettingEnabledBool, 'inflowBound':1})
+                                                  TFC={'resettingEnabled':resettingEnabledBool, 'inflowBound':1,
+                                                       'active':activeEnabledBool})
 
                         self.focusEdge = (self.selectedNode, clickedNode)
                         self.focusNode = None
@@ -344,6 +347,8 @@ class PlotCanvas(FigureCanvas):
             return "b"  # Blue
         elif self.onlyNTF:
             # Color resetting edges (those that have been selected by the user to be as such) differently
+            if not self.network[v][w]['TFC']['active']:
+                return 'gray'
             if self.network[v][w]['TFC']['resettingEnabled']:
                 return 'r'  # Red
         return 'black'  # Don't color resetting edges, thus edge should be black

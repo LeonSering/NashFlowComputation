@@ -80,6 +80,7 @@ class Interface(QtWidgets.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
             self.gttr('edgeSelectionListWidget', tfType).clicked.connect(self.update_focus_edge)
             self.gttr('computeThinFlowPushButton', tfType).clicked.connect(self.compute_NTF)
             self.gttr('resettingSwitchButton', tfType).clicked.connect(self.change_resetting)
+            self.gttr('activeSwitchButton', tfType).clicked.connect(self.change_active)
 
             # Keyboard shortcuts
             self.gttr('capacityLineEdit', tfType).returnPressed.connect(self.update_add_edge)
@@ -349,6 +350,7 @@ class Interface(QtWidgets.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
         self.setFocus()  # Focus has to leave LineEdits
 
         self.adjust_resettingSwitchButton(edge)
+        self.adjust_activeSwitchButton(edge)
 
     def update_add_edge(self):
         """Update attributes of focusEdge, if existing"""
@@ -466,6 +468,7 @@ class Interface(QtWidgets.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
         self.update_edge_display()
 
         self.adjust_resettingSwitchButton(None)
+        self.adjust_activeSwitchButton(None)
 
     def update_focus_edge(self):
         """Select new focusEdge"""
@@ -480,6 +483,7 @@ class Interface(QtWidgets.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
         self.update_edge_display()
 
         self.adjust_resettingSwitchButton(edge)
+        self.adjust_activeSwitchButton(edge)
 
     def adjust_resettingSwitchButton(self, edge):
         """Adjustment of resettingSwitchButton in GUI"""
@@ -493,6 +497,19 @@ class Interface(QtWidgets.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
             resettingSwitchButtonLabel = "On" if resettingStatusBool else "Off"
             self.gttr('resettingSwitchButton').setText(resettingSwitchButtonLabel)
             self.gttr('resettingSwitchButton').setEnabled(True)
+
+    def adjust_activeSwitchButton(self, edge):
+        """Adjustment of activeSwitchButton in GUI"""
+        if edge is None:
+            # Turn button off
+            self.gttr('activeSwitchButton').setText("On")
+            self.gttr('activeSwitchButton').setEnabled(False)
+        else:
+            # Turn button on, adjust Label accordingly
+            activeStatusBool = self.gttr('network')[edge[0]][edge[1]]['TFC']['active']
+            activeSwitchButtonLabel = "On" if activeStatusBool else "Off"
+            self.gttr('activeSwitchButton').setText(activeSwitchButtonLabel)
+            self.gttr('activeSwitchButton').setEnabled(True)
 
     def re_init_NTF_frame(self, newThinFlow=False):
         """Reinits the NTF frame"""
@@ -555,6 +572,19 @@ class Interface(QtWidgets.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
         # Update display
         self.gttr('graphCreationCanvas').update_edges(color=True)
 
+    def change_active(self):
+        """Changes the activeEnabled status of an edge"""
+        edge = self.gttr('graphCreationCanvas').focusEdge
+        if edge is None:
+            return
+
+        # Change activeEnabled Boolean
+        self.gttr('network')[edge[0]][edge[1]]['TFC']['active'] = not self.gttr('network')[edge[0]][edge[1]]['TFC']['active']
+        self.adjust_activeSwitchButton(edge)  # Change button accordingly
+
+        # Update display
+        self.gttr('graphCreationCanvas').update_edges(color=True)
+
     def change_no_flow_show_state(self):
         """Show/Hide edges without flow in each NTF Plot"""
         for tfType in self.tfTypeList:
@@ -590,13 +620,14 @@ class Interface(QtWidgets.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
         with open(fopen, 'rb') as f:
             network = pickle.load(f)
 
-        # Make sure that each edge has the property 'resettingEnabled'
+        # Make sure that each edge has the property 'resettingEnabled' and 'active
         for edge in network.edges():
             v, w = edge
             try:
-                property = network[v][w]['TFC']
+                propertyResetting = network[v][w]['TFC']
             except KeyError:
                 network[v][w]['TFC']['resettingEnabled'] = None
+                network[v][w]['TFC']['active'] = None
 
         if not graphPath:
             self.defaultLoadSaveDir = os.path.dirname(fopen)
