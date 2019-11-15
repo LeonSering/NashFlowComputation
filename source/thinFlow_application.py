@@ -672,7 +672,7 @@ class Interface(QtWidgets.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
         """
         Save graph instance to '.cg' file
         :param graphPath: If given, then save graph at path graphPath. Else a dialog is opened
-        :return: 
+        :return:
         """
         self.gttr('network').graph['inflowRate'] = float(self.inflowLineEdit.text())
 
@@ -723,7 +723,7 @@ class Interface(QtWidgets.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
         """
         Opens NashFlowComputation Tool
         :param moveGraph: network that should be moved, None if not specified
-        :return: 
+        :return:
         """
 
         if not moveGraph:
@@ -752,7 +752,12 @@ class Interface(QtWidgets.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
 
     def compute_NTF(self):
         """Computes NTF in current tab"""
-        network = self.gttr('network')
+        originalNetwork = self.gttr('network')
+        network = deepcopy(originalNetwork)
+        # Remove inactive edges from network
+        inactiveEdges = [edge for edge in originalNetwork.edges() if not originalNetwork[edge[0]][edge[1]]['TFC']['active']]
+        network.remove_edges_from(inactiveEdges)
+
         # Validate input
         returnCode = self.validate_thinflow_input(network)
         if returnCode != 0:
@@ -875,6 +880,11 @@ class Interface(QtWidgets.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
             except KeyError:
                 pass
 
+        descendantSet = nx.algorithms.descendants(network, 's')
+        if 't' not in descendantSet:
+            # 't' not reachable from 's'
+            return 7
+
         return 0
 
     @staticmethod
@@ -885,7 +895,8 @@ class Interface(QtWidgets.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
             3: "All nodes have to be reachable from 's'.",
             4: "Edge capacities and inflow bounds have to be positive.",
             5: "Network contains a cycle.",
-            6: "Inflow bounds of all outgoing edges from sink 's' have to be greater-or-equal than network inflow-rate."
+            6: "Inflow bounds of all outgoing edges from sink 's' have to be greater-or-equal than network inflow-rate.",
+            7: "The sink 't' must be reachable from 's'."
         }
 
         return errorDescription[errorCode]
