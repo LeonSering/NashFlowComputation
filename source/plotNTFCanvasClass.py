@@ -36,6 +36,7 @@ class PlotNTFCanvas(PlotCanvas):
             self.NTFEdgeFlowDict = flowIntervalInstance.NTFEdgeFlowDict
 
             self.resettingEdges = flowIntervalInstance.resettingEdges
+            self.fullEdges = flowIntervalInstance.fullEdges if self.tfType == 'spillback' else []
 
         PlotCanvas.__init__(self, graph, interface, stretchFactor=stretchFactor)  # Call parents constructor
         self.network = self.network.copy()  # Copy network to avoid modifying it in other Canvas when deleting/adding zero flow edges
@@ -163,24 +164,10 @@ class PlotNTFCanvas(PlotCanvas):
         :param w: head node
         :return: Color string (e.g. 'b', 'black', 'red' et cetera)
         """
-        resettingFlag = False
-        fullFlag = False
-        '''
-        if (v, w) in self.resettingEdges:
-            # Resetting edge
-            resettingFlag = True
-        if Utilities.is_geq_tol(self.NTFEdgeFlowDict[(v,w)], self.network[v][w]['capacity']):
-            fullFlag = True
-        if resettingFlag and fullFlag:
-            # Mix colors -> orange
-            return '#FF8000'
-        elif resettingFlag:
+        if (v, w) in self.fullEdges:
             return 'red'
-        elif fullFlag:
-            return '#FFFF00'   # Yellow
-        '''
-        if (v, w) in self.resettingEdges:
-            return 'red'
+        elif (v, w) in self.resettingEdges:
+            return 'blue'
         return 'black'  # Edge should be black if neither resetting nor full
 
     def get_viewpoint(self):
