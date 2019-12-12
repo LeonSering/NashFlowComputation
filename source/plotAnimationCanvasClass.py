@@ -418,7 +418,7 @@ class PlotAnimationCanvas(PlotCanvas):
                    **kwds):
         """Workaround to call specific edge drawing function"""
 
-        edges, boxes, tubes = Utilities.draw_animation_edges(G, pos,
+        edges, boxes, tubes, arrows = Utilities.draw_animation_edges(G, pos,
                    edgelist,
                    width,
                    edge_color,
@@ -432,7 +432,7 @@ class PlotAnimationCanvas(PlotCanvas):
                    label)
 
         self.tube_collection = tubes
-        return edges, boxes
+        return edges, boxes, arrows
 
     def zoom(self, factor=None):
         """Zoom by a factor"""

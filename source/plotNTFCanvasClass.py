@@ -38,7 +38,7 @@ class PlotNTFCanvas(PlotCanvas):
             self.resettingEdges = flowIntervalInstance.resettingEdges
             self.fullEdges = flowIntervalInstance.fullEdges if self.tfType == 'spillback' else []
 
-        PlotCanvas.__init__(self, graph, interface, stretchFactor=stretchFactor)  # Call parents constructor
+        PlotCanvas.__init__(self, graph, interface, stretchFactor=stretchFactor, showArrows=False)  # Call parents constructor
         self.network = self.network.copy()  # Copy network to avoid modifying it in other Canvas when deleting/adding zero flow edges
         self.originalNetwork = self.network.copy()
         if not showNoFlowEdges:

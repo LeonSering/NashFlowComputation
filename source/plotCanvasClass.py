@@ -26,7 +26,7 @@ SIMILARITY_DIST = 9  # Maximal distance at which a click is recognized as a clic
 class PlotCanvas(FigureCanvas):
     """Class to plot networkx graphs in widgets and control click events"""
 
-    def __init__(self, graph, interface, stretchFactor=1.57, onlyNTF=False, type='general'):
+    def __init__(self, graph, interface, stretchFactor=1.57, onlyNTF=False, type='general', showArrows=True):
         self.figure = matplotlib.figure.Figure()
         super(PlotCanvas, self).__init__(self.figure)  # Call parents constructor
         self.figure.patch.set_facecolor('lightgrey')
@@ -34,6 +34,7 @@ class PlotCanvas(FigureCanvas):
         self.interface = interface
         self.onlyNTF = onlyNTF  # If this is true, then PlotCanvas belongs to Thinflow Computation App
         self.type = type  # 'general' or 'spillback'
+        self.showArrows = showArrows
 
         # Visualization Settings
         sqSize = 120
@@ -384,14 +385,15 @@ class PlotCanvas(FigureCanvas):
                                                         font_size=nodeLabelSize)
 
         # Plot Edges
-        self.edgeCollections, self.boxCollections = [], []
+        self.edgeCollections, self.boxCollections, self.arrowCollections = [], [], []
         edgeColorList = [self.edgeColor(v, w) for v, w in self.network.edges()]
         if edgeColorList:
-            edgeCollection, boxCollection = self.draw_edges(self.network, pos=positions, ax=self.axes,
+            edgeCollection, boxCollection, arrowCollection = self.draw_edges(self.network, pos=positions, ax=self.axes,
                                                             arrow=True,
                                                             edge_color=edgeColorList, width=self.edgeWidthSize)
             self.edgeCollections.append((list(self.network.edges()), edgeCollection))
             self.boxCollections.append((list(self.network.edges()), boxCollection))
+            self.arrowCollections.append((list(self.network.edges()), arrowCollection))
 
         additionalNodeLabels = self.get_additional_node_labels()
         if additionalNodeLabels:
@@ -504,16 +506,20 @@ class PlotCanvas(FigureCanvas):
                 missingEdges = [edge for edge in edges if edge not in self.network.edges()]
                 if missingEdges:
                     boxCollection = self.boxCollections[collectionIndex][1]
+                    arrowCollection = self.arrowCollections[collectionIndex][1]
                     edgeCollection.remove()
                     boxCollection.remove()
+                    arrowCollection.remove()
+
                     edges = [edge for edge in edges if edge not in missingEdges]
                     if edges:
                         positions = {v: self.network.node[v]['position'] for v in self.network.nodes()}
-                        newEdgeCollection, newBoxCollection = self.draw_edges(self.network, pos=positions,
+                        newEdgeCollection, newBoxCollection, newArrowCollection = self.draw_edges(self.network, pos=positions,
                                                                               ax=self.axes, arrow=True,
                                                                               edgelist=edges, width=self.edgeWidthSize)
                         self.edgeCollections[collectionIndex] = (edges, newEdgeCollection)
                         self.boxCollections[collectionIndex] = (edges, newBoxCollection)
+                        self.arrowCollections[collectionIndex] = (edges, newArrowCollection)
 
                     else:
                         toDeleteIndices.append(collectionIndex)
@@ -528,13 +534,14 @@ class PlotCanvas(FigureCanvas):
             for index in reversed(toDeleteIndices):
                 del self.edgeCollections[index]
                 del self.boxCollections[index]
+                del self.arrowCollections[index]
 
 
         elif added:
             # A node has been added (can we do better than plotting all nodes again)
             if self.focusEdge is not None:
                 v, w = self.focusEdge
-                edgeCollection, boxCollection = self.draw_edges(self.network,
+                edgeCollection, boxCollection, arrowCollection = self.draw_edges(self.network,
                                                                 pos={v: self.network.node[v]['position'],
                                                                      w: self.network.node[w]['position']},
                                                                 ax=self.axes, arrow=True,
@@ -543,6 +550,7 @@ class PlotCanvas(FigureCanvas):
 
                 self.edgeCollections.append(([self.focusEdge], edgeCollection))
                 self.boxCollections.append(([self.focusEdge], boxCollection))
+                self.arrowCollections.append(([self.focusEdge], arrowCollection))
                 edgeLabelSize = int(round(self.edgeLabelFontSize))
                 if not self.onlyNTF:
                     if self.type == 'general':
@@ -566,7 +574,7 @@ class PlotCanvas(FigureCanvas):
             for edges, edgeCollection in self.edgeCollections:
                 pos = nx.get_node_attributes(self.network, 'position')
 
-                p = 0.25
+                p = 0.3
                 edge_pos = []
                 for edge in edges:
                     src, dst = np.array(pos[edge[0]]), np.array(pos[edge[1]])
@@ -589,6 +597,16 @@ class PlotCanvas(FigureCanvas):
                 # boxCollection.set_label(label)
                 self.axes.add_collection(boxCollection)
                 self.boxCollections[collectionIndex] = (self.boxCollections[collectionIndex][0], boxCollection)
+
+                arrowCollection = self.arrowCollections[collectionIndex][1]
+                # Move boxes
+                arrowCollection.remove()
+                arrowCollection = Utilities.get_arrows_on_edges(edge_pos=box_pos)
+                arrowCollection.set_zorder(2)  # edges go behind nodes
+                # boxCollection.set_label(label)
+                self.axes.add_collection(arrowCollection)
+                self.arrowCollections[collectionIndex] = (self.arrowCollections[collectionIndex][0], arrowCollection)
+
                 collectionIndex += 1
 
         if color:
@@ -606,9 +624,10 @@ class PlotCanvas(FigureCanvas):
 
                     boxCollection = self.boxCollections[collectionIndex][1]
                     boxCollection.set_edgecolor(edgeColorList)
-
                     boxCollection.set_linewidth([boxSize(v, w) for v, w in edges])
-                    # edgeCollection.set_facecolors(edgeColorList)
+
+                    arrowCollection = self.arrowCollections[collectionIndex][1]
+                    arrowCollection.set_edgecolor(edgeColorList)
                 collectionIndex += 1
 
         # Update edge label texts and positions
@@ -728,6 +747,7 @@ class PlotCanvas(FigureCanvas):
                    **kwds):
         """Workaround to specify edge drawing function"""
 
+        arrows = self.showArrows
         return Utilities.draw_edges_with_boxes(G, pos,
                                                edgelist,
                                                width,

@@ -13,7 +13,7 @@ import matplotlib
 import networkx as nx
 import numpy as np
 from matplotlib.collections import PatchCollection
-from matplotlib.patches import Rectangle, Circle
+from matplotlib.patches import Rectangle, Circle, FancyArrowPatch
 
 # ======================================================================================================================
 
@@ -68,6 +68,11 @@ class Utilities:
     def is_greater_tol(a, b, tol=TOL):
         """Is 'a' greater than 'b' with tolerance"""
         return a - tol - b > 0
+
+    @staticmethod
+    def is_between_tol(a, x, b,tol=TOL):
+        """Returns true if a <= x <= b w.r.t tol"""
+        return (Utilities.is_leq_tol(a, x) and Utilities.is_leq_tol(x, b))
 
     @staticmethod
     def get_insertion_point_left(L, el):
@@ -296,13 +301,17 @@ class Utilities:
             else:
                 edge_collection.autoscale()
 
-        if G.is_directed() and arrows:
-            box_collection = Utilities.get_boxes(edge_colors=edge_colors, edge_pos=box_pos)
-            box_collection.set_zorder(1)  # edges go behind nodes
-            box_collection.set_label(label)
-            ax.add_collection(box_collection)
+        box_collection = Utilities.get_boxes(edge_colors=edge_colors, edge_pos=box_pos)
+        box_collection.set_zorder(1)  # edges go behind nodes
+        box_collection.set_label(label)
+        ax.add_collection(box_collection)
 
-        return edge_collection, box_collection
+        arrow_collection = Utilities.get_arrows_on_edges(edge_colors=edge_colors, edge_pos=box_pos)
+        arrow_collection.set_zorder(2)
+        if arrows:
+            ax.add_collection(arrow_collection)
+
+        return edge_collection, box_collection, arrow_collection
 
     '''Modified function networkx.draw_networkx_edges'''
 
@@ -424,7 +433,6 @@ class Utilities:
         tube_collection.set_zorder(1)  # edges go behind nodes
         tube_collection.set_label(label)
         ax.add_collection(tube_collection)
-
         # Note: there was a bug in mpl regarding the handling of alpha values for
         # each line in a LineCollection.  It was fixed in matplotlib in r7184 and
         # r7189 (June 6 2009).  We should then not set the alpha value globally,
@@ -443,15 +451,76 @@ class Utilities:
             else:
                 edge_collection.autoscale()
 
-        if G.is_directed() and arrows:
-            arrow_collection = Utilities.get_boxes(edge_colors=edge_colors, edge_pos=box_pos)
-            arrow_collection.set_zorder(1)  # edges go behind nodes
-            arrow_collection.set_label(label)
+
+        box_collection = Utilities.get_boxes(edge_colors=edge_colors, edge_pos=box_pos)
+        box_collection.set_zorder(1)  # edges go behind nodes
+        box_collection.set_label(label)
+        ax.add_collection(box_collection)
+
+        arrow_collection = Utilities.get_arrows_on_edges(edge_colors=edge_colors, edge_pos=box_pos)
+        arrow_collection.set_zorder(2)
+
+        if arrows:
+            # Visualize them only if wanted
             ax.add_collection(arrow_collection)
 
-        return edge_collection, arrow_collection, tube_collection
+        return edge_collection, box_collection, tube_collection, arrow_collection
 
     '''Modified function networkx.draw_networkx_edges'''
+
+    @staticmethod
+    def get_arrows_on_edges(edge_colors=None, edge_pos=None, width=1.0):
+        import matplotlib.pyplot as plt
+        import matplotlib.cbook as cb
+        from matplotlib.colors import colorConverter
+        ax = plt.gca()
+
+        if not cb.iterable(width):
+            lw = (width,)
+        else:
+            lw = width
+
+        if edge_colors is None:
+            edge_colors = tuple([colorConverter.to_rgba(c)
+                                 for c in 'k'])
+
+        arrows = []
+        arrow_colors = edge_colors
+        p = 0.3
+        for src, dst in edge_pos:
+            src = np.array(src)
+            dst = np.array(dst)
+            d = np.sqrt(np.sum(((dst - src) * p) ** 2))
+            s = dst - src
+            start = src
+
+            if d == 0:  # source and target at same position
+                continue
+            #angle = np.rad2deg(np.arctan2(s[1], s[0]))
+            #t = matplotlib.transforms.Affine2D().rotate_deg_around(start[0], start[1], angle)
+
+            end = start + p*s
+            arrow = FancyArrowPatch(start, end,
+                                    arrowstyle='simple',
+                                    shrinkA=2,
+                                    shrinkB=2,
+                                    mutation_scale=10,
+                                    linewidth=10,
+                                    connectionstyle=None,
+                                    zorder=1)  # arrows go behind nodes
+            arrows.append(arrow)
+
+            # ax.add_patch(rec)
+            # ax.plot([src[0], dst[0]], [src[1], dst[1]], lw=2, solid_capstyle="butt", zorder=0, color='r')
+
+        arrow_collection = PatchCollection(arrows,
+                                           linewidths=[ww for ww in lw],
+                                           edgecolors=arrow_colors,
+                                           facecolors='none',
+                                           antialiaseds=(1,),
+                                           transOffset=ax.transData, )
+
+        return arrow_collection
 
     @staticmethod
     def get_boxes(edge_colors=None, edge_pos=None, width=1.0):
@@ -470,7 +539,7 @@ class Utilities:
                                  for c in 'k'])
 
         rectangles = []
-        arrow_colors = edge_colors
+        box_colors = edge_colors
         # p = 0.25  # 1/4 of edge should be the box
         p = 1
         radius = 7
@@ -491,17 +560,15 @@ class Utilities:
             rec = Rectangle(box_location - delta, width=d, height=radius * 2,
                             transform=t)
             rectangles.append(rec)
-            # ax.add_patch(rec)
-            # ax.plot([src[0], dst[0]], [src[1], dst[1]], lw=2, solid_capstyle="butt", zorder=0, color='r')
 
-        arrow_collection = PatchCollection(rectangles,
+        box_collection = PatchCollection(rectangles,
                                            linewidths=[ww for ww in lw],
-                                           edgecolors=arrow_colors,
+                                           edgecolors=box_colors,
                                            facecolors='none',
                                            antialiaseds=(1,),
                                            transOffset=ax.transData, )
         # alpha=0.5)
-        return arrow_collection
+        return box_collection
 
     '''Modified function networkx.draw_networkx_nodes'''
 
@@ -554,6 +621,6 @@ class Utilities:
             circles.append(circ)
 
         node_collection = PatchCollection(circles, facecolors='r', edgecolors='k', linewidths=2, alpha=0.8)
-        node_collection.set_zorder(2)
+        node_collection.set_zorder(3)
         ax.add_collection(node_collection)
         return node_collection
