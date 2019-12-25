@@ -67,12 +67,25 @@ class NashFlow_spillback(NashFlow):
         """Method to compute a single flowInterval"""
         # Get lowerBoundTime
         lowerBoundTime = 0 if not self.flowIntervals else self.flowIntervals[-1][1]
-
         # Compute resettingEdges
-        resettingEdges = [(v, w) for v, w in self.network.edges() if
-                          Utilities.is_greater_tol(self.node_label(w, lowerBoundTime),
-                                                   self.node_label(v, lowerBoundTime) + self.network[v][w][
-                                                       'transitTime'], TOL)] if lowerBoundTime > 0 else []
+        if lowerBoundTime >= 10:
+            print("yau3")
+            v, w = '0', '1'
+            print(self.node_label(w, lowerBoundTime))
+            print(self.node_label(v, lowerBoundTime) + self.network[v][w]['transitTime'])
+
+        cmp_queue = lambda v, w, t: \
+            Utilities.is_greater_tol(self.node_label(w, t),
+                                     self.node_label(v, t) + self.network[v][w]['transitTime'])
+        resettingEdges = [(v, w) for v, w in self.network.edges() if cmp_queue(v, w, lowerBoundTime)] \
+            if lowerBoundTime > 0 else []
+        """
+        cmp_queue = lambda v, w, t: \
+            self.node_label(w, t) > self.node_label(v, t) + self.network[v][w]['transitTime']
+        resettingEdges = [(v, w) for v, w in self.network.edges() if cmp_queue(v, w, lowerBoundTime)] \
+            if lowerBoundTime > 0 else []
+        """
+
         fullEdges = [(v, w) for v, w in self.network.edges() if
                      self.is_full(v, w, self.node_label(v, lowerBoundTime))] if lowerBoundTime > 0 else []
 
@@ -243,9 +256,9 @@ class NashFlow_spillback(NashFlow):
         """
         if Utilities.is_eq_tol(t, 0):
             return 0
-        for timeInterval, inflowVal in self.network[v][w]['inflow'].items():
+        for timeInterval, inflowVal in reversed(self.network[v][w]['inflow'].items()):
             vTimeLower, vTimeUpper = timeInterval
-            if vTimeLower <= t <= vTimeUpper:
+            if Utilities.is_between_tol(vTimeLower, t, vTimeUpper):
                 # This is the interval in which t lies
                 return self.network[v][w]['cumulativeInflow'][vTimeLower] + inflowVal * (t - vTimeLower)
 
@@ -258,9 +271,9 @@ class NashFlow_spillback(NashFlow):
         """
         if Utilities.is_eq_tol(t, 0):
             return 0
-        for timeInterval, outflowVal in self.network[v][w]['outflow'].items():
+        for timeInterval, outflowVal in reversed(self.network[v][w]['outflow'].items()):
             wTimeLower, wTimeUpper = timeInterval
-            if wTimeLower <= t <= wTimeUpper:
+            if Utilities.is_between_tol(wTimeLower, t, wTimeUpper):
                 # This is the interval in which t lies
                 return self.network[v][w]['cumulativeOutflow'][wTimeLower] + outflowVal * (t - wTimeLower)
 

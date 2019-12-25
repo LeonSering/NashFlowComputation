@@ -246,7 +246,7 @@ class NashFlow:
         if Utilities.is_eq_tol(t, 0):
             return 0
         for wTimeLower, wTimeUpper in self.network[v][w]['outflow']:
-            if wTimeLower <= t <= wTimeUpper:
+            if Utilities.is_between_tol(wTimeLower, t, wTimeUpper):
                 # t lies between l_w(theta_k) and l_w(theta_k+1)
                 lastOutflow = self.network[v][w]['outflow'][(wTimeLower, wTimeUpper)]
         return lastOutflow
