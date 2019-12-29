@@ -290,9 +290,9 @@ class Interface(QtWidgets.QMainWindow, mainWdw.Ui_MainWindow):
         """Update display of the properties of the currently focussed node self.graphCreationCanvas.focusNode, if existing"""
         if self.gttr('graphCreationCanvas').focusNode is not None:
             vertex = self.gttr('graphCreationCanvas').focusNode
-            self.gttr('nodeNameLineEdit').setText(self.gttr('network').node[vertex]['label'])
-            self.gttr('nodeXLineEdit').setText(str(round(self.gttr('network').node[vertex]['position'][0], 2)))
-            self.gttr('nodeYLineEdit').setText(str(round(self.gttr('network').node[vertex]['position'][1], 2)))
+            self.gttr('nodeNameLineEdit').setText(self.gttr('network').nodes[vertex]['label'])
+            self.gttr('nodeXLineEdit').setText(str(round(self.gttr('network').nodes[vertex]['position'][0], 2)))
+            self.gttr('nodeYLineEdit').setText(str(round(self.gttr('network').nodes[vertex]['position'][1], 2)))
         else:
             self.gttr('nodeNameLineEdit').setText("")
             self.gttr('nodeXLineEdit').setText("")
@@ -310,16 +310,16 @@ class Interface(QtWidgets.QMainWindow, mainWdw.Ui_MainWindow):
         YPos = str(self.gttr('nodeYLineEdit').text())
         if len(nodeName) > 0 and len(XPos) > 0 and len(YPos) > 0:
             vertex = self.gttr('graphCreationCanvas').focusNode
-            if nodeName != self.gttr('network').node[vertex]['label']:
-                self.gttr('network').node[vertex]['label'] = nodeName
+            if nodeName != self.gttr('network').nodes[vertex]['label']:
+                self.gttr('network').nodes[vertex]['label'] = nodeName
                 item = self.gttr('nodeToListItem')[vertex]
                 self.gttr('nodeSelectionListWidget').takeItem(
                     self.gttr('nodeSelectionListWidget').row(item))  # Delete item
                 self.add_node_to_list(vertex, self.currentTF)
                 self.gttr('nodeSelectionListWidget').sortItems()  # Re-sort
 
-            movedBool = (self.gttr('network').node[vertex]['position'] != (float(XPos), float(YPos)))
-            self.gttr('network').node[vertex]['position'] = (float(XPos), float(YPos))
+            movedBool = (self.gttr('network').nodes[vertex]['position'] != (float(XPos), float(YPos)))
+            self.gttr('network').nodes[vertex]['position'] = (float(XPos), float(YPos))
 
             self.gttr('graphCreationCanvas').update_nodes(moved=movedBool, color=True)  # Update UI
             if movedBool:
@@ -1129,7 +1129,7 @@ class Interface(QtWidgets.QMainWindow, mainWdw.Ui_MainWindow):
         elif self.gttr('plotAnimationCanvas').focusEdge is not None:
             v, w = self.gttr('plotAnimationCanvas').focusEdge
             self.gttr('currentFocusLabel').setText(
-                str((self.gttr('nashFlow').network.node[v]['label'], self.gttr('nashFlow').network.node[w]['label'])))
+                str((self.gttr('nashFlow').network.nodes[v]['label'], self.gttr('nashFlow').network.nodes[w]['label'])))
             self.gttr('currentCapacityLabel').setText(str(self.gttr('nashFlow').network[v][w]['outCapacity']))
             self.gttr('currentTransitTimeLabel').setText(str(self.gttr('nashFlow').network[v][w]['transitTime']))
             self.gttr('plotQueueCanvas').change_focusEdge(v, w)
@@ -1225,7 +1225,7 @@ class Interface(QtWidgets.QMainWindow, mainWdw.Ui_MainWindow):
         if not tfType:
             tfType = self.currentTF
 
-        nodeString = 'Node ' + str(node) + ': ' + self.gttr('network', tfType).node[node]['label']
+        nodeString = 'Node ' + str(node) + ': ' + self.gttr('network', tfType).nodes[node]['label']
         item = QtWidgets.QListWidgetItem(nodeString)
         self.gttr('nodeToListItem', tfType)[node] = item
         self.gttr('nodeSelectionListWidget', tfType).addItem(item)  # Add item to listWidget
@@ -1241,7 +1241,7 @@ class Interface(QtWidgets.QMainWindow, mainWdw.Ui_MainWindow):
 
         v, w = edge
         edgeString = 'Edge: ' + str(
-            (self.gttr('network', tfType).node[v]['label'], self.gttr('network', tfType).node[w]['label']))
+            (self.gttr('network', tfType).nodes[v]['label'], self.gttr('network', tfType).nodes[w]['label']))
         item = QtWidgets.QListWidgetItem(edgeString)
         self.gttr('edgeToListItem')[edge] = item
         self.gttr('edgeSelectionListWidget', tfType).addItem(item)
