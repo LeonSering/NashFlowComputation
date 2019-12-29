@@ -247,7 +247,7 @@ class PlotCanvas(FigureCanvas):
             self.draw_idle()
 
         elif self.mouseRightPressed and self.selectedNode is not None:
-            self.network.node[self.selectedNode]['position'] = (xAbsolute, yAbsolute)
+            self.network.nodes[self.selectedNode]['position'] = (xAbsolute, yAbsolute)
             self.update_nodes(moved=True, color=True)
             self.update_edges(moved=True)
             self.interface.update_node_display()
@@ -275,8 +275,8 @@ class PlotCanvas(FigureCanvas):
         """
         clickedEdge = None
         for edge in self.network.edges():
-            startpos = self.network.node[edge[0]]['position']
-            endpos = self.network.node[edge[1]]['position']
+            startpos = self.network.nodes[edge[0]]['position']
+            endpos = self.network.nodes[edge[1]]['position']
             dist = self.compute_dist_projection_on_segment(clickpos, startpos, endpos)
             if 0 <= dist <= SIMILARITY_DIST:
                 clickedEdge = edge
@@ -331,8 +331,8 @@ class PlotCanvas(FigureCanvas):
             # Create new node
             nodeID = str(self.network.graph['lastID'])
             self.network.add_node(nodeID)
-            self.network.node[nodeID]['position'] = (int(xAbsolute), int(yAbsolute))
-            self.network.node[nodeID]['label'] = nodeID
+            self.network.nodes[nodeID]['position'] = (int(xAbsolute), int(yAbsolute))
+            self.network.nodes[nodeID]['label'] = nodeID
             self.network.graph['lastID'] += 1
             return nodeID
         return clickedNode
@@ -437,7 +437,7 @@ class PlotCanvas(FigureCanvas):
                     nodeCollection.remove()
                     nodes = [node for node in nodes if node != v]
                     if nodes:
-                        positions = {v: self.network.node[v]['position'] for v in self.network.nodes()}
+                        positions = {v: self.network.nodes[v]['position'] for v in self.network.nodes()}
                         newNodeCollection = self.draw_nodes(self.network,
                                                             pos=positions,
                                                             ax=self.axes, node_size=self.nodeSize,
@@ -456,7 +456,7 @@ class PlotCanvas(FigureCanvas):
 
             else:
                 self.nodeCollections.append(([v], self.draw_nodes(self.network,
-                                                                  pos={v: self.network.node[v]['position']},
+                                                                  pos={v: self.network.nodes[v]['position']},
                                                                   ax=self.axes, node_size=self.nodeSize,
                                                                   nodelist=[v], node_color='b')))
         elif added:
@@ -464,22 +464,22 @@ class PlotCanvas(FigureCanvas):
             if self.focusNode is not None and all([self.focusNode not in entry for entry in self.nodeCollections]):
                 v = self.focusNode
                 self.nodeCollections.append(([v], self.draw_nodes(self.network,
-                                                                  pos={v: self.network.node[v]['position']},
+                                                                  pos={v: self.network.nodes[v]['position']},
                                                                   ax=self.axes, node_size=self.nodeSize,
                                                                   nodelist=[v])))
                 self.nodeLabelCollection.update(
-                    draw_networkx_labels(self.network, pos={v: self.network.node[v]['position']}, ax=self.axes,
-                                         labels={v: self.network.node[v]['label']}, font_size=nodeLabelSize))
+                    draw_networkx_labels(self.network, pos={v: self.network.nodes[v]['position']}, ax=self.axes,
+                                         labels={v: self.network.nodes[v]['label']}, font_size=nodeLabelSize))
 
         # Update node label texts and positions
         for v, label in self.nodeLabelCollection.items():  # type(label) = matplotlib.text.Text object
-            if label.get_text() != self.network.node[v]['label']:
+            if label.get_text() != self.network.nodes[v]['label']:
                 label.remove()
                 self.nodeLabelCollection[v] = \
-                    draw_networkx_labels(self.network, pos={v: self.network.node[v]['position']}, ax=self.axes,
-                                         labels={v: self.network.node[v]['label']}, font_size=nodeLabelSize)[v]
+                    draw_networkx_labels(self.network, pos={v: self.network.nodes[v]['position']}, ax=self.axes,
+                                         labels={v: self.network.nodes[v]['label']}, font_size=nodeLabelSize)[v]
             elif v == self.focusNode and moved:
-                label.set_position(self.network.node[v]['position'])
+                label.set_position(self.network.nodes[v]['position'])
 
         if color:
             nodeColor = lambda v: 'r' if v != self.focusNode else 'b'
@@ -513,7 +513,7 @@ class PlotCanvas(FigureCanvas):
 
                     edges = [edge for edge in edges if edge not in missingEdges]
                     if edges:
-                        positions = {v: self.network.node[v]['position'] for v in self.network.nodes()}
+                        positions = {v: self.network.nodes[v]['position'] for v in self.network.nodes()}
                         newEdgeCollection, newBoxCollection, newArrowCollection = self.draw_edges(self.network, pos=positions,
                                                                               ax=self.axes, arrow=True,
                                                                               edgelist=edges, width=self.edgeWidthSize)
@@ -542,8 +542,8 @@ class PlotCanvas(FigureCanvas):
             if self.focusEdge is not None:
                 v, w = self.focusEdge
                 edgeCollection, boxCollection, arrowCollection = self.draw_edges(self.network,
-                                                                pos={v: self.network.node[v]['position'],
-                                                                     w: self.network.node[w]['position']},
+                                                                pos={v: self.network.nodes[v]['position'],
+                                                                     w: self.network.nodes[w]['position']},
                                                                 ax=self.axes, arrow=True,
                                                                 edgelist=[self.focusEdge],
                                                                 width=self.edgeWidthSize)
@@ -564,8 +564,8 @@ class PlotCanvas(FigureCanvas):
                     elif self.type == 'spillback':
                         lbl = {self.focusEdge: (self.network[v][w]['outCapacity'], self.network[v][w]['TFC']['inflowBound'])}
                 self.edgeLabelCollection.update(draw_networkx_edge_labels(self.network,
-                                                                          pos={v: self.network.node[v]['position'],
-                                                                               w: self.network.node[w]['position']},
+                                                                          pos={v: self.network.nodes[v]['position'],
+                                                                               w: self.network.nodes[w]['position']},
                                                                           ax=self.axes, edge_labels=lbl,
                                                                           font_size=edgeLabelSize))
 
@@ -642,8 +642,8 @@ class PlotCanvas(FigureCanvas):
             lblTuple = lbls[(v, w)]
             if label.get_text() != lblTuple:
                 label.set_text(lblTuple)
-            posv = (self.network.node[v]['position'][0] * 0.5, self.network.node[v]['position'][1] * 0.5)
-            posw = (self.network.node[w]['position'][0] * 0.5, self.network.node[w]['position'][1] * 0.5)
+            posv = (self.network.nodes[v]['position'][0] * 0.5, self.network.nodes[v]['position'][1] * 0.5)
+            posw = (self.network.nodes[w]['position'][0] * 0.5, self.network.nodes[w]['position'][1] * 0.5)
             pos = (posv[0] + posw[0], posv[1] + posw[1])
             label.set_position(pos)
 

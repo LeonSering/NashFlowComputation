@@ -218,7 +218,7 @@ class PlotAnimationCanvas(PlotCanvas):
         """Update the animation"""
         for edge in self.network.edges():
             v,w = edge
-            src, dst = self.network.node[v]['position'], self.network.node[w]['position']
+            src, dst = self.network.nodes[v]['position'], self.network.nodes[w]['position']
             #self.draw_queue_color_box(edge, src, dst)
             #self.draw_edge_colors(edge, src, dst)
             self.draw_flow(edge, src, dst)

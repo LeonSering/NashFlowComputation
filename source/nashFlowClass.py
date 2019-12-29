@@ -220,7 +220,7 @@ class NashFlow:
             return float('inf')
         intervalLowerBoundTime = self.time_interval_correspondence(t)
         interval = self.lowerBoundsToIntervalDict[intervalLowerBoundTime]
-        label = interval.shortestPathNetwork.node[v]['dist'] + (t - intervalLowerBoundTime) * \
+        label = interval.shortestPathNetwork.nodes[v]['dist'] + (t - intervalLowerBoundTime) * \
                 interval.NTFNodeLabelDict[v]
         return label
 

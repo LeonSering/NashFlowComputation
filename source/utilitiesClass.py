@@ -136,9 +136,9 @@ class Utilities:
             '''
 
         for w in shortestPathNetwork:
-            shortestPathNetwork.node[w]['dist'] = labels[w]
-            shortestPathNetwork.node[w]['label'] = network.node[w]['label']
-            shortestPathNetwork.node[w]['position'] = network.node[w]['position']
+            shortestPathNetwork.nodes[w]['dist'] = labels[w]
+            shortestPathNetwork.nodes[w]['label'] = network.nodes[w]['label']
+            shortestPathNetwork.nodes[w]['position'] = network.nodes[w]['position']
 
         return shortestPathNetwork
 
