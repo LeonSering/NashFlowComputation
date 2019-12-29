@@ -231,8 +231,7 @@ class NashFlow_spillback(NashFlow):
                 self.update_queue_size(v, w, vTimeLower, vTimeUpper)
             self.animationIntervals[(v, w)].append(((vTimeLower, vTimeUpper), (wTimeLower, wTimeUpper)))
 
-            #if vTimeUpper <= wTimeUpper:
-            if Utilities.is_geq_tol(wTimeUpper, vTimeUpper):
+            if vTimeUpper <= wTimeUpper and vTimeUpper != float('inf'):
                 # Lies on shortest path
                 self.network[v][w]['load'][vTimeUpper] = self.arc_load(v, w, vTimeUpper)
 
