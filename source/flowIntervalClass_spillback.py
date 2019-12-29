@@ -209,8 +209,6 @@ class FlowInterval_spillback(FlowInterval):
         Compute alpha respecting the conditions
         :param labelLowerBoundTimeDict: Dict assigning lower bound times to nodes, i.e. v:l_v(\theta_k)
         """
-        if labelLowerBoundTimeDict['s'] >= 10:
-            print("yau")
         def get_max_alpha_conditions_2_3(u, v):
             return (self.network[u][v]['transitTime'] + labelLowerBoundTimeDict[u] -
                     labelLowerBoundTimeDict[v]) \
@@ -334,8 +332,6 @@ class FlowInterval_spillback(FlowInterval):
 
         self.alpha = float('inf')
         for u, v in self.network.edges():
-            if labelLowerBoundTimeDict['s'] >= 133 and u == '0' and v == '1':
-                print("yau2")
             e = (u, v)
             if e not in self.shortestPathNetwork.edges():  # Condition (3) in paper
                 if self.NTFNodeLabelDict[v] - self.NTFNodeLabelDict[u] > TOL:
