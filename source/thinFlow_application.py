@@ -110,6 +110,10 @@ class Interface(QtWidgets.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
 
         QtWidgets.QShortcut(QtGui.QKeySequence(QtCore.Qt.Key_Delete), self).activated.connect(
             self.pressed_delete)  # Pressed Delete
+        QtWidgets.QShortcut(QtGui.QKeySequence('a'), self).activated.connect(
+            self.pressed_a)  # Pressed a, changing active status of FocusEdge
+        QtWidgets.QShortcut(QtGui.QKeySequence('r'), self).activated.connect(
+            self.pressed_r)  # Pressed r, changing resetting status of FocusEdge
 
         self.tabWidget.setCurrentIndex(0)  # Show General Tab
 
@@ -598,6 +602,16 @@ class Interface(QtWidgets.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
         elif self.gttr('graphCreationCanvas').focusEdge is not None:
             self.delete_edge()
 
+    def pressed_a(self):
+        """Slot for 'a' Key"""
+        if self.gttr('graphCreationCanvas').focusEdge is not None:
+            self.change_active()
+
+    def pressed_r(self):
+        """Slot for 'r' Key"""
+        if self.gttr('graphCreationCanvas').focusEdge is not None:
+            self.change_resetting()
+
     def cleanup(self):
         """Cleanup if activated. Note: In NFC this functionality is part of the nashFlow Class"""
         if self.cleanUpEnabled:
@@ -757,6 +771,13 @@ class Interface(QtWidgets.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
         # Remove inactive edges from network
         inactiveEdges = [edge for edge in originalNetwork.edges() if not originalNetwork[edge[0]][edge[1]]['TFC']['active']]
         network.remove_edges_from(inactiveEdges)
+        # Remove nodes that are now no longer reachable
+        L = []
+        for (v, d) in network.in_degree():
+            if d == 0 and v != 's':
+                # Non-reachable node found
+                L.append(v)
+        network.remove_nodes_from(L)
 
         # Validate input
         returnCode = self.validate_thinflow_input(network)
