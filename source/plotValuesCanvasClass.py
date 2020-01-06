@@ -257,26 +257,27 @@ class PlotValuesCanvas(FigureCanvas):
                 hLineText.set_visible(False)
             self.lineToHLineDict[line] = (hLine, hLineText)
 
-    def get_approx_load(self, t):
+    def get_approx_data(self, t):
         """
-        Returns approximated load at time t
-        :param t:
-        :return: d_e(t) or N/A
+        Returns approximated queue size and load at time t
+        :param t: time
+        :return: z_e(t), d_e(t),  where entries can be "N/A"
         """
+        D = {'Queue size': "N/A", 'Load': "N/A"}
         for plot in self.plots:
             xVals, yVals, line, label = plot
-            if label != 'Load':
+            if label != 'Load' and label != "Queue size":
                 continue
 
-            # Get the y-value of self.verticalLinePos
             index = Utilities.get_insertion_point_left(xVals, t)
             if index == len(xVals) or index == 0:
-                return "N/A"
-            x1, x, x2 = xVals[index - 1], t, xVals[index]
-            y1, y2 = yVals[index - 1], yVals[index]
-            # It holds xVals[index-1] < t <= xVals[index]
-            fac = float(x - x2) / (x1 - x2)
-            y = fac * y1 + (1 - fac) * y2  # this obviously only works if plots are piecewise linear
-            return y
+                continue
+            else:
+                x1, x, x2 = xVals[index - 1], t, xVals[index]
+                y1, y2 = yVals[index - 1], yVals[index]
+                # It holds: xVals[index-1] < t <= xVals[index]
+                fac = float(x - x2) / (x1 - x2)
+                y = fac * y1 + (1 - fac) * y2  # this obviously only works if plots are piecewise linear
+                D[label] = y
 
-        return "N/A"
+        return D['Queue size'], D['Load']
