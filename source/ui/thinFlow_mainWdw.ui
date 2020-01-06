@@ -760,8 +760,6 @@
     <addaction name="actionNew_graph"/>
     <addaction name="actionLoad_graph"/>
     <addaction name="actionSave_graph"/>
-    <addaction name="actionLoad_Thinflow"/>
-    <addaction name="actionSave_Thinflow"/>
     <addaction name="actionExit"/>
    </widget>
    <widget class="QMenu" name="menuOptions">

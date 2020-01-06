@@ -24,7 +24,7 @@
        </sizepolicy>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="tab_general">
        <attribute name="title">
@@ -731,8 +731,8 @@
                         <string/>
                        </property>
                        <property name="icon">
-                        <iconset>
-                         <normaloff>:/record/Downloads/rec-button2.png</normaloff>:/record/Downloads/rec-button2.png</iconset>
+                        <iconset resource="recordIcon.qrc">
+                         <normaloff>:/record/record.png</normaloff>:/record/record.png</iconset>
                        </property>
                       </widget>
                      </item>
@@ -1568,8 +1568,8 @@
                         <string/>
                        </property>
                        <property name="icon">
-                        <iconset>
-                         <normaloff>:/record/Downloads/rec-button2.png</normaloff>:/record/Downloads/rec-button2.png</iconset>
+                        <iconset resource="recordIcon.qrc">
+                         <normaloff>:/record/record.png</normaloff>:/record/record.png</iconset>
                        </property>
                       </widget>
                      </item>
@@ -1715,7 +1715,7 @@
      <x>0</x>
      <y>0</y>
      <width>1018</width>
-     <height>30</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -1725,8 +1725,6 @@
     <addaction name="actionNew_graph"/>
     <addaction name="actionLoad_graph"/>
     <addaction name="actionSave_graph"/>
-    <addaction name="actionLoad_Nashflow"/>
-    <addaction name="actionSave_Nashflow"/>
     <addaction name="actionExit"/>
    </widget>
    <widget class="QMenu" name="menuHelp">

@@ -2,11 +2,13 @@
 
 # Form implementation generated from reading ui file 'thinFlow_mainWdw.ui'
 #
-# Created by: PyQt5 UI code generator 5.10.1
+# Created by: PyQt5 UI code generator 5.12.3
 #
 # WARNING! All changes made in this file will be lost!
 
+
 from PyQt5 import QtCore, QtGui, QtWidgets
+
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -415,8 +417,6 @@ class Ui_MainWindow(object):
         self.menuFile.addAction(self.actionNew_graph)
         self.menuFile.addAction(self.actionLoad_graph)
         self.menuFile.addAction(self.actionSave_graph)
-        self.menuFile.addAction(self.actionLoad_Thinflow)
-        self.menuFile.addAction(self.actionSave_Thinflow)
         self.menuFile.addAction(self.actionExit)
         self.menuOptions.addAction(self.actionOpen_NashFlowComputation)
         self.menuOptions.addAction(self.actionMove_current_graph_to_NashFlowComputation)
@@ -511,4 +511,3 @@ class Ui_MainWindow(object):
         self.actionSave_Thinflow.setText(_translate("MainWindow", "Save Thinflow"))
         self.actionOpen_NashFlowComputation.setText(_translate("MainWindow", "Open NashFlowComputation"))
         self.actionMove_current_graph_to_NashFlowComputation.setText(_translate("MainWindow", "Move current graph to NashFlowComputation"))
-

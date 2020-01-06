@@ -1,5 +1,5 @@
 <RCC>
   <qresource prefix="record">
-    <file>../../../../../../../../Downloads/rec-button2.png</file>
+    <file>record.png</file>
   </qresource>
 </RCC>

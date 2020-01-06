@@ -101,8 +101,8 @@ class Interface(QtWidgets.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
         self.actionLoad_graph.triggered.connect(self.load_graph)
         self.actionSave_graph.triggered.connect(self.save_graph)
         self.actionExit.triggered.connect(QtWidgets.QApplication.quit)
-        self.actionLoad_Thinflow.triggered.connect(self.load_thinflow)
-        self.actionSave_Thinflow.triggered.connect(self.save_thinflow)
+        #self.actionLoad_Thinflow.triggered.connect(self.load_thinflow)
+        #self.actionSave_Thinflow.triggered.connect(self.save_thinflow)
         self.actionOpen_NashFlowComputation.triggered.connect(self.open_nfc)
         self.actionMove_current_graph_to_NashFlowComputation.triggered.connect(self.move_to_nfc)
         # TO BE DONE LATER

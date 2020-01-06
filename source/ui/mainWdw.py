@@ -2,11 +2,13 @@
 
 # Form implementation generated from reading ui file 'mainWdw.ui'
 #
-# Created by: PyQt5 UI code generator 5.10.1
+# Created by: PyQt5 UI code generator 5.12.3
 #
 # WARNING! All changes made in this file will be lost!
 
+
 from PyQt5 import QtCore, QtGui, QtWidgets
+
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -410,7 +412,7 @@ class Ui_MainWindow(object):
         self.recordPushButton_general.setSizePolicy(sizePolicy)
         self.recordPushButton_general.setText("")
         icon3 = QtGui.QIcon()
-        icon3.addPixmap(QtGui.QPixmap(":/record/Downloads/rec-button2.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon3.addPixmap(QtGui.QPixmap(":/record/record.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.recordPushButton_general.setIcon(icon3)
         self.recordPushButton_general.setObjectName("recordPushButton_general")
         self.formLayout_17.setWidget(3, QtWidgets.QFormLayout.FieldRole, self.recordPushButton_general)
@@ -928,7 +930,7 @@ class Ui_MainWindow(object):
         self.verticalLayout_2.addWidget(self.tabWidget)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 1018, 30))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 1018, 22))
         self.menubar.setObjectName("menubar")
         self.menuFile = QtWidgets.QMenu(self.menubar)
         self.menuFile.setObjectName("menuFile")
@@ -969,8 +971,6 @@ class Ui_MainWindow(object):
         self.menuFile.addAction(self.actionNew_graph)
         self.menuFile.addAction(self.actionLoad_graph)
         self.menuFile.addAction(self.actionSave_graph)
-        self.menuFile.addAction(self.actionLoad_Nashflow)
-        self.menuFile.addAction(self.actionSave_Nashflow)
         self.menuFile.addAction(self.actionExit)
         self.menuHelp.addAction(self.actionOpen_manual)
         self.menuOptions.addAction(self.actionOpen_ThinFlowComputation)
@@ -981,7 +981,7 @@ class Ui_MainWindow(object):
         self.menubar.addAction(self.menuHelp.menuAction())
 
         self.retranslateUi(MainWindow)
-        self.tabWidget.setCurrentIndex(1)
+        self.tabWidget.setCurrentIndex(0)
         self.tabWidget_general.setCurrentIndex(1)
         self.tabWidget_spillback.setCurrentIndex(1)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
@@ -1181,6 +1181,5 @@ class Ui_MainWindow(object):
         self.actionOpen_ThinFlowComputation.setText(_translate("MainWindow", "Open ThinFlowComputation"))
         self.actionMove_graph_to_ThinFlowComputation.setText(_translate("MainWindow", "Move current graph to ThinFlowComputation"))
         self.actionChange_animation_time_range.setText(_translate("MainWindow", "Change animation time range"))
-
 from . import icons_rc
 from . import recordIcon_rc
