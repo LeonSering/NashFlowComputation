@@ -198,11 +198,13 @@ class FlowInterval_spillback(FlowInterval):
         :param t: timepoint
         :return: lowerBoundTime, upperBoundTime, j s.t. l_v(lowerBoundTime) <= t <= l_v(upperBoundTime) outflowBounds of [theta_j, theta_{j+1}[
         """
-        j = 0
-        for lowerBoundTime, upperBoundTime in self.network[u][v]['outflow']:
+        # Now works in reversed order to assure to really get the largest interval containing t
+        j = len(self.network[u][v]['outflow']) - 1
+        for lowerBoundTime, upperBoundTime in reversed(self.network[u][v]['outflow']):
             if Utilities.is_geq_tol(t, lowerBoundTime) and Utilities.is_geq_tol(upperBoundTime, t):
                 return lowerBoundTime, upperBoundTime, j
-            j += 1
+            j -= 1
+
 
     def compute_alpha(self, labelLowerBoundTimeDict):
         """
