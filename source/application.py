@@ -1167,7 +1167,7 @@ class Interface(QtWidgets.QMainWindow, mainWdw.Ui_MainWindow):
         thread.start()
 
     def move_to_tfc(self):
-        self.open_tfc(moveGraph=self.network)
+        self.open_tfc(moveGraph=self.gttr('network'))
 
     def change_no_flow_show_state(self):
         """Show/Hide edges without flow in each NTF Plot"""

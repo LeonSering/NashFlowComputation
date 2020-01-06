@@ -634,14 +634,16 @@ class Interface(QtWidgets.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
         with open(fopen, 'rb') as f:
             network = pickle.load(f)
 
-        # Make sure that each edge has the property 'resettingEnabled' and 'active
+        # Make sure that each edge has the property 'resettingEnabled' and 'active'
         for edge in network.edges():
             v, w = edge
             try:
                 propertyResetting = network[v][w]['TFC']
+                resettingProperty = network[v][w]['TFC']['resettingEnabled']
+                activeProperty = network[v][w]['TFC']['active']
             except KeyError:
-                network[v][w]['TFC']['resettingEnabled'] = None
-                network[v][w]['TFC']['active'] = None
+                network[v][w]['TFC']['resettingEnabled'] = False
+                network[v][w]['TFC']['active'] = True
 
         if not graphPath:
             self.defaultLoadSaveDir = os.path.dirname(fopen)
