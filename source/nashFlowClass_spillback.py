@@ -72,38 +72,13 @@ class NashFlow_spillback(NashFlow):
             Utilities.is_greater_tol(self.node_label(w, t),
                                      self.node_label(v, t) + self.network[v][w]['transitTime'])
 
-        cmp_queue_alternative = lambda v, w, t: \
-            Utilities.is_greater_tol(self.get_queue_size(v, w, self.node_label(v, lowerBoundTime)), 0)
-
         resettingEdges = [(v, w) for v, w in self.network.edges() if cmp_queue(v, w, lowerBoundTime)] \
             if lowerBoundTime > 0 else []
-        resettingEdges_alternative = [(v, w) for v, w in self.network.edges() if cmp_queue_alternative(v, w, lowerBoundTime)] \
-            if lowerBoundTime > 0 else []
 
-        if lowerBoundTime >= 100:
-            print("Interval computation at time: ", lowerBoundTime)
-            v, w = '0', '1'
-            l_v = self.node_label(v, lowerBoundTime)
-            l_w = self.node_label(w, lowerBoundTime)
-            tau = self.network[v][w]['transitTime']
-            print("l_0(", lowerBoundTime, "):", l_v)
-            print("l_0(", lowerBoundTime, ") + tau_e: ", l_v + tau)
-            print("l_1(", lowerBoundTime, "): ", l_w)
-            print("z_e(", lowerBoundTime, " + tau_e):", self.get_queue_size(v, w, l_v))
-            print("Resetting edges: ", resettingEdges)
-            print("Alternative Resetting Edges: ", resettingEdges_alternative)
-
-
-
-        """
-        cmp_queue = lambda v, w, t: \
-            self.node_label(w, t) > self.node_label(v, t) + self.network[v][w]['transitTime']
-        resettingEdges = [(v, w) for v, w in self.network.edges() if cmp_queue(v, w, lowerBoundTime)] \
-            if lowerBoundTime > 0 else []
-        """
-
-        fullEdges = [(v, w) for v, w in self.network.edges() if
+        edges_to_choose_from = resettingEdges   # Every full edge must be a resettingEdge
+        fullEdges = [(v, w) for v, w in edges_to_choose_from if
                      self.is_full(v, w, self.node_label(v, lowerBoundTime))] if lowerBoundTime > 0 else []
+
 
         minInflowBound = None
         interval = FlowInterval_spillback(self.network, resettingEdges=resettingEdges, fullEdges=fullEdges,
@@ -292,22 +267,6 @@ class NashFlow_spillback(NashFlow):
             if Utilities.is_between_tol(wTimeLower, t, wTimeUpper):
                 # This is the interval in which t lies
                 return self.network[v][w]['cumulativeOutflow'][wTimeLower] + outflowVal * (t - wTimeLower)
-
-    def get_queue_size(self, v, w, t):
-        """
-        :param v: tail of edge
-        :param w: head of edge
-        :param t: time
-        :return: z_e(t) = F_(v,w)^+[t-tau(v,w)] - F_(v,w)^-[t]
-        """
-        if t >= 109 and v == "2" and w == "t":
-            print("yu")
-        if Utilities.is_eq_tol(t, 0):
-            return 0
-        tau = self.network[v][w]['transitTime']
-        a = self.get_cumulative_inflow(v, w, t-tau)
-        b = self.get_cumulative_outflow(v, w, t)
-        return self.get_cumulative_inflow(v, w, t-tau) - self.get_cumulative_outflow(v, w, t)
 
     def arc_load(self, v, w, t):
         """
