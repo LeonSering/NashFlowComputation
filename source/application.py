@@ -872,11 +872,9 @@ class Interface(QtWidgets.QMainWindow, mainWdw.Ui_MainWindow):
             val = self.gttr('timeSlider').value()
             t = self.gttr('plotAnimationCanvas').get_time_from_tick(val)
         edge = self.gttr('plotAnimationCanvas').focusEdge
-        v, w = edge
-
         if edge is None:
             return
-
+        v, w = edge
         queueSize, load = self.gttr('plotDiagramCanvas').get_approx_data(t)
         queueSizeLabel = "%.2f" % queueSize if queueSize != "N/A" else "N/A"
         if load == "N/A":
