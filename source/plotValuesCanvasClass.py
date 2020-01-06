@@ -73,14 +73,14 @@ class PlotValuesCanvas(FigureCanvas):
 
         yMin, yMax = min(yValues), max(yValues)
         line, = axes.plot(xValues, yValues, linewidth=2, color=self.additionalColors[0], label=labels[0])
-        self.plots.append((xValues, yValues, line))
+        self.plots.append((xValues, yValues, line, labels[0]))
         lines.append(line)
         colorCounter = 1
         for xVals, yVals in additional_values:
             yMin, yMax = min(yMin, min(yVals)), max(yMax, max(yVals))
             line, = axes.plot(xVals, yVals, linewidth=2, color=self.additionalColors[colorCounter],
                               label=labels[colorCounter])
-            self.plots.append((xVals, yVals, line))
+            self.plots.append((xVals, yVals, line, labels[colorCounter]))
             lines.append(line)
             colorCounter += 1
 
@@ -229,7 +229,7 @@ class PlotValuesCanvas(FigureCanvas):
         self.hLinesLabels = []
 
         for plot in self.plots:
-            xVals, yVals, line = plot
+            xVals, yVals, line, label = plot
 
             # Get the y-value of self.verticalLinePos
             index = Utilities.get_insertion_point_left(xVals, self.verticalLinePos)
@@ -256,3 +256,27 @@ class PlotValuesCanvas(FigureCanvas):
                 hLine.set_visible(False)
                 hLineText.set_visible(False)
             self.lineToHLineDict[line] = (hLine, hLineText)
+
+    def get_approx_load(self, t):
+        """
+        Returns approximated load at time t
+        :param t:
+        :return: d_e(t) or N/A
+        """
+        for plot in self.plots:
+            xVals, yVals, line, label = plot
+            if label != 'Load':
+                continue
+
+            # Get the y-value of self.verticalLinePos
+            index = Utilities.get_insertion_point_left(xVals, t)
+            if index == len(xVals) or index == 0:
+                return "N/A"
+            x1, x, x2 = xVals[index - 1], t, xVals[index]
+            y1, y2 = yVals[index - 1], yVals[index]
+            # It holds xVals[index-1] < t <= xVals[index]
+            fac = float(x - x2) / (x1 - x2)
+            y = fac * y1 + (1 - fac) * y2  # this obviously only works if plots are piecewise linear
+            return y
+
+        return "N/A"

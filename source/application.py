@@ -865,6 +865,26 @@ class Interface(QtWidgets.QMainWindow, mainWdw.Ui_MainWindow):
         self.gttr('plotDiagramCanvas').change_vline_position(currentTime)
         self.gttr('currentSliderTimeLabel').setText("%.2f" % currentTime)
 
+        if self.currentTF == 'spillback':
+            self.update_current_load()
+
+    def update_current_load(self):
+        val = self.gttr('timeSlider').value()
+        t = self.gttr('plotAnimationCanvas').get_time_from_tick(val)
+        edge = self.gttr('plotAnimationCanvas').focusEdge
+        load = self.gttr('plotDiagramCanvas').get_approx_load(t) if edge is not None else "N/A"
+        if load == "N/A":
+            label = "N/A"
+        else:
+            v, w = edge
+            load = float(load)
+            loadStorageRatio = load/self.gttr('network')[v][w]['storage'] * 100
+            label = str(int(loadStorageRatio))
+
+        self.loadLabel_spillback.setText(label)
+
+
+
     def change_NTF_display(self, index):
         """
         Changes currently displayed NTF to index
@@ -1133,6 +1153,8 @@ class Interface(QtWidgets.QMainWindow, mainWdw.Ui_MainWindow):
             self.gttr('currentCapacityLabel').setText(str(self.gttr('nashFlow').network[v][w]['outCapacity']))
             self.gttr('currentTransitTimeLabel').setText(str(self.gttr('nashFlow').network[v][w]['transitTime']))
             self.gttr('plotQueueCanvas').change_focusEdge(v, w)
+            if self.currentTF == "spillback":
+                self.update_current_load()
         else:
             self.gttr('currentFocusLabel').setText("N/A")
             self.gttr('currentCapacityLabel').setText("N/A")
