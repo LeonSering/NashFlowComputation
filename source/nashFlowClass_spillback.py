@@ -283,10 +283,3 @@ class NashFlow_spillback(NashFlow):
             return Utilities.is_eq_tol(load, self.network[v][w]['storage'])
         except TypeError:
             return False
-        """
-        Equivalent to d_(v,w)(t)
-        :param v: node
-        :param w: node (s.t. (v,w) is an edge)
-        :param t: float, time
-        :return: d_(v,w)(t)
-        """

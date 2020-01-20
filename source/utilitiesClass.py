@@ -458,7 +458,7 @@ class Utilities:
         ax.add_collection(box_collection)
 
         arrow_collection = Utilities.get_arrows_on_edges(edge_colors=edge_colors, edge_pos=box_pos)
-        arrow_collection.set_zorder(2)
+        arrow_collection.set_zorder(0)
 
         if arrows:
             # Visualize them only if wanted
