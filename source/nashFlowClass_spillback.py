@@ -75,10 +75,9 @@ class NashFlow_spillback(NashFlow):
         resettingEdges = [(v, w) for v, w in self.network.edges() if cmp_queue(v, w, lowerBoundTime)] \
             if lowerBoundTime > 0 else []
 
-        edges_to_choose_from = resettingEdges   # Every full edge must be a resettingEdge
+        edges_to_choose_from = self.network.edges() # Fulledges can be non resetting!
         fullEdges = [(v, w) for v, w in edges_to_choose_from if
                      self.is_full(v, w, self.node_label(v, lowerBoundTime))] if lowerBoundTime > 0 else []
-
 
         minInflowBound = None
         interval = FlowInterval_spillback(self.network, resettingEdges=resettingEdges, fullEdges=fullEdges,
@@ -269,13 +268,6 @@ class NashFlow_spillback(NashFlow):
                 return self.network[v][w]['cumulativeOutflow'][wTimeLower] + outflowVal * (t - wTimeLower)
 
     def arc_load(self, v, w, t):
-        """
-        Equivalent to d_(v,w)(t)
-        :param v: node
-        :param w: node (s.t. (v,w) is an edge)
-        :param t: float, time
-        :return: d_(v,w)(t)
-        """
         return self.get_cumulative_inflow(v, w, t) - self.get_cumulative_outflow(v, w, t)
 
     def is_full(self, v, w, t):
@@ -291,3 +283,10 @@ class NashFlow_spillback(NashFlow):
             return Utilities.is_eq_tol(load, self.network[v][w]['storage'])
         except TypeError:
             return False
+        """
+        Equivalent to d_(v,w)(t)
+        :param v: node
+        :param w: node (s.t. (v,w) is an edge)
+        :param t: float, time
+        :return: d_(v,w)(t)
+        """
