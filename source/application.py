@@ -575,6 +575,7 @@ class Interface(QtWidgets.QMainWindow, mainWdw.Ui_MainWindow):
             network = pickle.load(f)
             self.sttr('network', network.graph['type'], network)
             self.tabWidget.setCurrentIndex(self.tfTypeList.index(network.graph['type']))
+            self.gttr('tabWidget').setCurrentIndex(0)
         if not graphPath:
             self.defaultLoadSaveDir = os.path.dirname(fopen)
             self.save_config()
