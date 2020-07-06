@@ -213,7 +213,6 @@ class Interface(QtWidgets.QMainWindow, mainWdw.Ui_MainWindow):
             self.sttr('plotNTFFrameLayout', tfType, QtWidgets.QVBoxLayout())
             self.gttr('plotNTFFrame', tfType).setLayout(self.gttr('plotNTFFrameLayout', tfType))
 
-            # TODO: Does this destroy layout?
             '''
             # Add empty graph to plotNTFCanvas to not destroy layout
             self.sttr('plotNTFCanvas', tfType, PlotNTFCanvas(nx.DiGraph(), self, intervalID=None,
@@ -406,7 +405,6 @@ class Interface(QtWidgets.QMainWindow, mainWdw.Ui_MainWindow):
                 return
             elif tail == 's' and storageText != float('inf'):
                 # This has to be satisfied
-                # TODO: raise messagebox or warning? for all other such situations as well
                 return
             if storageText <= transitText * inCapacityText:
                 # This is not allowed and is corrected automatically
@@ -619,7 +617,6 @@ class Interface(QtWidgets.QMainWindow, mainWdw.Ui_MainWindow):
     # noinspection PyCallByClass
     def load_nashflow(self):
         """Load NashFlow instance from '.nf' file"""
-        # TODO: This has to be adapted to NF Type
         dialog = QtWidgets.QFileDialog
         fopen = dialog.getOpenFileName(self, "Select File", self.defaultLoadSaveDir, "Nashflow files (*.nf)")
 
@@ -1387,7 +1384,7 @@ class Interface(QtWidgets.QMainWindow, mainWdw.Ui_MainWindow):
                 for e in network.out_edges('s'):
                     (v, w) = e
                     if network[v][w]['inCapacity'] < float(
-                            self.inflowLineEdit_spillback.text()):  # TODO: Should this be <= as in paper? Example from paper doesnt fulfil
+                            self.inflowLineEdit_spillback.text()):
                         return 6
             except KeyError:
                 pass

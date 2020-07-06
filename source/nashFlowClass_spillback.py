@@ -277,7 +277,6 @@ class NashFlow_spillback(NashFlow):
         :param t: time
         :return: True if d_(v,w)(t) ~= storage(v,w)
         """
-        # TODO: SHITTY WORKAROUND
         try:
             load = self.arc_load(v, w, t)
             return Utilities.is_eq_tol(load, self.network[v][w]['storage'])
