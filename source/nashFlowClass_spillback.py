@@ -9,9 +9,9 @@ import os
 import time
 from collections import OrderedDict
 
-from .flowIntervalClass_spillback import FlowInterval_spillback
-from .nashFlowClass import NashFlow
-from .utilitiesClass import Utilities
+from source.flowIntervalClass_spillback import FlowInterval_spillback
+from source.nashFlowClass import NashFlow
+from source.utilitiesClass import Utilities
 
 # ======================================================================================================================
 

@@ -9,7 +9,7 @@ if __name__ == '__main__':
     import os
     import sys
     import warnings
-    from source import application
+    import source.application as application
 
     warnings.filterwarnings('ignore')
 

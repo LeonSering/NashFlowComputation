@@ -7,9 +7,9 @@
 
 from itertools import combinations
 
-from .flowIntervalClass import FlowInterval
-from .normalizedThinFlowClass_spillback import NormalizedThinFlow_spillback
-from .utilitiesClass import Utilities
+from source.flowIntervalClass import FlowInterval
+from source.normalizedThinFlowClass_spillback import NormalizedThinFlow_spillback
+from source.utilitiesClass import Utilities
 
 # =======================================================================================================================
 

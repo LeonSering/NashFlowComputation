@@ -13,8 +13,8 @@ from matplotlib.collections import PatchCollection, LineCollection
 from matplotlib.colors import colorConverter
 from networkx import draw_networkx_labels, get_node_attributes
 
-from .plotCanvasClass import PlotCanvas
-from .utilitiesClass import Utilities
+from source.plotCanvasClass import PlotCanvas
+from source.utilitiesClass import Utilities
 
 
 # ======================================================================================================================

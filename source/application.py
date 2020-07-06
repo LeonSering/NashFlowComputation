@@ -18,15 +18,16 @@ from tempfile import gettempdir
 import networkx as nx
 from PyQt5 import QtGui, QtCore, QtWidgets
 
-from .nashFlowClass import NashFlow
-from .nashFlowClass_spillback import NashFlow_spillback
-from .plotAnimationCanvasClass import PlotAnimationCanvas
-from .plotCanvasClass import PlotCanvas
-from .plotNTFCanvasClass import PlotNTFCanvas
-from .plotQueueCanvasClass import PlotQueueCanvas
-from .plotValuesCanvasClass import PlotValuesCanvas
-from .ui import mainWdw
-from .utilitiesClass import Utilities
+from source.nashFlowClass import NashFlow
+from source.nashFlowClass_spillback import NashFlow_spillback
+from source.plotAnimationCanvasClass import PlotAnimationCanvas
+from source.plotCanvasClass import PlotCanvas
+from source.plotNTFCanvasClass import PlotNTFCanvas
+from source.plotQueueCanvasClass import PlotQueueCanvas
+from source.plotValuesCanvasClass import PlotValuesCanvas
+from source.utilitiesClass import Utilities
+import source.ui.mainWdw as mainWdw
+
 
 # =======================================================================================================================
 warnings.filterwarnings('ignore')  # Suppress GTK-Warnings

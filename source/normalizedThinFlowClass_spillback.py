@@ -8,7 +8,7 @@
 import os
 import re
 
-from .normalizedThinFlowClass import NormalizedThinFlow
+from source.normalizedThinFlowClass import NormalizedThinFlow
 
 
 # ======================================================================================================================

@@ -20,13 +20,13 @@ from warnings import filterwarnings
 import networkx as nx
 from PyQt5 import QtGui, QtCore, QtWidgets
 
-from .application import Interface as app_Interface
-from .flowIntervalClass import FlowInterval
-from .flowIntervalClass_spillback import FlowInterval_spillback
-from .plotCanvasClass import PlotCanvas
-from .plotNTFCanvasClass import PlotNTFCanvas
-from .ui import thinFlow_mainWdw
-from .utilitiesClass import Utilities
+from source.application import Interface as app_Interface
+from source.flowIntervalClass import FlowInterval
+from source.flowIntervalClass_spillback import FlowInterval_spillback
+from source.plotCanvasClass import PlotCanvas
+from source.plotNTFCanvasClass import PlotNTFCanvas
+from source.utilitiesClass import Utilities
+import source.ui.thinFlow_mainWdw as thinFlow_mainWdw
 
 # =======================================================================================================================
 filterwarnings('ignore')  # For the moment: ignore warnings as pyplot.hold is deprecated

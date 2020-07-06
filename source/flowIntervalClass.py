@@ -12,8 +12,8 @@ import time
 from collections import deque
 from itertools import combinations
 
-from .normalizedThinFlowClass import NormalizedThinFlow
-from .utilitiesClass import Utilities
+from source.normalizedThinFlowClass import NormalizedThinFlow
+from source.utilitiesClass import Utilities
 
 # =======================================================================================================================
 
