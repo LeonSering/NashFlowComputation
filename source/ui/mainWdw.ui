@@ -34,7 +34,7 @@
         <item row="0" column="0">
          <widget class="QTabWidget" name="tabWidget_general">
           <property name="currentIndex">
-           <number>1</number>
+           <number>0</number>
           </property>
           <widget class="QWidget" name="tab_3">
            <attribute name="title">
@@ -146,7 +146,7 @@
                 <widget class="QComboBox" name="templateComboBox_general">
                  <item>
                   <property name="text">
-                   <string>1. Basic algorithm by Cominetti, Correa and Larré</string>
+                   <string>1. Basic algorithm</string>
                   </property>
                  </item>
                  <item>
@@ -876,7 +876,7 @@
         <item row="0" column="0">
          <widget class="QTabWidget" name="tabWidget_spillback">
           <property name="currentIndex">
-           <number>1</number>
+           <number>0</number>
           </property>
           <widget class="QWidget" name="tab_5">
            <attribute name="title">
@@ -1261,17 +1261,7 @@
                 <widget class="QComboBox" name="templateComboBox_spillback">
                  <item>
                   <property name="text">
-                   <string>1. Basic algorithm by Cominetti, Correa and Larré</string>
-                  </property>
-                 </item>
-                 <item>
-                  <property name="text">
-                   <string>2. Solve only one LP/IP</string>
-                  </property>
-                 </item>
-                 <item>
-                  <property name="text">
-                   <string>3. Advanced algorithm</string>
+                   <string>1. Basic algorithm</string>
                   </property>
                  </item>
                 </widget>

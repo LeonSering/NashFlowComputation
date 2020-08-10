@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'mainWdw.ui'
 #
-# Created by: PyQt5 UI code generator 5.12.3
+# Created by: PyQt5 UI code generator 5.14.1
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -691,8 +691,6 @@ class Ui_MainWindow(object):
         self.templateComboBox_spillback = QtWidgets.QComboBox(self.groupBox_7)
         self.templateComboBox_spillback.setObjectName("templateComboBox_spillback")
         self.templateComboBox_spillback.addItem("")
-        self.templateComboBox_spillback.addItem("")
-        self.templateComboBox_spillback.addItem("")
         self.gridLayout_16.addWidget(self.templateComboBox_spillback, 8, 1, 1, 1)
         self.intervalsLineEdit_spillback = QtWidgets.QLineEdit(self.groupBox_7)
         self.intervalsLineEdit_spillback.setObjectName("intervalsLineEdit_spillback")
@@ -988,8 +986,8 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
         self.tabWidget.setCurrentIndex(0)
-        self.tabWidget_general.setCurrentIndex(1)
-        self.tabWidget_spillback.setCurrentIndex(1)
+        self.tabWidget_general.setCurrentIndex(0)
+        self.tabWidget_spillback.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
         MainWindow.setTabOrder(self.tabWidget, self.tabWidget_general)
         MainWindow.setTabOrder(self.tabWidget_general, self.capacityLineEdit_general)
@@ -1081,7 +1079,7 @@ class Ui_MainWindow(object):
         self.timeoutLineEdit_general.setText(_translate("MainWindow", "300"))
         self.inflowLineEdit_general.setText(_translate("MainWindow", "0"))
         self.label_11.setText(_translate("MainWindow", "Algorithm & Template"))
-        self.templateComboBox_general.setItemText(0, _translate("MainWindow", "1. Basic algorithm by Cominetti, Correa and Larré"))
+        self.templateComboBox_general.setItemText(0, _translate("MainWindow", "1. Basic algorithm"))
         self.templateComboBox_general.setItemText(1, _translate("MainWindow", "2. Solve only one LP/IP"))
         self.templateComboBox_general.setItemText(2, _translate("MainWindow", "3. Advanced algorithm"))
         self.intervalsLineEdit_general.setText(_translate("MainWindow", "-1"))
@@ -1145,9 +1143,7 @@ class Ui_MainWindow(object):
         self.timeoutLineEdit_spillback.setText(_translate("MainWindow", "300"))
         self.inflowLineEdit_spillback.setText(_translate("MainWindow", "0"))
         self.label_27.setText(_translate("MainWindow", "Algorithm & Template"))
-        self.templateComboBox_spillback.setItemText(0, _translate("MainWindow", "1. Basic algorithm by Cominetti, Correa and Larré"))
-        self.templateComboBox_spillback.setItemText(1, _translate("MainWindow", "2. Solve only one LP/IP"))
-        self.templateComboBox_spillback.setItemText(2, _translate("MainWindow", "3. Advanced algorithm"))
+        self.templateComboBox_spillback.setItemText(0, _translate("MainWindow", "1. Basic algorithm"))
         self.intervalsLineEdit_spillback.setText(_translate("MainWindow", "-1"))
         self.label_28.setText(_translate("MainWindow", "# Intervals (-1 = all)"))
         self.tabWidget_spillback.setTabText(self.tabWidget_spillback.indexOf(self.tab_5), _translate("MainWindow", "Create/Load graph"))

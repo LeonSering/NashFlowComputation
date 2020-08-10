@@ -800,15 +800,13 @@ class Interface(QtWidgets.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
         minCapacity = Utilities.compute_min_attr_of_network(network)
         counter = "Standalone"
         rootPath = self.outputDirectory
-        self.templateFile = self.templateComboBox.currentIndex()  # TODO: Does not work if different algorithm set? (Copied from application)
+        self.templateFile = self.templateComboBox.currentIndex()
 
         if self.currentTF == 'general':
             templateFile = os.path.join(os.getcwd(), 'templates',
                                         'algorithm_' + str(self.templateFile + 1) + '.zpl')
         elif self.currentTF == 'spillback':
-            # TODO: At the moment only one script available
-            #templateFile = os.path.join(os.getcwd(), 'templates',
-            #                            'algorithm_spillback_' + str(self.templateFile + 1) + '.zpl')
+            print("Note: For spillback only the basic algorithm [1] is available and hence run now.")
             templateFile = os.path.join(os.getcwd(), 'templates',
                                         'algorithm_spillback_1.zpl')
         scipFile = self.scipFile
@@ -898,7 +896,7 @@ class Interface(QtWidgets.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
                 for e in network.out_edges('s'):
                     (v, w) = e
                     if network[v][w]['TFC']['inflowBound'] < float(
-                            self.inflowLineEdit.text()):  # TODO REALLY INFLOWBOUND, NOT CAPACITY?
+                            self.inflowLineEdit.text()):
                         return 6
             except KeyError:
                 pass

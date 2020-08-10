@@ -66,7 +66,7 @@ class Interface(QtWidgets.QMainWindow, mainWdw.Ui_MainWindow):
 
         # Config defaults
         self.outputDirectory = ''
-        self.templateFile = 0  # 0,1,2 for three algorithms from thesis # TODO: Switch between Flow types?
+        self.templateFile = 0  # 0,1,2 for three algorithms from thesis (0 in case of spillback)
         self.scipFile = ''
         self.timeoutActivated = False
         self.defaultLoadSaveDir = ''
@@ -714,7 +714,10 @@ class Interface(QtWidgets.QMainWindow, mainWdw.Ui_MainWindow):
 
             for tfType in self.tfTypeList:
                 self.gttr('outputDirectoryLineEdit', tfType).setText(self.outputDirectory)
-                self.gttr('templateComboBox', tfType).setCurrentIndex(self.templateFile)
+                if tfType == 'general':
+                    self.gttr('templateComboBox', tfType).setCurrentIndex(self.templateFile)
+                elif tfType == 'spillback':
+                    self.gttr('templateComboBox', tfType).setCurrentIndex(0)
                 self.gttr('scipPathLineEdit', tfType).setText(self.scipFile)
                 self.gttr('cleanUpCheckBox', tfType).setChecked(self.cleanUpEnabled)
                 self.gttr('intervalsLineEdit', tfType).setText(self.numberOfIntervals)
@@ -768,7 +771,7 @@ class Interface(QtWidgets.QMainWindow, mainWdw.Ui_MainWindow):
         # Get remaining settings
         self.numberOfIntervals = self.gttr('intervalsLineEdit').text()
         self.templateFile = self.gttr(
-            'templateComboBox').currentIndex()  # TODO: Does not work if different algorithm set
+            'templateComboBox').currentIndex()
         inflowRate = float(self.gttr('inflowLineEdit').text())
 
         self.save_config()  # Save config-settings to file
@@ -788,8 +791,8 @@ class Interface(QtWidgets.QMainWindow, mainWdw.Ui_MainWindow):
                 self.sttr('nashFlow', None,
                           NashFlow_spillback(self.gttr('network'), float(inflowRate), float(self.numberOfIntervals),
                                              self.outputDirectory,
-                                             0, self.scipFile, self.cleanUpEnabled,
-                                             timeout))  # TODO: self.templateFile replaced by 0
+                                             self.templateFile, self.scipFile, self.cleanUpEnabled,
+                                             timeout))
         else:
             self.output("Starting computation of next flow interval")
         self.gttr('nashFlow').run(nextIntervalOnly)
@@ -1168,7 +1171,7 @@ class Interface(QtWidgets.QMainWindow, mainWdw.Ui_MainWindow):
         Opens ThinFlowComputation Tool
         :param moveGraph: network that should be moved, None if not specified
         """
-        # TODO: This has to been adapted to open tfType correctly
+        # TODO: This has to be adapted to open tfType correctly
         if not moveGraph:
             # Just open the application
             cmd = ['python', 'source/thinFlow_mainControl.py']
