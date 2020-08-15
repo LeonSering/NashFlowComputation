@@ -1,9 +1,11 @@
 # NashFlowComputation Tool
 
 ## Requirements
-[matplotlib](https://matplotlib.org/) >= 3.1.1
+[Python](https://python.org/) >= 3.7
 
-[numpy](https://numpy.org/) >= 1.17.4
+[matplotlib](https://matplotlib.org/) >= 3.1
+
+[numpy](https://numpy.org/) >= 1.17
 
 [networkx](https://networkx.github.io/) >= 2.4
 
