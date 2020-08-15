@@ -1171,7 +1171,6 @@ class Interface(QtWidgets.QMainWindow, mainWdw.Ui_MainWindow):
         Opens ThinFlowComputation Tool
         :param moveGraph: network that should be moved, None if not specified
         """
-        # TODO: This has to be adapted to open tfType correctly
         if not moveGraph:
             # Just open the application
             cmd = ['python', 'source/thinFlow_mainControl.py']
