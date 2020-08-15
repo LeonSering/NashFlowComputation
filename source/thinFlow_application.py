@@ -644,6 +644,10 @@ class Interface(QtWidgets.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
             except KeyError:
                 network[v][w]['TFC']['resettingEnabled'] = False
                 network[v][w]['TFC']['active'] = True
+            if network[v][w]['TFC']['resettingEnabled'] is None:
+                network[v][w]['TFC']['resettingEnabled'] = False
+            if network[v][w]['TFC']['active'] is None:
+                network[v][w]['TFC']['active'] = True
 
         if not graphPath:
             self.defaultLoadSaveDir = os.path.dirname(fopen)
