@@ -22,7 +22,7 @@ NFC was designed to run on Linux-based OS. If the packages below can be installe
 - [SCIP](https://www.scipopt.org/) >= 7.0
 
 ## Usage
-Run mainControl.py to open the GUI. For a full documentation see [here](TBD).
+Run mainControl.py to open the GUI.
 
 
 ## References
