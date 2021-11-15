@@ -94,6 +94,8 @@ class NormalizedThinFlow:
         if PRINT_TO_CONSOLE:
             # Print stdout to terminal
             print(stdOut)
+        if stdErr is not None:
+            print(stdErr)
 
     def write_zimpl_files(self):
         """Write the ZIMPL files"""
