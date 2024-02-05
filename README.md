@@ -16,6 +16,7 @@ enhanced within the TU Berlin/ECMath project [*Dynamic Models and Algorithms for
 ## Requirements
 NFC was designed to run on Linux-based OS. If the packages below can be installed, then the tool should run on other OS as well.
 - [Python](https://python.org/) >= 3.7
+- PyQt5
 - [matplotlib](https://matplotlib.org/) >= 3.1
 - [numpy](https://numpy.org/) >= 1.17
 - [networkx](https://networkx.github.io/) >= 2.4
