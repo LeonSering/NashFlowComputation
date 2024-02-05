@@ -10,7 +10,7 @@ based on [[2]](#references) and [[3]](#references).
 At the moment, NFC is only able to handle single-commodity flow networks. For a useful tool to compute multi-commodity flows 
 (although no equilibria), please check out [this repository](https://github.com/LeonSering/multi-commodity-flows-over-time). 
 
-NFC was developed being part of a bachelor thesis [[3]](#references) and then afterwards 
+NFC was developed being part of a bachelor thesis [[3]](#references) (found [here](/documentation/thesis.pdf)) and then afterwards 
 enhanced within the TU Berlin/ECMath project *Dynamic Models and Algorithms for Equilibria in Traffic Networks*.
 
 ## Requirements
