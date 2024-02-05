@@ -8,15 +8,15 @@ the basic case without spillback and due to [[2]](#references) in the case of sp
 based on [[2]](#references) and [[3]](#references).
 
 At the moment, NFC is only able to handle single-commodity flow networks. For a useful tool to compute multi-commodity flows 
-(although no equilibria), please check out [this repository](https://github.com/zimmer-m/multi-commodity-flows-over-time). 
+(although no equilibria), please check out [this repository](https://github.com/LeonSering/multi-commodity-flows-over-time). 
 
 NFC was developed being part of a bachelor thesis [[3]](#references) and then afterwards 
-enhanced within the TU Berlin/ECMath project [*Dynamic Models and Algorithms for Equilibria in Traffic Networks*](https://www.coga.tu-berlin.de/v_menue/projects/mi12/).
+enhanced within the TU Berlin/ECMath project *Dynamic Models and Algorithms for Equilibria in Traffic Networks*.
 
 ## Requirements
 NFC was designed to run on Linux-based OS. If the packages below can be installed, then the tool should run on other OS as well.
 - [Python](https://python.org/) >= 3.7
-- PyQt5
+- [PyQt5](https://pypi.org/project/PyQt5/) >= 5.15
 - [matplotlib](https://matplotlib.org/) >= 3.1
 - [numpy](https://numpy.org/) >= 1.17
 - [networkx](https://networkx.github.io/) >= 2.4
