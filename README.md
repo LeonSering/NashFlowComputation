@@ -1,4 +1,4 @@
-# Computing Nash Flows over Time and Thin flows
+# Computing Nash Flows Over Time and Thin flows
 The *NashFlowComputation Tool* (NFC) allows the computation of normalized thin flows with resetting and consequently Nash
 flows over time with or without spillback. 
 NFC, being embedded in a graphical user-interface, facilitates not only quick and easy creation of networks but 
@@ -26,6 +26,6 @@ Run mainControl.py to open the GUI.
 
 
 ## References
-- [1] Koch, Ronald, and Martin Skutella. "Nash equilibria and the price of anarchy for flows over time." Theory of Computing Systems 49.1 (2011): 71-97.
-- [2] Sering, Leon, and Laura Vargas Koch. "Nash flows over time with spillback." Proceedings of the Thirtieth Annual ACM-SIAM Symposium on Discrete Algorithms. Society for Industrial and Applied Mathematics, 2019.
+- [1] Koch, Ronald, and Skutella, Martin. "Nash equilibria and the price of anarchy for flows over time." Theory of Computing Systems 49.1 (2011): 71-97.
+- [2] Sering, Leon, and Vargas Koch, Laura. "Nash flows over time with spillback." Proceedings of the Thirtieth Annual ACM-SIAM Symposium on Discrete Algorithms. Society for Industrial and Applied Mathematics, 2019.
 - [3] Zimmer, Max. "Nash Flows Over Time: Models and Computation." Bachelor Thesis at TU Berlin (2017)
