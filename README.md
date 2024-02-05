@@ -1,5 +1,5 @@
-# Computing Nash Flows Over Time and Thin flows
-The *NashFlowComputation Tool* (NFC) allows the computation of normalized thin flows with resetting and consequently Nash
+# Computing Nash Flows Over Time and Thin Flows
+The *Nash Flow Computation Tool* (NFC) allows the computation of normalized thin flows with resetting and consequently Nash
 flows over time with or without spillback. 
 NFC, being embedded in a graphical user-interface, facilitates not only quick and easy creation of networks but 
 also the analysis of e.g. earliest arrival time functions and inflow functions in a dynamic
