@@ -22,7 +22,7 @@ NFC was designed to run on Linux-based OS.
 
 For Windows or Mac we recommend to use a virtual machine [VirtualBox](https://www.virtualbox.org) running [Ubuntu 20.04.4 Focal Fossa](https://www.osboxes.org/ubuntu/).
 
-## ## Install (Ubuntu)
+## Install (Ubuntu)
 
 The following is tested in with VirtualBox 7.0 running Ubuntu 20.04.4 Focal Fossa 64bit.
 
@@ -30,21 +30,21 @@ Open a terminal an run the following commands.
 
 1) Install **python3** (often already installed) and **git**:
 
-```bash
-sudo apt update && sudo apt install python3 git
-```
+   ```bash
+   sudo apt update && sudo apt install python3 git
+   ```
 
 2. Install python packages:
 
-```bash
-sudo apt install python3-pyqt5 python3-matplotlib python3-numpy python3-networkx
-```
+   ```bash
+   sudo apt install python3-pyqt5 python3-matplotlib python3-numpy python3-networkx
+   ```
 
 3. Clone the repository into a folder **NashFlowComputation**:
 
-```bash
-git clone https://github.com/LeonSering/NashFlowComputation.git
-```
+   ```bash
+   git clone https://github.com/LeonSering/NashFlowComputation.git
+   ```
 
 4. Download SCIP from the [SCIP download page](https://www.scipopt.org/index.php#download). Choose the newest Debian package (ends with .deb). Tested with [SCIPOptSuite-8.1.0-Linux-ubuntu.deb](https://www.scipopt.org/download.php?fname=SCIPOptSuite-8.1.0-Linux-ubuntu.deb).
 
@@ -56,15 +56,15 @@ git clone https://github.com/LeonSering/NashFlowComputation.git
 
 6. Go into the NashFlowComputation directory with
 
-```bash
-cd NashFlowComputation
-```
+   ```bash
+   cd NashFlowComputation
+   ```
 
   and open the GUI with:
 
-```bash
-python3 mainControl.py
-```
+   ```bash
+   python3 mainControl.py
+   ```
 
 7. Set the SCIP path by clickling "Select binary" and choose the scip binary which can often be found under /usr/bin/scip (otherwise you can find it by using the command ```whereis scip```).
 
