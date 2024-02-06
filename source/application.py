@@ -1173,7 +1173,7 @@ class Interface(QtWidgets.QMainWindow, mainWdw.Ui_MainWindow):
         """
         if not moveGraph:
             # Just open the application
-            cmd = ['python', 'source/thinFlow_mainControl.py']
+            cmd = ['python3', 'thinFlow_mainControl.py']
         else:
             # Open the application with a certain graph
             # Save the graph
@@ -1183,7 +1183,7 @@ class Interface(QtWidgets.QMainWindow, mainWdw.Ui_MainWindow):
             self.save_graph(graphPath=tmpFilePath)
             tmpFilePathArgument = tmpFilePath + '.cg'
 
-            cmd = ['python', 'source/thinFlow_mainControl.py', '-l', tmpFilePathArgument]
+            cmd = ['python3', 'thinFlow_mainControl.py', '-l', tmpFilePathArgument]
 
         def open_tfc_thread():
             self.proc = subprocess.Popen(cmd)

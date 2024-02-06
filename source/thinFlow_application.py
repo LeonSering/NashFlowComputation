@@ -748,7 +748,7 @@ class Interface(QtWidgets.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
 
         if not moveGraph:
             # Just open the application
-            cmd = ['python', '../mainControl.py']
+            cmd = ['python3', '../mainControl.py']
         else:
             # Open the application with a certain graph
             # Save the graph
@@ -758,7 +758,7 @@ class Interface(QtWidgets.QMainWindow, thinFlow_mainWdw.Ui_MainWindow):
             self.save_graph(graphPath=tmpFilePath)
             tmpFilePathArgument = tmpFilePath + '.cg'
 
-            cmd = ['python', '../mainControl.py', '-l', tmpFilePathArgument]
+            cmd = ['python3', '../mainControl.py', '-l', tmpFilePathArgument]
 
         def open_nfc_thread():
             self.proc = subprocess.Popen(cmd)
