@@ -54,13 +54,13 @@ Open a terminal an run the following commands.
    sudo apt install ./Downloads/SCIPOptSuite-8.1.0-Linux-ubuntu.deb 
    ```
 
-6. Go into the NashFlowComputation directory with
+6. Go into the NashFlowComputation directory with:
 
    ```bash
    cd NashFlowComputation
    ```
 
-  and open the GUI with:
+7. Open the GUI with:
 
    ```bash
    python3 mainControl.py
