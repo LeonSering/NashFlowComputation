@@ -78,11 +78,13 @@ Open a terminal and follow these steps:
 
 2. Create a graph by clicking on an existing node and drag the mouse to create an arc. At the end all nodes (in particular the sink t) must be reachable from the source s.
 
-3. Click on an edge to set the capacity and the transit times (and inflow and storage capacity for spillback networks). Don't forget to click "Update edge".
+3. Use the middle mouse to pan the canvas and use "Del" to delete the selected node or edge.
 
-4. Set the network inflow rate.
+4. Select an edge to set the "Capacity" and the "Transit times" (and inflow and storage capacity for spillback networks). Don't forget to click "Update edge".
 
-5. If the network is created, click on "Compute Nashflow" to start the computation.
+5. Set the network "Inflow Rate" to the desired value.
+
+6. If the network is created, click on "Compute Nashflow" to start the computation.
 
 #### Optional settings
 - For a larger network it is recommended to set "\# Intervals" to some positive value (for example 100) to obtain a result in a reasonable amount of time.
@@ -98,9 +100,9 @@ Open a terminal and follow these steps:
 
 #### Inspect the Nash Flow Over Time
 
-- Click on a node in the upper frame to inspect the earliest arrival time of that node.
+- Click on a node in the upper canvas to inspect the earliest arrival time of that node.
 
-- Click on an edge in the upper frame to inspect the cumulative in- and outflow the queue size and the edge load. Above the graphs the current queue is visualized.
+- Click on an edge in the upper canvas to inspect the cumulative in- and outflow the queue size and the edge load. Above the graphs the current queue is visualized.
 
 - You can hide graphs by clicking on the respective line in the legend.
 
@@ -110,9 +112,9 @@ Open a terminal and follow these steps:
 
 - You can also set a specific time. For example if you set the time to 10:
   
-  - The upper frame shows the current flow state at snapshot time 10. 
+  - The upper canvas shows the current flow state at snapshot time 10. 
   
-  - The thin flow in the lower frame shows that thin flow for the particle/agent that starts at time 10.
+  - The thin flow in the lower canvas shows that thin flow for the particle/agent that starts at time 10.
   
   - By default active edges with no thin flow are displayed. You can show them by disabling the "Show edges w/out flow"-checkbox.
 
@@ -128,13 +130,13 @@ Open a terminal and follow these steps:
   python3 thinFlow_mainControl.py
   ```
   
-  or by selecting "Open ThinFlowComputation" in the Options menu in the Nash Flow Computation Window.
+  or by selecting "Open ThinFlowComputation" in the "Options" menu in the Nash Flow Computation window.
 
-- It is also possible to move the network from the NashFlowComputation window to the ThinFlowComputation by choosing "Move current graph to ThinFlowComputation" in the Options menu.
+- It is also possible to move the network from the NashFlowComputation window to the ThinFlowComputation by choosing "Move current graph to ThinFlowComputation" in the "Options" menu.
 
 - Create the network in the upper canvas by drag and drop.
 
-- Set the Capacity and the Flow bound (only for spillback thin flows) for each edge (transit times do not play any role for thin flows as long as you only include active edges). Don't forget to press "Update edge".
+- Set the "Capacity" and the "Flow bound" (only for spillback thin flows) for each edge (transit times do not play any role for thin flows as long as you only include active edges). Don't forget to press "Update edge".
 
 - Set the status (active or resetting) of each edge. (Note that resetting edges are always active. However for the program an resetting edge that is not active is assumed to be non-active and ignored.)
 
@@ -142,9 +144,9 @@ Open a terminal and follow these steps:
 
 - Again there are three different algorithms for computing a non-spillback thin flow. All of them should output the same but my vary in the running time.
 
-- Set the inflow rate.
+- Set the "Inflow Rate" to the desired value.
 
-- Click on "Compute Thin Flow" if the network is ready.
+- Click on "Compute Thin Flow" when the network is ready.
 
 - The bottom canvas shows the computed thin flow. Next to each node is the $\ell'$ value and next to each node the $x'$ value.
 
