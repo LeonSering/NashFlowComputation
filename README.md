@@ -85,6 +85,8 @@ Open a terminal and follow these steps:
 5. If the network is created, click on "Compute Nashflow" to start the computation.
 
 #### Optional settings
+- For larger network it is recommended to set "\# Intervals" to some positive value (for example 100) to obtain a result in a reasonable amount of time.
+  More intervals can still be computed afterwards. For networks with infinite phases the default value of -1 (compute all intervals) will crash the applications.
 
 - You can rename and re-position nodes by clicking on them and editing the fields. Click "Update node" afterwards.
 
