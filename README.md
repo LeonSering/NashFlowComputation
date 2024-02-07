@@ -74,7 +74,7 @@ Open a terminal and follow these steps:
 
 #### Create the network and compute a Nash Flow Over Time
 
-1. First choose if you want to compute a Nash Flow Over Time with Spillback (choose Spillback) or without (choose General).
+1. First choose if you want to compute a Nash Flow Over Time with Spillback (choose "Spillback") or without (choose "General").
 
 2. Create a graph by clicking on an existing node and drag the mouse to create an arc. At the end all nodes (in particular the sink t) must be reachable from the source s.
 
