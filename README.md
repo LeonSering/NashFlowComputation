@@ -26,9 +26,9 @@ For Windows or Mac we recommend to use a virtual machine [VirtualBox](https://ww
 
 **Warning:** Newer Ubuntu version might not have Qt5 anymore and it can be tricky to install it. However, [this](https://stackoverflow.com/questions/74110674/problem-installing-qt5-default-on-ubuntu-22-04#:~:text=1%20Answer&text=Ubuntu%2022.04%20repository%20dont%20have,by%20installing%20the%20qtbase5-dev.) might help. Otherwise, it might be easier to set up a virtual machine with VirtualBox and follow the steps below within the VM.
 
-The following is tested in with VirtualBox 7.0 running Ubuntu 20.04.4 Focal Fossa 64bit.
+The following is tested in a virtual machine with VirtualBox 7.0 running Ubuntu 20.04.4 Focal Fossa 64bit.
 
-Open a terminal an run the following commands.
+Open a terminal and follow these steps:
 
 1) Install **python3** (often already installed) and **git**:
 
@@ -48,15 +48,15 @@ Open a terminal an run the following commands.
    git clone https://github.com/LeonSering/NashFlowComputation.git
    ```
 
-4. Download SCIP from the [SCIP download page](https://www.scipopt.org/index.php#download). Choose the newest Debian package (ends with .deb). Tested with [SCIPOptSuite-8.1.0-Linux-ubuntu.deb](https://www.scipopt.org/download.php?fname=SCIPOptSuite-8.1.0-Linux-ubuntu.deb).
+4. Download **SCIP** from the [SCIP download page](https://www.scipopt.org/index.php#download). Choose the newest Debian package (ends with .deb). Tested with [SCIPOptSuite-8.1.0-Linux-ubuntu.deb](https://www.scipopt.org/download.php?fname=SCIPOptSuite-8.1.0-Linux-ubuntu.deb).
 
-5. Install SCIP by either clicking on the SCIPOptSuite-8.1.0-Linux-ubuntu.deb or by
+5. Install **SCIP** by either clicking on **SCIPOptSuite-8.1.0-Linux-ubuntu.deb** or by
    
    ```bash
    sudo apt install ./Downloads/SCIPOptSuite-8.1.0-Linux-ubuntu.deb 
    ```
 
-6. Go into the NashFlowComputation directory with:
+6. Go into the **NashFlowComputation** directory with:
 
    ```bash
    cd NashFlowComputation
