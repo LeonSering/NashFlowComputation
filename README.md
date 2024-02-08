@@ -11,12 +11,12 @@ NFC was developed being part of a bachelor thesis [[3]](#references) (found [her
 
 NFC was designed to run on Linux-based OS.
 
-- [Python3](https://python.org/) >= 3.7
-- [PyQt5](https://pypi.org/project/PyQt5/) >= 5.15
-- [matplotlib](https://matplotlib.org/) >= 3.1
-- [numpy](https://numpy.org/) >= 1.17
+- [Python3](https://python.org/) >= 3.8.2
+- [PyQt5](https://pypi.org/project/PyQt5/) >= 5.14.1
+- [matplotlib](https://matplotlib.org/) >= 3.1.2
+- [numpy](https://numpy.org/) >= 1.17.4
 - [networkx](https://networkx.github.io/) >= 2.4
-- [SCIP](https://www.scipopt.org/) >= 7.0
+- [SCIP](https://www.scipopt.org/) >= 8.1.0
 
 ## Install (Windows / Mac)
 
@@ -69,6 +69,9 @@ Open a terminal and follow these steps:
    ```
 
 7. Set the SCIP path by clickling "Select binary" and choose the scip binary which can often be found under /usr/bin/scip (otherwise you can find it by using the command ```whereis scip```).
+
+If there are any errors, check the versions of the python packages with ```apt-cache policy <package_name>```. 
+To install the correct version use ```sudo apt install <package_name>=<version>``` with the version given in requirements-section.
 
 ## Usage
 
