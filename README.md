@@ -7,6 +7,8 @@ At the moment, NFC is only able to handle single-commodity flow networks. For a 
 
 NFC was developed being part of a bachelor thesis [[3]](#references) (found [here](/documentation/thesis.pdf)) and then afterwards enhanced within the TU Berlin/ECMath project *Dynamic Models and Algorithms for Equilibria in Traffic Networks*.
 
+As an example we provide the breass network with spillback for which the Nash flow over time consists of infinitly many phases, as it is described in [this paper](https://doi.org/10.4230/OASIcs.ATMOS.2023.11) by Ziemke, Nagel, and Sering.
+
 ## Requirements
 
 NFC was designed to run on Linux-based OS.
