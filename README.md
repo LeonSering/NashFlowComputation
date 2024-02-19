@@ -22,30 +22,51 @@ NFC was designed to run on Linux-based OS.
 
 ## Install (Windows / Mac)
 
-For Windows or Mac we recommend to use a virtual machine [VirtualBox](https://www.virtualbox.org) running [Ubuntu 20.04.4 Focal Fossa](https://www.osboxes.org/ubuntu/).
+For Windows or Mac we recommend to use a virtual machine [VirtualBox](https://www.virtualbox.org) running [Ubuntu 20.04.4 Focal Fossa](https://www.osboxes.org/ubuntu/). 
+
+To do so, first follow the guide to set up the Ubuntu virtual machine with VirtualBox. Then follow the installation guide for Ubuntu.
+
+#### VirtualBox Guide
+
+This guide has been tested with VirtualBox 7.0.
+
+1. In the main windows, choose "new" to create a new virtual machine.
+
+2. Type in some name and choose `Type: Linux` and `Version: Ubuntu (64bit)`. Keep `ISO Image` empty.
+
+3. Choose at least 4 GB of memory and 4 CPUs.
+
+4. Select "Use an Existing Virtual Hard Drive File" and open the "Hard Disk Selector".
+
+5. Add the `Ubuntu 20.04.4 (64bit).vdi` file downloaded from [www.osboxes.org](https://www.osboxes.org/ubuntu/).
+
+6. Finish the dialog.
+
+7. In the main windows: press `start` while the newly created virtual machine is selected to start it.
+
+8. The password of user `osboxes.org` is `osboxes.org`. This user has administration rights and the password needs to be entered for `sudo` commands.
 
 ## Install (Ubuntu)
 
-**Warning:** Newer Ubuntu version might not have Qt5 anymore and it can be tricky to install it. However, [this](https://stackoverflow.com/questions/74110674/problem-installing-qt5-default-on-ubuntu-22-04#:~:text=1%20Answer&text=Ubuntu%2022.04%20repository%20dont%20have,by%20installing%20the%20qtbase5-dev.) might help. Otherwise, it might be easier to set up a virtual machine with VirtualBox and follow the steps below within the VM.
+**Warning:** Newer Ubuntu version might not have Qt5 anymore and it can be tricky to install it. However, [this](https://stackoverflow.com/questions/74110674/problem-installing-qt5-default-on-ubuntu-22-04#:~:text=1%20Answer&text=Ubuntu%2022.04%20repository%20dont%20have,by%20installing%20the%20qtbase5-dev.) might help. Otherwise, this easiest way is to set up a virtual machine with VirtualBox (see above) and afterwards follow the steps below within the VM.
 
-The following is tested in a virtual machine with VirtualBox 7.0 running Ubuntu 20.04.4 Focal Fossa 64bit.
+The following has been tested in a virtual machine with VirtualBox 7.0 running Ubuntu 20.04.4 Focal Fossa 64bit.
 
 Open a terminal and follow these steps:
 
 1) Install **python3** (often already installed) and **git**:
-
+   
    ```bash
    sudo apt update && sudo apt install python3 git
    ```
-
 2. Install python packages:
-
+   
    ```bash
    sudo apt install python3-pyqt5 python3-matplotlib python3-numpy python3-networkx
    ```
 
 3. Clone the repository into a folder **NashFlowComputation**:
-
+   
    ```bash
    git clone https://github.com/LeonSering/NashFlowComputation.git
    ```
@@ -59,18 +80,18 @@ Open a terminal and follow these steps:
    ```
 
 6. Go into the **NashFlowComputation** directory with:
-
+   
    ```bash
    cd NashFlowComputation
    ```
 
 7. Open the GUI with:
-
+   
    ```bash
    python3 mainControl.py
    ```
 
-7. Set the SCIP path by clickling "Select binary" and choose the scip binary which can often be found under /usr/bin/scip (otherwise you can find it by using the command ```whereis scip```).
+8. Set the SCIP path by clickling "Select binary" and choose the scip binary which can often be found under /usr/bin/scip (otherwise you can find it by using the command ```whereis scip```).
 
 If there are any errors, check the versions of the python packages with ```apt-cache policy <package_name>```. 
 To install the correct version use ```sudo apt install <package_name>=<version>``` with the version given in requirements-section.
@@ -92,6 +113,7 @@ To install the correct version use ```sudo apt install <package_name>=<version>`
 6. If the network is created, click on "Compute Nashflow" to start the computation.
 
 #### Optional settings
+
 - For a larger network it is recommended to set "\# Intervals" to some positive value (for example 100) to obtain a result in a reasonable amount of time.
   More intervals can still be computed afterward. For networks with infinite phases, the default value of -1 (compute all intervals) will crash the application.
 
