@@ -7,7 +7,7 @@ At the moment, NFC is only able to handle single-commodity flow networks. For a 
 
 NFC was developed being part of a bachelor thesis [[3]](#references) (found [here](/documentation/thesis.pdf)) and then afterwards enhanced within the TU Berlin/ECMath project *Dynamic Models and Algorithms for Equilibria in Traffic Networks*.
 
-As an example we provide the breass network with spillback for which the Nash flow over time consists of infinitly many phases, as it is described in [this paper](https://doi.org/10.4230/OASIcs.ATMOS.2023.11) by Ziemke, Nagel, and Sering.
+As an example we provide the breass network with spillback for which the Nash flow over time consists of infinitly many phases, as it is described in [[5]](#references).
 
 ## Requirements
 
@@ -44,7 +44,7 @@ This guide has been tested with VirtualBox 7.0.
 
 7. In the main windows: press `start` while the newly created virtual machine is selected to start it.
 
-8. The password of user `osboxes.org` is `osboxes.org`. This user has administration rights and the password needs to be entered for `sudo` commands.
+8. The password of user `osboxes` is `osboxes.org`. This user has administration rights and the password needs to be entered for `sudo` commands.
 
 ## Install (Ubuntu)
 
@@ -179,7 +179,8 @@ To install the correct version use ```sudo apt install <package_name>=<version>`
 
 ## References
 
-- [1] Koch, Ronald, and Skutella, Martin. "Nash equilibria and the price of anarchy for flows over time." Theory of Computing Systems 49.1 (2011): 71-97. [link](https://doi.org/10.1007/s00224-010-9299-y)
-- [2] Sering, Leon, and Vargas Koch, Laura. "Nash flows over time with spillback." Proceedings of the Thirtieth Annual ACM-SIAM Symposium on Discrete Algorithms. Society for Industrial and Applied Mathematics, 2019. [link](https://doi.org/10.1137/1.9781611975482.57)
+- [1] Koch, Ronald, and Skutella, Martin. "Nash equilibria and the price of anarchy for flows over time." Theory of Computing Systems (2011) [link](https://doi.org/10.1007/s00224-010-9299-y)
+- [2] Sering, Leon, and Vargas Koch, Laura. "Nash flows over time with spillback." Proceedings of the Thirtieth Annual ACM-SIAM Symposium on Discrete Algorithms (2019) [link](https://doi.org/10.1137/1.9781611975482.57)
 - [3] Zimmer, Max. "Nash Flows Over Time: Models and Computation." Bachelor Thesis at TU Berlin (2017) [link](/documentation/thesis.pdf)
 - [4] Sering, Leon. "Nash flows over time." Dissertation (2020) [link](https://doi.org/10.14279/depositonce-10640)
+- [5] Ziemke, Theresa, and Sering. Leon, and Nagel, Kai. "Spillback Changes the Long-Term Behavior of Dynamic Equilibria in Fluid Queuing Networks." 23rd Symposium on Algorithmic Approaches for Transportation Modelling, Optimization, and Systems (2023) [link](https://doi.org/10.4230/OASIcs.ATMOS.2023.11)
