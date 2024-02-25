@@ -42,7 +42,7 @@ This guide has been tested with VirtualBox 7.0.
 
 6. Finish the dialog.
 
-7. In the main windows: press `start` while the newly created virtual machine is selected to start it.
+7. In the main windows: press `start` while the newly created virtual machine is selected to start it. A graphical user interface with a login mask should open. (If only a terminal opens something went wrong with the installation of the virtual machine or VirtualBox.)
 
 8. The password of user `osboxes` is `osboxes.org`. This user has administration rights and the password needs to be entered for `sudo` commands.
 
